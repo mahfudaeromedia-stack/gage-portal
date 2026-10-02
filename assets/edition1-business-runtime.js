@@ -1241,6 +1241,7 @@ function geTableSort(table,col,th){
   geTableApply(table);
 }
 function geEnhanceTable(table){
+  if(table?.dataset?.geTableStandardV1==='1')return;
   if(GETableState.has(table) || !table.tHead || !table.tBodies.length)return;
   const wrap=table.closest('.table-scroll,.card')||table.parentElement;
   const controls=document.createElement('div');
@@ -9847,7 +9848,7 @@ function gantt(rows,tp){
    const tip=`${esc(r.title||'-')} • PIC: ${esc(r.pic||'-')} • ${esc(r.start||'-')} – ${esc(r.due||'-')} • ${esc(r.status||'-')}`;
    return `<button class="ge-gantt-label-r13 ${r.kind.toLowerCase()}" data-gantt-id="${esc(r.id)}" onclick="geV2554OpenGanttItem('${esc(r.id)}')"><i class="${r.kind.toLowerCase()}"></i><span>${esc(r.title)}</span></button><button class="ge-gantt-deadline-r13" onclick="geV2554OpenGanttItem('${esc(r.id)}')">${esc(r.due||'—')}</button><div class="ge-gantt-track-r13">${todayLine}${intersects?`<button aria-label="${tip}" data-gantt-tip="${tip}" data-gantt-id="${esc(r.id)}" onclick="geV2554OpenGanttItem('${esc(r.id)}')" class="ge-gantt-bar-r13 ${r.kind.toLowerCase()}" style="left:${left}%;width:${width}%"></button>`:''}${deadline!==null?`<i class="ge-gantt-deadline-marker-r16 ${r.kind.toLowerCase()}" style="left:${deadline}%" aria-label="Deadline ${esc(r.due)}"></i>`:''}</div>`;
  }).join('')||'<div class="ge-gantt-empty-r13">Belum ada data.</div>';
- return `<div class="ge-gantt-r13"><div class="ge-gantt-title-r13"><div><b>Gantt Project Tracking</b><small>${min.toLocaleDateString('id-ID')} – ${max.toLocaleDateString('id-ID')}</small></div><div class="ge-gantt-legend-r13"><span class="initiative">Initiative</span><span class="milestone">Milestone</span><span class="activity">Activity</span></div></div><div class="ge-gantt-grid-r13"><div class="ge-gantt-head-r13 ge-gantt-project-head-r13"><button onclick="geGanttSortR13('title')">Project / Milestone / Activity${arrow('title')}</button><i class="ge-gantt-resize-r13" title="Geser untuk mengubah lebar kolom"></i></div><div class="ge-gantt-head-r13 ge-gantt-deadline-head-r13"><button onclick="geGanttSortR13('due')">Deadline${arrow('due')}</button></div><div class="ge-gantt-periods-r13">${heads}</div>${body}</div><div id="geGanttTooltipR17" class="ge-gantt-tooltip-r17" role="tooltip"></div></div>`;
+ return `<div class="ge-gantt-r13"><div class="ge-gantt-title-r13"><div><b>Gantt Project Tracking</b><small>${min.toLocaleDateString('id-ID')} – ${max.toLocaleDateString('id-ID')}</small></div><div class="ge-gantt-legend-r13"><span class="initiative">Initiative</span><span class="milestone">Milestone</span><span class="activity">Activity</span></div></div><div class="ge-gantt-grid-r13"><div class="ge-gantt-head-r13 ge-gantt-project-head-r13" role="button" tabindex="0" onclick="geGanttSortR13('title')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();geGanttSortR13('title')}">Project / Milestone / Activity${arrow('title')}<i class="ge-gantt-resize-r13" title="Geser untuk mengubah lebar kolom" onclick="event.stopPropagation()"></i></div><div class="ge-gantt-head-r13 ge-gantt-deadline-head-r13" role="button" tabindex="0" onclick="geGanttSortR13('due')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();geGanttSortR13('due')}">Deadline${arrow('due')}</div><div class="ge-gantt-periods-r13">${heads}</div>${body}</div><div id="geGanttTooltipR17" class="ge-gantt-tooltip-r17" role="tooltip"></div></div>`;
 }
 function geBindGanttTooltipR17(){
  const root=document.querySelector('.ge-gantt-r13'),tip=document.getElementById('geGanttTooltipR17');if(!root||!tip)return;
@@ -10035,3 +10036,17 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 
 })();
+
+/* R107 — Map Region filter uses Airport Master data and the same global searchable field. */
+window.geSyncMapMasterRegionV107=function(){
+  const sel=document.getElementById('mapMasterRegionV107');
+  if(!sel)return;
+  let rows=[];
+  try{rows=(window.GECore?.list?.('airports'))||window.GEStore?.get?.()?.airports||window.GXPortalStore?.airports||window.data?.airports||[]}catch(e){rows=[]}
+  const values=[...new Set(rows.map(x=>x.wilayah||x.region||x.networkRegion).filter(Boolean).map(String))].sort((a,b)=>a.localeCompare(b,'id'));
+  const current=sel.value||'';
+  sel.innerHTML='<option value="">All Regions</option>'+values.map(v=>`<option value="${geEsc(v)}">${geEsc(v)}</option>`).join('');
+  if(values.includes(current))sel.value=current;
+  sel.onchange=()=>{const v=sel.value||'';window.GEActiveMapRegion=v;try{GE_MAP_REGION=v}catch(e){}window.renderAirportMapMarkers?.();window.geApplyMapView?.();window.geUpdateMapRegionCounts?.()};
+};
+if(document.getElementById('mapMasterRegionV107'))setTimeout(window.geSyncMapMasterRegionV107,0);
