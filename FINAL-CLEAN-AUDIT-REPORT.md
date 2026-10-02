@@ -1,98 +1,106 @@
-# GE_Portal — CBNR CLEAN FINAL Audit Report
+# GE Portal — CBNR Clean UI Consolidation Audit
 
 Date: 2026-10-02
-Status: CLEAN FINAL candidate frozen after source cleanup and regression gate
+Status: **FULL CLEAN PACKAGE — UI CANONICAL REVISED**
 
 ## 1. Scope
 
-This cleanup was performed directly against the existing CBNR Canonical Consolidation Baseline. MAIN + TEST-1 were not reconsolidated, and no delta/overlay package was used as the working architecture.
+This revision continues from the existing CBNR baseline. It does **not** reconsolidate MAIN + TEST-1 and does not create a delta package.
 
-The objective was to preserve the already-proven canonical functionality while removing historical/process duplication and eliminating the unhealthy CSS override dependency.
+The work addresses the UI regressions identified during visual review:
 
-## 2. Before → After
+- inconsistent Lounge/Tenant and GHA visual standards;
+- legacy/custom dropdown treatment;
+- Grid/Details implemented as a select instead of the approved segmented control;
+- thin/over-weight button proportions;
+- dark/high-contrast guidance text inside form fields;
+- inconsistent Price Schedule typography and control height;
+- table sorting controls rendered as nested button-like areas instead of making the table header cell the sort target;
+- rounded legacy Gantt bars/cells;
+- inconsistent modal typography and layering;
+- Lounge/Tenant Service & Provider navigation placement;
+- duplicate Lounge runtime implementation.
 
-| Metric | Before cleanup | After cleanup |
+## 2. Canonical UI changes
+
+### Shared controls
+
+- Native `<select>` is now the default dropdown implementation.
+- Dropdown indicator is a filled navy triangle inside the field; there is no detached arrow button.
+- Dormant `global-select-standard.js` was removed because no production field used its opt-in marker.
+- Shared fields use one control height and one typography scale.
+- Placeholder/guidance text is muted; entered values remain normal text.
+- Buttons use one geometry: balanced height, padding and medium weight; danger actions are filled red with white text.
+
+### Grid / Details
+
+- Planning and Lounge/Tenant no longer use the legacy Grid View / Details View `<select>`.
+- Both use the same segmented Grid / Details control.
+- The control remains in the toolbar/header area rather than appearing below cards.
+
+### Sortable tables
+
+- Sorting remains a whole-header-cell interaction.
+- No nested sort button/pill/circle is introduced.
+- Sort state is represented by a small directional indicator in the header cell.
+
+### Modals
+
+- Canonical overlay manager continues to promote dialog backdrops to `document.body`.
+- Modal strata remain above the portal shell.
+- Title, subtitle/guidance, labels, fields and actions now use the same shared typography and control geometry.
+
+### Lounge/Tenant
+
+- Standalone `assets/lounge-planning-v29.js` was removed because its implementation was already consolidated into `assets/edition1-business-runtime.js`.
+- Registry no longer loads that duplicate runtime.
+- Add action is `Add`.
+- Grid/Details uses the shared segmented control.
+- `← Service & Provider` remains in the upper-right heading action area.
+- Form guidance is muted and explicitly differentiated from entered values.
+- Price Schedule typography and field/button heights are normalized.
+
+### GHA / Service Provider
+
+- Shared card geometry is normalized instead of maintaining a separate visual scale.
+- Card typography no longer uses oversized KPI values that distort page balance.
+
+### Gantt
+
+- Legacy rounded cell/bar treatment is removed from the canonical shared presentation.
+- Gantt bars use a restrained rectangular geometry.
+- Year/scale typography is normalized with the rest of the workspace.
+
+## 3. Cleanup measurements
+
+| Metric | Previous clean package | Current revision |
 |---|---:|---:|
-| Total files | 302 | 147 |
-| Source/runtime lines (assets + netlify JS/CSS/HTML/MJS) | 34,811 | 32,203 |
-| `portal.css` lines | 5,769* | 5,763 |
-| `!important` in `portal.css` | 4,384 | 0 |
-| `!important` in all external CSS | 4,794* | 0 |
-| `.patch` / `.diff` artifacts | 16 | 0 |
-| Revision/process documents | ~33 | consolidated into `HISTORICAL-BASELINE.md` |
-| Regression test files | many historical files | 1 canonical `tests/regression-gate.js` |
-| Root HTML | 2 | 2 (`app.html`, `login.html`) |
+| Files | 147 | **145** |
+| `.patch` / `.diff` artifacts | 0 | **0** |
+| CSS `!important` | 0 after previous cleanup | **0** |
+| `portal.css` lines | 5,763 previous | **5,755** |
+| CSS/JS/HTML source lines | 31,393 previous | **31,223** |
+| Dormant global searchable-select runtime | present | **removed** |
+| Standalone Lounge planning runtime | present | **removed / consolidated** |
 
-*Historical pre-clean measurements from the working baseline; exact current filesystem measurements are used for the after values.
+The remaining `!important` text found by a raw repository search is only a literal reference inside the consolidated regression-gate source describing the historical anti-pattern; it is **not CSS and is not emitted at runtime**. CSS itself contains zero `!important` declarations.
 
-## 3. CSS consolidation
+## 4. Regression
 
-The prior state contained thousands of `!important` declarations across the CSS stack. This was treated as a cascade/dependency problem, not as a number to hide with another override.
-
-The canonical external stylesheets were cleaned so that:
-
-- `assets/portal.css` contains **0** `!important`.
-- All external CSS under `assets/` contains **0** `!important`.
-- The pending-route inline style in `app.html` was also removed from `!important` usage.
-- The regression contracts that previously required literal `!important` tokens were changed to verify the required behavior/property instead of enforcing the implementation hack.
-- No new CSS override layer was introduced.
-
-A full removal trial was run before accepting the change. The complete canonical regression gate remained functionally green after the contracts were converted from implementation-specific `!important` checks to semantic CSS checks.
-
-## 4. Historical/process consolidation
-
-Historical revision/process material was consolidated rather than retained as runtime architecture.
-
-Removed from the final package:
-
-- `.patch` files
-- `.diff` files
-- patch/apply process artifacts
-- duplicate historical revision reports
-- scattered revision test files
-
-Retained historical traceability:
-
-- `HISTORICAL-BASELINE.md`
-- `CANONICAL-BASELINE-LEDGER.md`
-- `ROOT_MAP.md`
-- canonical regression gate
-
-## 5. Runtime/source architecture
-
-The final package retains the canonical two-HTML architecture:
-
-- `login.html`
-- `app.html`
-
-Business/runtime implementation remains in the canonical assets/functions structure. No duplicate HTML page family was reintroduced. The Master Data and Planning changes remain incorporated into the same CBNR baseline rather than delivered as a separate delta architecture.
-
-## 6. Regression result
-
-Command:
-
-`npm test`
-
-Result:
+Canonical regression gate:
 
 `CBNR_REGRESSION_GATE_PASS TESTS=55`
 
-All 55 consolidated contracts passed, including routing/readiness, Firebase/rules contracts, Master Data, Planning, Lounge/Tenant, cache/persistence, UI standardization, initiative CRUD, checklist sharing, and production deployment contracts.
+All 55 contracts pass, including Master Data, Planning, Lounge/Tenant, routing, Firebase/cache, modal layering, UI standardization, and checklist sharing contracts.
 
-## 7. Syntax / structural checks
+Syntax checks passed for the changed canonical JavaScript modules.
 
-- Canonical JavaScript syntax checks: PASS
-- Root HTML count: PASS — exactly 2
-- Patch/diff artifact count: PASS — 0
-- External CSS `!important` count: PASS — 0
-- Canonical regression gate: PASS — 55/55
+## 5. Browser validation limitation
 
-## 8. Browser validation limitation
+Interactive Chromium capture is not available in the current execution environment; therefore this report does **not** claim a full human-browser visual acceptance test. The UI changes are validated through canonical source inspection and the full regression gate.
 
-A headless Chromium smoke attempt was made in the environment, but the process did not complete within the available execution window. Therefore this report does **not** claim a full interactive browser PASS. The source-level regression gate and syntax/structural checks are green; interactive browser validation remains the explicit limitation of this environment.
+The package is intended for the user's next deployment/visual acceptance check. If a visual discrepancy remains, it must be corrected directly in this same CBNR baseline under the no-regression rule.
 
-## 9. CBNR status
+## 6. CBNR status
 
-This package is the intended CLEAN FINAL baseline for the current consolidation cycle. Future corrections must modify this same canonical baseline under CBNR and must rerun the full regression gate plus the targeted regression for the changed area.
-
-No MAIN + TEST-1 reconsolidation is required for ordinary future corrections.
+This package remains the **same full CBNR baseline**, revised in place. It is not a delta and does not require another MAIN + TEST-1 consolidation.

@@ -125,3 +125,14 @@ Rule: CBNR (Canonical Baseline No-Regression Rule)
 - `npm test`: `CBNR_REGRESSION_GATE_PASS TESTS=55`.
 - Final artifact count: 147 files; `.patch/.diff` count 0; root HTML remains `app.html` + `login.html`.
 - Browser interactive smoke could not complete within the environment timeout; this is recorded as a validation limitation, not claimed as PASS.
+
+## 2026-10-02 — UI Canonical Consolidation Follow-up
+
+- Continued from the existing CBNR baseline; no MAIN + TEST-1 reconsolidation.
+- Removed duplicate `assets/lounge-planning-v29.js`; its valid implementation was already consolidated into `assets/edition1-business-runtime.js`.
+- Removed dormant `assets/global-select-standard.js`; no production element used its opt-in marker.
+- Lounge/Tenant Grid/Details is now the shared segmented control, not a legacy select.
+- Default dropdown is native select with filled navy triangle treatment.
+- Shared button geometry, field geometry, muted placeholder/guidance typography, modal typography/layering, sortable whole-header-cell behavior and Gantt geometry are canonicalized in `assets/global-ui-canonical.css`.
+- `portal.css` contains zero `!important` declarations.
+- Full CBNR regression gate: `55/55 PASS`.
