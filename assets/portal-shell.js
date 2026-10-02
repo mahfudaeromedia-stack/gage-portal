@@ -182,7 +182,7 @@ async function shell(){
  const pov=dashboardPOV(s);
  const initials=(s.name||s.username||'GE').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
  const roleLabel=pov==='branch'?(s.unit||'Branch Office'):(pov==='ge-team'?'Ground Experience Team':(s.role||'User'));
- const context={superadmin:'Dashboard',admin:'Dashboard',management:'Dashboard','ge-team':'Ground Experience Team / Head Office Dashboard',branch:'Dashboard',external:'Partner / External Collaboration',unresolved:'Dashboard — Role Not Mapped'}[pov]||'Dashboard';
+ const context='Internal Service Experience';
  refs.top.innerHTML=`<button id="mobileNavTriggerV233" class="mobile-nav-trigger-v233 ge-iconbtn" type="button" aria-label="Menu">☰</button>
  <div class="ge-brand-logos"><img class="garuda" src="assets/garuda-horizontal-white.png" alt="Garuda Indonesia"><img class="danantara" src="assets/danantara-white-user.png" alt="Danantara Indonesia"></div>
  <div class="ge-title"><strong>GROUND EXPERIENCE PORTAL</strong><span>${context}</span></div>
