@@ -1356,7 +1356,7 @@ function prepareEligibleConfirmation(parsed){
         </label>
         <div class="confirm-actions">
           <button class="btn" onclick="recordEligibleVisitor()">Konfirmasi & Rekam Visitor</button>
-          <button class="btn secondary" onclick="closeEligibilityModal()">Batal</button>
+          <button class="btn secondary" onclick="closeEligibilityModal()">Cancel</button>
         </div>
       </div>`}
   </div>`;
@@ -3235,7 +3235,7 @@ function openPlanningRecordModal(type,id=null){
    }
    return`<label>${label}<input data-plan-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`;
   }).join('')
- }</div><div class="modal-actions sticky-actions"><button class="btn">Simpan</button><button type="button" class="btn secondary" onclick="closePlanningRecordModal()">Batal</button></div></form>`;
+ }</div><div class="modal-actions sticky-actions"><button class="btn">Simpan</button><button type="button" class="btn secondary" onclick="closePlanningRecordModal()">Cancel</button></div></form>`;
  document.getElementById('planningRecordModal').classList.add('show');
 }
 function closePlanningRecordModal(){document.getElementById('planningRecordModal')?.classList.remove('show')}
@@ -3448,8 +3448,8 @@ function geEnsureStationMaterialViewR65(){
  document.getElementById('materialTemplateR65')?.addEventListener('click',()=>{const csv='Kode Barang,Nama Barang Cetak Kestasiunan,Area,Provider,Mulai,Berakhir,Status\r\n';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='station-material-template.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
  document.getElementById('materialUploadR65')?.addEventListener('click',()=>openBulkImportV223('station-material'));
  document.getElementById('materialAddR65')?.addEventListener('click',()=>openStationMaterialModalV231());
- document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="stationMaterialModalV231"><div class="modal-card"><button class="modal-x" type="button" onclick="closeStationMaterialModalV231()">×</button><h2 id="stationMaterialModalTitleV231">Station Material</h2><input id="stationMaterialEditIdV231" type="hidden"><div class="formgrid"><label>Kode Barang<input id="stationMaterialCodeV231"></label><label>Nama Barang<input id="stationMaterialNameV231"></label><label>Area<input id="stationMaterialAreaV231"></label><label>Provider<input id="stationMaterialVendorV231"></label><label>Periode<input id="stationMaterialPeriodV231"></label><label>Mulai<input id="stationMaterialStartV246" type="date"></label><label>Berakhir<input id="stationMaterialEndV246" type="date"></label><label>Status<input id="stationMaterialStatusV231"></label><label>Dokumen<input id="stationMaterialFileV231" type="file"></label></div><div class="modal-actions"><button class="btn" type="button" onclick="saveStationMaterialV231()">Simpan</button><button class="btn secondary" type="button" onclick="closeStationMaterialModalV231()">Batal</button></div></div></div>
- <div class="modal-backdrop" id="bulkImportModalV223"><div class="modal-card bulk-import-modal-v223"><button class="modal-x" type="button" onclick="closeBulkImportV223()">×</button><h2 id="bulkImportTitleV223">Upload Data</h2><p id="bulkImportHelpV223"></p><input id="bulkImportFileV223" type="file" accept=".csv,.xlsx" onchange="previewBulkImportV223(this.files[0])"><div id="bulkImportPreviewV223"></div><div class="modal-actions"><button class="btn" id="bulkImportConfirmV223" type="button" disabled onclick="confirmBulkImportV243()">Import Data</button><button class="btn secondary" type="button" onclick="closeBulkImportV223()">Batal</button></div></div></div>`);
+ document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="stationMaterialModalV231"><div class="modal-card"><button class="modal-x" type="button" onclick="closeStationMaterialModalV231()">×</button><h2 id="stationMaterialModalTitleV231">Station Material</h2><input id="stationMaterialEditIdV231" type="hidden"><div class="formgrid"><label>Kode Barang<input id="stationMaterialCodeV231"></label><label>Nama Barang<input id="stationMaterialNameV231"></label><label>Area<input id="stationMaterialAreaV231"></label><label>Provider<input id="stationMaterialVendorV231"></label><label>Periode<input id="stationMaterialPeriodV231"></label><label>Mulai<input id="stationMaterialStartV246" type="date"></label><label>Berakhir<input id="stationMaterialEndV246" type="date"></label><label>Status<input id="stationMaterialStatusV231"></label><label>Dokumen<input id="stationMaterialFileV231" type="file"></label></div><div class="modal-actions"><button class="btn" type="button" onclick="saveStationMaterialV231()">Simpan</button><button class="btn secondary" type="button" onclick="closeStationMaterialModalV231()">Cancel</button></div></div></div>
+ <div class="modal-backdrop" id="bulkImportModalV223"><div class="modal-card bulk-import-modal-v223"><button class="modal-x" type="button" onclick="closeBulkImportV223()">×</button><h2 id="bulkImportTitleV223">Upload Data</h2><p id="bulkImportHelpV223"></p><input id="bulkImportFileV223" type="file" accept=".csv,.xlsx" onchange="previewBulkImportV223(this.files[0])"><div id="bulkImportPreviewV223"></div><div class="modal-actions"><button class="btn" id="bulkImportConfirmV223" type="button" disabled onclick="confirmBulkImportV243()">Import Data</button><button class="btn secondary" type="button" onclick="closeBulkImportV223()">Cancel</button></div></div></div>`);
  const panel=new URLSearchParams(location.search).get('panel');if(panel==='material')section.scrollIntoView({block:'start'});
 }
 function geRenderPlanningPage(){
@@ -5127,7 +5127,7 @@ function openGasoModalV231(type,id=null){
  gasoModalFormV231.innerHTML=`<form onsubmit="event.preventDefault();saveGasoV231()"><div class="formgrid">${GE_GASO_FIELDS_V231[type].map(([key,label,kind])=>{
   const val=x?.[key]??'';if(kind==='textarea')return`<label>${label}<textarea data-gaso-field="${key}" rows="3">${geEsc(val)}</textarea></label>`;
   if(kind.startsWith('select:'))return`<label>${label}<select data-gaso-field="${key}">${kind.slice(7).split('|').map(o=>`<option ${val===o?'selected':''}>${o}</option>`).join('')}</select></label>`;
-  return`<label>${label}<input data-gaso-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`}).join('')}</div><div class="modal-actions sticky-actions"><button class="btn">Simpan</button><button type="button" class="btn secondary" onclick="closeGasoModalV231()">Batal</button></div></form>`;
+  return`<label>${label}<input data-gaso-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`}).join('')}</div><div class="modal-actions sticky-actions"><button class="btn">Simpan</button><button type="button" class="btn secondary" onclick="closeGasoModalV231()">Cancel</button></div></form>`;
  gasoModalV231.classList.add('show');
 }
 function closeGasoModalV231(){gasoModalV231?.classList.remove('show')}
@@ -5880,7 +5880,7 @@ prepareEligibleConfirmation=function(parsed){
     eligibilityModalBody.innerHTML=`<div class="lounge-eligible-v236"><div class="lounge-modal-success-v236">✓</div><h2>Eligible Lounge/Tenant</h2><p>Konfirmasi kategori penumpang sebelum visitor direkam.</p>
     ${geParsedPassengerGridV236(parsed)}<div class="lounge-category-box-v236"><label>Kategori Penumpang<select id="eligibleCategoryV236" onchange="geEligibilityCategoryChangedV236()">${GE_LOUNGE_FINAL_CATEGORIES_V236.map(x=>`<option ${x===initial?'selected':''}>${x}</option>`).join('')}</select></label>
     <label id="eligibleReferenceWrapV236" style="display:none"><span id="eligibleReferenceLabelV236">Nomor Member</span><input id="eligibleReferenceV236"></label></div>
-    <div class="modal-actions"><button class="btn lounge-primary-v236" onclick="recordEligibleVisitorV236()">Konfirmasi & Rekam Visitor</button><button class="btn secondary" onclick="closeEligibilityModal()">Batal</button></div></div>`;
+    <div class="modal-actions"><button class="btn lounge-primary-v236" onclick="recordEligibleVisitorV236()">Konfirmasi & Rekam Visitor</button><button class="btn secondary" onclick="closeEligibilityModal()">Cancel</button></div></div>`;
     setTimeout(geEligibilityCategoryChangedV236,0);
   }
   eligibilityModal.classList.add('show');
@@ -6082,7 +6082,7 @@ function geManualFallbackMarkupV238(){
       <label>Sequence Check-in<input id="manualSeq" placeholder="107"></label><label>Ticket Number<input id="manualTicket" placeholder="126xxxxxxxxxxx"></label>
       <label>Member<select id="manualMember"><option value="">Tidak Ada / Lainnya</option><option>Platinum</option><option>Elite Plus</option></select></label>
     </div><div class="scanner-note lounge-note-v236">Eligibility dihitung otomatis: Cabin C/Business = Eligible. Cabin Y/Economy = Eligible untuk Platinum atau Elite Plus; kombinasi lain = Tidak Eligible.</div>
-    <div class="scan-actions"><button class="btn lounge-primary-v236" onclick="verifyManualPassenger()">Verifikasi Data Manual</button><button class="btn secondary" onclick="resetLoungeAccess()">Batal</button></div></div>`;
+    <div class="scan-actions"><button class="btn lounge-primary-v236" onclick="verifyManualPassenger()">Verifikasi Data Manual</button><button class="btn secondary" onclick="resetLoungeAccess()">Cancel</button></div></div>`;
 }
 toggleManualEntry=function(){
   stopCameraScanner?.();
@@ -7239,8 +7239,8 @@ function geApplyStandardContentV248(){
 
 function geEnsureStandardModalV248(){
   if(document.getElementById('standardContentModalV248')){gePromoteModalViewportV248(document.getElementById('standardContentModalV248'));gePromoteModalViewportV248(document.getElementById('announcementEditModalV248'));return}
-  document.body.insertAdjacentHTML('beforeend',`<div id="standardContentModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseStandardContentModalV248()">×</button><h2 id="standardContentModalTitleV248">Kelola Konten</h2><input type="hidden" id="standardContentModeV248"><input type="hidden" id="standardContentKeyV248"><div id="standardContentFieldsV248" class="formgrid"></div><div class="modal-actions sticky-actions"><button class="btn" onclick="geSaveStandardContentV248()">Simpan</button><button class="btn secondary" onclick="geCloseStandardContentModalV248()">Batal</button></div></div></div>
-  <div id="announcementEditModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseAnnouncementEditV248()">×</button><h2 id="announcementEditTitleV248">Tambah Announcement</h2><input type="hidden" id="announcementEditIdV248"><div class="formgrid"><label>Judul<input id="annTitleV248"></label><label>Touch Point<input id="annTouchpointV248"></label><label>Jenis / Type<input id="annTypeV248"></label><label>Aircraft Type<textarea id="annVariantsV248" rows="2" placeholder="Narrow Body\nWide Body"></textarea></label><label>Bahasa<textarea id="annLanguagesV248" rows="2" placeholder="Bahasa Indonesia\nEnglish"></textarea></label><label class="span2">Ringkasan / Isi<textarea id="annSummaryV248" rows="4"></textarea></label><label class="span2">Poin / Urutan Announcement<textarea id="annGroupsV248" rows="7" placeholder="Satu poin per baris"></textarea></label></div><div class="modal-actions sticky-actions"><button class="btn" onclick="geSaveAnnouncementV248()">Simpan Announcement</button><button class="btn secondary" onclick="geCloseAnnouncementEditV248()">Batal</button></div></div></div>`);
+  document.body.insertAdjacentHTML('beforeend',`<div id="standardContentModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseStandardContentModalV248()">×</button><h2 id="standardContentModalTitleV248">Kelola Konten</h2><input type="hidden" id="standardContentModeV248"><input type="hidden" id="standardContentKeyV248"><div id="standardContentFieldsV248" class="formgrid"></div><div class="modal-actions sticky-actions"><button class="btn" onclick="geSaveStandardContentV248()">Simpan</button><button class="btn secondary" onclick="geCloseStandardContentModalV248()">Cancel</button></div></div></div>
+  <div id="announcementEditModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseAnnouncementEditV248()">×</button><h2 id="announcementEditTitleV248">Tambah Announcement</h2><input type="hidden" id="announcementEditIdV248"><div class="formgrid"><label>Judul<input id="annTitleV248"></label><label>Touch Point<input id="annTouchpointV248"></label><label>Jenis / Type<input id="annTypeV248"></label><label>Aircraft Type<textarea id="annVariantsV248" rows="2" placeholder="Narrow Body\nWide Body"></textarea></label><label>Bahasa<textarea id="annLanguagesV248" rows="2" placeholder="Bahasa Indonesia\nEnglish"></textarea></label><label class="span2">Ringkasan / Isi<textarea id="annSummaryV248" rows="4"></textarea></label><label class="span2">Poin / Urutan Announcement<textarea id="annGroupsV248" rows="7" placeholder="Satu poin per baris"></textarea></label></div><div class="modal-actions sticky-actions"><button class="btn" onclick="geSaveAnnouncementV248()">Simpan Announcement</button><button class="btn secondary" onclick="geCloseAnnouncementEditV248()">Cancel</button></div></div></div>`);
   gePromoteModalViewportV248(document.getElementById('standardContentModalV248'));
   gePromoteModalViewportV248(document.getElementById('announcementEditModalV248'));
 }
@@ -7323,7 +7323,7 @@ function geV251Ensure(){
 function geV251ReadImage(file,cb){if(!file)return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file)}
 function geV251EditVisual(key){if(!geV251Admin())return;const s=geV251Ensure().visuals[key];geV251OpenEditor('Edit Referensi Visual',s,(v)=>{Object.assign(s,v);save();geV251RenderTouchpointPage()})}
 function geV251OpenEditor(title,obj,onSave){
- let m=document.getElementById('geV251Editor');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Editor" class="modal-backdrop"><div class="modal-card"><button class="modal-x" onclick="geV251CloseEditor()">×</button><h2 id="geV251EditorTitle"></h2><div class="formgrid"><label>Judul<input id="geV251EdTitle"></label><label class="span2">Keterangan<textarea id="geV251EdCaption" rows="4"></textarea></label><label class="span2">Gambar<input id="geV251EdFile" type="file" accept="image/*"></label></div><div class="modal-actions"><button class="btn" id="geV251EdSave">Simpan</button><button class="btn secondary" onclick="geV251CloseEditor()">Batal</button></div></div></div>`);m=document.getElementById('geV251Editor')}
+ let m=document.getElementById('geV251Editor');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Editor" class="modal-backdrop"><div class="modal-card"><button class="modal-x" onclick="geV251CloseEditor()">×</button><h2 id="geV251EditorTitle"></h2><div class="formgrid"><label>Judul<input id="geV251EdTitle"></label><label class="span2">Keterangan<textarea id="geV251EdCaption" rows="4"></textarea></label><label class="span2">Gambar<input id="geV251EdFile" type="file" accept="image/*"></label></div><div class="modal-actions"><button class="btn" id="geV251EdSave">Simpan</button><button class="btn secondary" onclick="geV251CloseEditor()">Cancel</button></div></div></div>`);m=document.getElementById('geV251Editor')}
  geV251EditorTitle.textContent=title;geV251EdTitle.value=obj.title||'';geV251EdCaption.value=obj.caption||'';geV251EdFile.value='';geV251EdSave.onclick=()=>{const done=(img)=>{onSave({title:geV251EdTitle.value.trim(),caption:geV251EdCaption.value.trim(),image:img||obj.image||''});geV251CloseEditor()};const f=geV251EdFile.files[0];f?geV251ReadImage(f,done):done(obj.image)};m.classList.add('show')
 }
 function geV251CloseEditor(){document.getElementById('geV251Editor')?.classList.remove('show')}
@@ -7389,7 +7389,7 @@ function geV251C1EnsureTPModal(){
       </div>
       <div class="ge-tp-photo-head-v251c1"><b>Gallery Touch Point</b><span>Caption dapat berbeda untuk setiap foto.</span></div>
       <div id="geV251C1TPPhotoList" class="ge-tp-photo-list-v251c1"></div>
-      <div class="modal-actions sticky-actions"><button class="btn" onclick="geV251C1SaveTP()">Simpan</button><button class="btn secondary" onclick="geV251C1CloseTPEditor()">Batal</button></div>
+      <div class="modal-actions sticky-actions"><button class="btn" onclick="geV251C1SaveTP()">Simpan</button><button class="btn secondary" onclick="geV251C1CloseTPEditor()">Cancel</button></div>
     </div></div>`);
   m=document.getElementById('geV251C1TPEditor');
   document.getElementById('geV251C1TPFiles').addEventListener('change',e=>{
@@ -8969,7 +8969,7 @@ function doImport(){
 window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiativeControls();bindCalendar();ensureBulk();window.geV2554BindGantt?.()},80));
 })();
 
-/* SOURCE: assets/lounge-planning-v29.js */
+/* SOURCE: consolidated Lounge/Tenant Planning implementation */
 /* Ground Experience P29 — Lounge/Tenant planning, shared input contract,
    multi-period pricing and defensive rendering. No production migration. */
 (function(){
@@ -9221,19 +9221,19 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     return `<div class="formgrid ge-p29-form-grid">
       <label>Region<select id="${prefix}Region"><option value="">Pilih Region</option><option ${m.region==='WEST'?'selected':''}>WEST</option><option ${m.region==='EAST'?'selected':''}>EAST</option><option ${m.region==='INT'?'selected':''}>INT</option></select></label>
       <label>Station<select id="${prefix}Airport" required><option value="">Pilih Station</option>${airports().filter(a=>a.status!=='Inactive').map(a=>`<option value="${esc(a.code)}" ${String(m.airport||'').toUpperCase()===String(a.code).toUpperCase()?'selected':''}>${esc(a.code+(a.airportName?' — '+a.airportName:''))}</option>`).join('')}</select></label>
-      <label>Nama Layanan / Provider<input id="${prefix}Name" required value="${esc(m.name||'')}"></label>
+      <label>Nama Layanan / Provider<input id="${prefix}Name" required value="${esc(m.name||'')}" placeholder="Masukkan nama layanan / provider"></label>
       <label>Jenis Layanan<select id="${prefix}ServiceType" required><option value="">Pilih Jenis Layanan</option>${TYPES.map(t=>`<option value="${t}" ${m.serviceType===t?'selected':''}>${t}</option>`).join('')}</select></label>
-      <label>PIC<input id="${prefix}Pic" value="${esc(m.pic||'')}"></label>
+      <label>PIC<input id="${prefix}Pic" value="${esc(m.pic||'')}" placeholder="Pilih atau masukkan PIC"></label>
       <label>Record / Agreement Action<select id="${prefix}AgreementAction"><option value="new" ${!m.supersedesId?'selected':''}>New / Existing Active Agreement</option><option value="replacement" ${m.agreementAction==='replacement'?'selected':''}>Replacement</option><option value="amendment" ${m.agreementAction==='amendment'?'selected':''}>Amendment</option><option value="extension" ${m.agreementAction==='extension'?'selected':''}>Extension / Renewal</option></select></label>
       <label>Replaces Record ID<input id="${prefix}SupersedesId" value="${esc(m.supersedesId||'')}" placeholder="Isi bila menggantikan record lama"></label>
       <label>Agreement Start Date<input id="${prefix}Start" type="date" value="${esc(m.startDate||'')}"></label>
       <label>Agreement End Date<input id="${prefix}End" type="date" value="${esc(m.endDate||'')}"></label>
       <label>Mata Uang (single price)<input id="${prefix}Currency" maxlength="3" value="${esc(m.currency||'')}" placeholder="IDR"></label>
       <label>Harga Per Pax (single price)<input id="${prefix}Price" type="number" min="0" step="0.01" value="${m.pricePerPax?esc(m.pricePerPax):''}"></label>
-      <label>Nomor Dokumen / Agreement Identity<input id="${prefix}DocumentNumber" value="${esc(m.documentNumber||'')}"></label>
-      <label>Jenis Dokumen<input id="${prefix}DocumentType" value="${esc(m.documentType||'')}"></label>
+      <label>Nomor Dokumen / Agreement Identity<input id="${prefix}DocumentNumber" value="${esc(m.documentNumber||'')}" placeholder="Masukkan nomor agreement / dokumen"></label>
+      <label>Jenis Dokumen<input id="${prefix}DocumentType" value="${esc(m.documentType||'')}" placeholder="Contoh: Agreement / Contract"></label>
       <label>Status Dokumen<input id="${prefix}DocumentStatus" list="geP29StatusOptions" value="${esc(m.documentStatus||'Valid')}"><datalist id="geP29StatusOptions">${STATUS_VALUES.map(s=>`<option value="${s}">`).join('')}</datalist></label>
-      <label class="ge-p29-span2">Remarks<textarea id="${prefix}Remarks" rows="3">${esc(m.remarks||'')}</textarea></label>
+      <label class="ge-p29-span2">Remarks<textarea id="${prefix}Remarks" rows="3" placeholder="Tambahkan catatan bila diperlukan">${esc(m.remarks||'')}</textarea></label>
     </div>
     <section class="ge-p29-price-section">
       <div class="ge-p29-section-head"><div><b>Price Schedule</b><small>Opsional. Gunakan ini bila satu Agreement memiliki lebih dari satu periode harga. Agreement Start/End tetap menjadi periode Agreement.</small></div><button type="button" class="btn secondary compact-btn" onclick="geP29AddPriceRow('${prefix}Prices')">+ Add Price Period</button></div>
@@ -9266,9 +9266,9 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     const modal=document.getElementById(id);if(!modal)return;
     const card=modal.querySelector('.modal-card');if(!card)return;
     card.innerHTML=`<button class="modal-x" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">×</button>
-      <h2>${esc(title)}</h2><p class="section-subtitle">Satu struktur data untuk Add, Update, dan CSV. Lounge dan Tenant tetap merupakan Service Type yang berbeda.</p>
+      <h2>${esc(title)}</h2><p class="section-subtitle">Lengkapi data layanan. Teks abu-abu di dalam field adalah panduan dan bukan nilai data.</p>
       <form id="${prefix}Form"><div id="${prefix}Errors"></div>${commonFormMarkup(prefix,model)}
-      <div class="modal-actions sticky-actions"><button class="btn" type="submit">${id==='loungeAddModalV221'?'Simpan Layanan':'Simpan Update'}</button><button class="btn secondary" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">Batal</button></div></form>`;
+      <div class="modal-actions sticky-actions"><button class="btn" type="submit">${id==='loungeAddModalV221'?'Save':'Save Changes'}</button><button class="btn secondary" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">Cancel</button></div></form>`;
     renderPriceRows(prefix+'Prices',model?.priceSchedules||[]);
     renderCapacityRows(prefix+'Capacity',model?.capacitySchedules||[]);
     document.getElementById(prefix+'Form').addEventListener('submit',e=>{e.preventDefault();id==='loungeAddModalV221'?saveAdd(prefix):saveEdit(prefix)});
@@ -9277,7 +9277,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
 
   window.openLoungeAddModalV230=function(){
     if(!canCreate())return;
-    state.editId=null;replaceModalContent('loungeAddModalV221','Tambah Layanan Lounge/Tenant','geP29Add',{});
+    state.editId=null;replaceModalContent('loungeAddModalV221','Add Lounge/Tenant Service','geP29Add',{});
   };
   window.closeLoungeAddModalV221=function(){document.getElementById('loungeAddModalV221')?.classList.remove('show')};
   window.openLoungeEdit=function(id){
@@ -9287,7 +9287,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     state.editId=x.id;
     const model={...x,serviceType:rt.value};
     if(Array.isArray(x.priceSchedules)&&x.priceSchedules.length){model.pricePerPax='';model.currency='';model.priceDisplay='';}
-    replaceModalContent('loungeEditModal','Update Layanan Lounge/Tenant','geP29Edit',model);
+    replaceModalContent('loungeEditModal','Edit Lounge/Tenant Service','geP29Edit',model);
     if(rt.status==='REVIEW')setFormError('geP29Edit',[rt.reason+'; koreksi melalui Update sebelum menyimpan.']);
   };
   window.closeLoungeEdit=function(){document.getElementById('loungeEditModal')?.classList.remove('show')};
@@ -9868,47 +9868,23 @@ window.geInitAirportCanonical=function(){const rows=(typeof geAirportVisibleRows
 })();
 
 
-/* Canonical view controls shared by Initiative and Lounge/Tenant. */
+/* Canonical shared view controls — Grid/Details uses one segmented control. */
 (function(){
- window.geSetLoungeViewR6=function(view){const detail=view==='detail',grid=document.getElementById('loungeCardGridV237'),table=document.querySelector('.lounge-table-fallback-v237'),pager=document.getElementById('loungeCardPageInfoV237')?.parentElement;if(grid)grid.style.display=detail?'none':'';if(table){table.classList.toggle('ge-p29-table-visible',detail);table.style.removeProperty('display');}if(pager)pager.style.display=detail?'none':'';};
- const oldRender=window.renderLounges; if(oldRender)window.renderLounges=function(){oldRender();const v=document.getElementById('geLoungeViewSelectR6')?.value||'grid';window.geSetLoungeViewR6(v)};
-})();
-
-
-/* R12 CANONICAL UI CONTRACT — replaces obsolete mutation behavior; no parallel data model. */
-(function(){
-'use strict';
-const esc12=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function ensureInitiativeCanonicalFields(){
- const modal=document.getElementById('initiativeModalV224'); if(!modal)return;
- const ensure=(hiddenId,pickerId,labelText)=>{const hidden=document.getElementById(hiddenId);if(hidden){hidden.type='hidden';hidden.removeAttribute('multiple');hidden.removeAttribute('size');hidden.style.display='none';}let host=document.getElementById(pickerId);if(!host&&hidden?.parentElement){host=document.createElement('div');host.id=pickerId;host.className='ge-picker-r11';hidden.parentElement.insertBefore(host,hidden);}return host;};
- ensure('initiativeAirportV224','initiativeStationPickerR11','Station / Area');
- ensure('initiativeJourneyV224','initiativeJourneyPickerR11','Journey Scope');
- ensure('initiativeTouchpointV224','initiativeTouchpointPickerR11','Touch Point');
-}
-const open0=window.openInitiativeModalV224;
-window.openInitiativeModalV224=function(id=null){ensureInitiativeCanonicalFields();return open0?.(id)};
-window.geEnsureInitiativeCanonicalFieldsR12=ensureInitiativeCanonicalFields;
-
-function installSearchableSelect(select){
- if(window.GEGlobalSelect)return;
- if(!select||select.multiple||select.dataset.comboR12)return;select.dataset.comboR12='1';
- const wrap=document.createElement('div');wrap.className='ge-combo-r12';
- const input=document.createElement('input');input.type='text';input.className='ge-combo-input-r12';input.placeholder=select.options[0]?.textContent||'Pilih atau ketik...';input.autocomplete='off';
- const toggle=document.createElement('button');toggle.type='button';toggle.className='ge-combo-toggle-r12';toggle.setAttribute('aria-label','Buka pilihan');toggle.textContent='⌄';
- const menu=document.createElement('div');menu.className='ge-combo-menu-r12';
- select.parentNode.insertBefore(wrap,select);wrap.append(input,toggle,menu,select);select.classList.add('ge-combo-source-r12');
- const render=()=>{const q=input.value.trim().toLowerCase(),opts=[...select.options].filter((o,i)=>i>0&&(!q||o.textContent.toLowerCase().includes(q)));menu.innerHTML=opts.length?opts.map(o=>`<button type="button" data-value="${esc12(o.value)}">${esc12(o.textContent)}</button>`).join(''):'<div class="ge-combo-empty-r12">Tidak ada pilihan yang cocok.</div>';menu.querySelectorAll('button').forEach(b=>b.onclick=()=>{select.value=b.dataset.value;input.value=b.textContent;menu.classList.remove('show');select.dispatchEvent(new Event('change',{bubbles:true}))})};
- const open=()=>{render();menu.classList.add('show')};toggle.onclick=()=>menu.classList.toggle('show')?render():null;input.onfocus=open;input.oninput=()=>{select.value='';open();select.dispatchEvent(new Event('change',{bubbles:true}))};
- document.addEventListener('pointerdown',e=>{if(!wrap.contains(e.target))menu.classList.remove('show')});
- select.addEventListener('change',()=>{const o=select.selectedOptions?.[0];if(o&&select.value)input.value=o.textContent;else if(!select.value&&document.activeElement!==input)input.value=''});
-}
-window.geInstallLoungeFiltersR12=function(){
- const free=document.getElementById('loungeFilterTextR6');if(free)free.remove();
- ['loungeRegionFilter','loungeAirportFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>installSearchableSelect(document.getElementById(id)));
-};
-const lounge0=window.renderLounges;
-if(lounge0)window.renderLounges=function(){const r=lounge0();window.geInstallLoungeFiltersR12();const v=document.getElementById('geLoungeViewSelectR6')?.value||'grid';window.geSetLoungeViewR6?.(v);return r};
+  'use strict';
+  function applyLoungeView(view){
+    const detail=view==='detail';
+    const grid=document.getElementById('loungeCardGridV237');
+    const table=document.querySelector('.lounge-table-fallback-v237');
+    const pager=document.getElementById('loungeCardPageInfoV237')?.parentElement;
+    if(grid)grid.hidden=detail;
+    if(table){table.hidden=!detail;table.classList.toggle('ge-p29-table-visible',detail)}
+    if(pager)pager.hidden=detail;
+    document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  }
+  window.geSetLoungeViewP87=applyLoungeView;
+  window.geSetLoungeViewR6=applyLoungeView;
+  window.geLoungeViewSelectR6=view=>applyLoungeView(view);
+  window.geInstallLoungeFiltersR12=function(){ return true; };
 })();
 
 /* R19 — consolidated interaction fixes: planning actions + canonical list/detail views. */
@@ -9920,19 +9896,14 @@ function byId(id){return document.getElementById(id)}
   try{ if(typeof eval(name)==='function') window[name]=eval(name); }catch(_e){}
 });
 function setLoungeView(view){
- const detail=view==='detail';
- window.GE_LOUNGE_VIEW_R19=detail?'detail':'grid';
- const grid=byId('loungeCardGridV237'), table=document.querySelector('.lounge-table-fallback-v237');
- const pager=byId('loungeCardPageInfoV237')?.parentElement;
- if(grid)grid.hidden=detail;
- if(table){table.classList.toggle('ge-p29-table-visible',detail);table.hidden=!detail;}
- if(pager)pager.hidden=detail;
- const sel=byId('geLoungeViewSelectR6');if(sel&&sel.value!==window.GE_LOUNGE_VIEW_R19)sel.value=window.GE_LOUNGE_VIEW_R19;
+ const v=view==='detail'?'detail':'grid';
+ window.GE_LOUNGE_VIEW_R19=v;
+ window.geSetLoungeViewP87?.(v);
 }
 window.geSetLoungeViewR6=setLoungeView;
 function bindLoungeView(){
- const sel=byId('geLoungeViewSelectR6');if(sel&&!sel.dataset.r19){sel.dataset.r19='1';sel.onchange=()=>setLoungeView(sel.value);}
- setLoungeView(window.GE_LOUNGE_VIEW_R19||sel?.value||'grid');
+ document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(b=>{if(b.dataset.r19)return;b.dataset.r19='1';b.onclick=()=>setLoungeView(b.dataset.view)});
+ setLoungeView(window.GE_LOUNGE_VIEW_R19||'grid');
 }
 function setInitiativeView(view){
  window.GE_INITIATIVE_VIEW_R4=view==='list'?'list':'grid';

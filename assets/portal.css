@@ -1051,18 +1051,10 @@ body,button,input,select,textarea,table{
   grid-template-columns:1fr;
   gap:16px;
 }
-.provider-kpi{
-  min-height:0;
-  padding:24px 28px;
-  display:grid;
-  grid-template-columns:1fr auto;
-  grid-template-rows:auto auto;
-  align-items:center;
-  column-gap:22px;
-}
+.provider-kpi{min-height:0;padding:18px 20px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center;column-gap:18px;border:1px solid #d6e0e9;border-radius:10px;background:#fff;box-shadow:0 5px 16px rgba(20,50,75,.06)}
 .provider-kpi .provider-label{margin:0;grid-column:1}
-.provider-kpi b{font-size:38px;color:#0b6fa8;grid-column:2;grid-row:1/3}
-.provider-kpi small{color:var(--muted);font-size:13px;grid-column:1}
+.provider-kpi b{font-size:24px;font-weight:600;color:#18364f;grid-column:2;grid-row:1/3}
+.provider-kpi small{color:#8a99a7;font-size:11px;font-weight:400;grid-column:1}
 
 /* Compact expired-contract alert: summary only */
 .lounge-expiry-warning.compact{padding:22px 26px}
@@ -4839,16 +4831,16 @@ html body.final-v257.final-shell-r5 .ge-dash-readiness .donut{background:conic-g
 .ge-p29-lounge-card .lounge-card-actions-v237 .btn{min-height:32px;height:auto;padding:7px 10px;font-size:9px}
 .ge-p29-price-section{margin-top:14px;padding:14px;border:1px solid #D9E4E8;border-radius:13px;background:#F8FAFB}
 .ge-p29-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
-.ge-p29-section-head b{display:block;color:#15394D;font-size:12px}
-.ge-p29-section-head small{display:block;max-width:650px;margin-top:3px;color:#748B96;font-size:9px;line-height:1.45}
+.ge-p29-section-head b{display:block;color:#18364f;font-size:13.5px;font-weight:600}
+.ge-p29-section-head small{display:block;max-width:650px;margin-top:4px;color:#8a99a7;font-size:11px;font-weight:400;line-height:1.45}
 .ge-p29-price-rows{display:grid;gap:10px}
 .ge-p29-price-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:9px;padding:11px;border:1px solid #DCE6EA;border-radius:11px;background:#fff;align-items:end}
-.ge-p29-price-row label{font-size:9px;font-weight:750;color:#506779}
-.ge-p29-price-row input{margin-top:5px;min-height:34px;padding:8px 9px;font-size:10px}
-.ge-p29-price-row .ge-p29-remove-price{min-height:34px;height:34px}
-.ge-p29-input-note{margin-top:9px;color:#748B96;font-size:9px;line-height:1.45}
+.ge-p29-price-row label{font-size:11.5px;font-weight:600;color:#607386}
+.ge-p29-price-row input{margin-top:5px;min-height:40px;padding:0 11px;font-size:13px;font-weight:400}
+.ge-p29-price-row .ge-p29-remove-price{min-height:40px;height:40px}
+.ge-p29-input-note{margin-top:9px;color:#9aa8b5;font-size:11px;font-weight:400;line-height:1.45}
 .ge-p29-span2{grid-column:1/-1}
-.ge-p29-file-field{display:block;margin-top:12px;font-size:10px;font-weight:750;color:#506779}
+.ge-p29-file-field{display:block;margin-top:12px;font-size:11.5px;font-weight:600;color:#607386}
 .ge-p29-file-field input{margin-top:5px}
 .ge-p29-form-grid{gap:11px 13px}
 .ge-p29-form-errors{margin-bottom:11px;padding:10px 12px;border:1px solid #E7BBB6;border-left:3px solid #A6463E;border-radius:9px;background:#FCE9E6;color:#7C302A;font-size:10px}
