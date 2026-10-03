@@ -271,3 +271,176 @@ html body.final-v257.final-shell-r5 .ge-title span{font-size:12px;line-height:1.
 html body.final-v257.final-shell-r5 .ge-session .filter{height:40px;min-width:132px;padding:0 10px;border:0;border-radius:8px;background:rgba(255,255,255,.06)}
 html body.final-v257.final-shell-r5 .ge-session .filter span{font-size:11px;color:#dbe8f7;font-weight:500}
 html body.final-v257.final-shell-r5 .ge-session .filter select{height:38px;min-height:38px;min-width:58px;font-size:13px;font-weight:600;color:#fff;border:0;outline:0;background:transparent;padding:0 14px 0 0}
+
+
+/* CBNR R4 — single global UI contract. These are the canonical component rules;
+   page-specific CSS must not redefine the same control geometry. */
+:root{
+  --ge-control-h:48px;
+  --ge-control-radius:10px;
+  --ge-border:#0b376d;
+  --ge-text:#17324d;
+  --ge-muted:#7187a0;
+  --ge-surface:#fff;
+  --ge-soft:#f5f8fc;
+}
+.ge-filter-grid,
+.ge-toolbar-row,
+.ge-submission-toolbar,
+.lounge-filter-grid-ref{
+  align-items:center;
+  display:grid;
+  gap:14px;
+}
+.ge-filter-grid > label,
+.ge-filter-grid > .ge-field,
+.ge-toolbar-row > label,
+.ge-toolbar-row > .ge-field,
+.ge-submission-toolbar > label,
+.lounge-filter-grid-ref > label,
+.lounge-filter-grid-ref > .ge-searchable,
+.lounge-filter-grid-ref > select,
+.lounge-filter-grid-ref > button{
+  min-width:0;
+}
+.ge-filter-grid label,
+.ge-toolbar-row label,
+.ge-submission-toolbar label,
+.lounge-filter-grid-ref label{
+  color:var(--ge-muted);
+  font-size:13px;
+  font-weight:500;
+}
+.ge-filter-grid input,
+.ge-filter-grid select,
+.ge-toolbar-row input,
+.ge-toolbar-row select,
+.ge-submission-toolbar input,
+.ge-submission-toolbar select,
+.lounge-filter-grid-ref input,
+.lounge-filter-grid-ref select,
+.ge-searchable-trigger,
+.ge-searchable-menu input{
+  box-sizing:border-box;
+  min-height:var(--ge-control-h);
+  height:var(--ge-control-h);
+  border:1px solid var(--ge-border);
+  border-radius:var(--ge-control-radius);
+  background:#fff;
+  color:var(--ge-text);
+  font:500 16px/1.2 Arial,sans-serif;
+}
+.ge-filter-grid input::placeholder,
+.ge-toolbar-row input::placeholder,
+.ge-searchable-menu input::placeholder,
+.lounge-filter-grid-ref input::placeholder{
+  color:#91a2b5;
+  opacity:1;
+  font-weight:400;
+}
+.ge-filter-grid select,
+.ge-toolbar-row select,
+.ge-submission-toolbar select,
+.lounge-filter-grid-ref select{
+  padding:0 40px 0 16px;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,#0b376d 50%),linear-gradient(135deg,#0b376d 50%,transparent 50%);
+  background-position:calc(100% - 21px) 20px,calc(100% - 15px) 20px;
+  background-size:7px 7px,7px 7px;
+  background-repeat:no-repeat;
+}
+.ge-btn,
+.ge-filter-grid > button,
+.ge-toolbar-row > button,
+.ge-submission-toolbar > button,
+.lounge-filter-grid-ref > button{
+  box-sizing:border-box;
+  min-height:var(--ge-control-h);
+  height:var(--ge-control-h);
+  border-radius:var(--ge-control-radius);
+  padding:0 18px;
+  font:600 16px/1 Arial,sans-serif;
+  white-space:nowrap;
+}
+.ge-btn.compact{min-height:40px;height:40px;font-size:14px;padding:0 14px}
+.ge-btn.primary{background:#0b376d;color:#fff;border:1px solid #0b376d}
+.ge-btn:not(.primary){background:#fff;color:#17324d;border:1px solid #0b376d}
+.ge-btn.danger{background:#c62828;color:#fff;border-color:#c62828}
+.ge-btn:hover:not(:disabled){filter:none;box-shadow:0 2px 7px rgba(11,55,109,.12)}
+.ge-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* Searchable select: the example remains a muted placeholder until a value is chosen. */
+.ge-searchable{position:relative;min-width:0}
+.ge-searchable-trigger{width:100%;padding:0 40px 0 16px;text-align:left;position:relative;cursor:pointer}
+.ge-searchable-trigger.is-placeholder{color:#91a2b5;font-weight:400}
+.ge-searchable-trigger::after{content:"";position:absolute;right:16px;top:19px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #0b376d}
+.ge-searchable-menu{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:120000;background:#fff;border:1px solid #0b376d;border-radius:10px;box-shadow:0 12px 30px rgba(18,43,70,.18);padding:10px}
+.ge-searchable.is-open .ge-searchable-menu{display:block}
+.ge-searchable-menu input{width:100%;height:42px;min-height:42px;padding:0 12px;margin-bottom:8px}
+.ge-searchable-options{max-height:220px;overflow:auto}
+.ge-searchable-option{display:flex;align-items:center;gap:9px;min-height:40px;padding:6px 8px;border-radius:7px;color:#17324d;font-size:14px;font-weight:500;cursor:pointer}
+.ge-searchable-option:hover{background:#f1f5fa}
+.ge-searchable-option input{width:16px;height:16px;min-height:16px;margin:0}
+.ge-searchable-empty{padding:10px 8px;color:#8192a5;font-size:13px}
+.ge-searchable.is-multiple .ge-searchable-trigger{padding-right:42px}
+
+/* Equal one-line filter geometry. */
+.lounge-filter-grid-ref{grid-template-columns:minmax(180px,1fr) minmax(210px,1.15fr) minmax(220px,1.2fr) minmax(190px,1fr) auto;}
+.lounge-filter-grid-ref > *{width:100%;margin:0}
+.lounge-filter-grid-ref > button{width:auto}
+
+/* Modal is always body-level and above the portal shell. */
+.modal-backdrop,
+.ge-id-backdrop,
+.ge-planning-modal,
+[data-modal-root]{z-index:120000}
+.ge-modal-card,
+.modal-card,
+.ge-id-modal{max-height:calc(100vh - 48px);overflow:auto}
+.ge-modal-card .modal-actions,
+.modal-card .modal-actions,
+.ge-id-modal .modal-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:16px 0 0;margin-top:18px;border-top:1px solid #dbe4ee}
+
+/* Attachment/evidence blocks: never touch the parent card edge. */
+.ge-attachment,
+.ge-evidence,
+.ge-upload-box,
+.v2554-upload-box{margin:12px 0;padding:14px 16px;border:1px solid #d9e2ec;border-radius:10px;background:#f8fafc}
+
+/* Header / period: one canonical geometry */
+body.e1-page>.top .ge-title strong{font-size:28px;line-height:1.05;font-weight:700;letter-spacing:.2px}
+body.e1-page>.top .ge-title span{font-size:16px;line-height:1.2;font-weight:500;color:#fff}
+body.e1-page>.top .ge-session .filter{height:48px;min-width:164px;display:flex;align-items:center;gap:12px;padding:0 14px;border:1px solid rgba(255,255,255,.55);border-radius:10px;background:transparent;box-sizing:border-box}
+body.e1-page>.top .ge-session .filter span{font-size:13px;font-weight:600;color:#fff}
+body.e1-page>.top .ge-session .filter select{height:34px;min-width:58px;padding:0 22px 0 4px;border:0;background:transparent;color:#fff;font-size:15px;font-weight:700}
+body.e1-page>.top .ge-session .filter select:focus{outline:none;box-shadow:none}
+
+.ge-plan-field>span,.planning-stations>span{display:block;color:#7187a0;font-size:13px;font-weight:500;margin-bottom:6px}
+.ge-plan-field>input,.ge-plan-field>select,.ge-plan-field>.ge-input,.planning-stations .ge-searchable-trigger{box-sizing:border-box;min-height:48px;height:48px;border:1px solid #0b376d;border-radius:10px;color:#17324d;background:#fff;font:500 16px/1.2 Arial,sans-serif;padding:0 14px}
+.ge-plan-field>input::placeholder,.ge-plan-field textarea::placeholder{color:#91a2b5;font-weight:400;opacity:1}
+
+/* Planning Workspace + Lounge/Tenant canonical field and action geometry. */
+.planning-domain-form label{font-size:13px;font-weight:500;color:#7187a0}
+.planning-domain-form label>input,.planning-domain-form label>select{height:48px;min-height:48px;border:1px solid #0b376d;border-radius:10px;background:#fff;color:#17324d;font:500 16px/1.2 Arial,sans-serif;padding:0 14px;box-sizing:border-box}
+.planning-domain-form label>input::placeholder{color:#91a2b5;font-weight:400;opacity:1}
+.planning-modal h2,.lounge-add-modal-v221 h2{font-size:20px;line-height:1.3;font-weight:700;color:#17324d;margin:0 0 8px}
+.planning-modal [data-close],.planning-modal [data-save],.lounge-add-modal-v221 .btn{height:48px;min-height:48px;border-radius:10px;padding:0 18px;font:600 16px/1 Arial,sans-serif}
+.planning-modal [data-close],.lounge-add-modal-v221 .btn.secondary{background:#fff;color:#17324d;border:1px solid #0b376d}
+.planning-modal [data-save],.lounge-add-modal-v221 .btn.primary{background:#0b376d;color:#fff;border:1px solid #0b376d}
+.lounge-add-modal-v221 label{font-size:13px;font-weight:500;color:#7187a0}
+.lounge-add-modal-v221 input,.lounge-add-modal-v221 select,.lounge-add-modal-v221 textarea{min-height:48px;height:48px;border:1px solid #0b376d;border-radius:10px;color:#17324d;background:#fff;font:500 16px/1.2 Arial,sans-serif;padding:0 14px;box-sizing:border-box}
+.lounge-add-modal-v221 textarea{height:auto;min-height:96px;padding:12px 14px}
+.lounge-add-modal-v221 input::placeholder,.lounge-add-modal-v221 textarea::placeholder{color:#91a2b5;font-weight:400;opacity:1}
+.ge-p29-lounge-card h3{font-size:16px;line-height:1.35;font-weight:700;color:#17324d;margin:8px 0 13px}
+.ge-p29-card-fields{gap:10px}.ge-p29-card-fields>div{grid-template-columns:minmax(90px,.7fr) minmax(0,1.3fr);gap:10px}.ge-p29-card-fields dt{font-size:12px;color:#7187a0}.ge-p29-card-fields dd{font-size:14px;font-weight:500;color:#17324d}
+.ge-p29-lounge-card .lounge-card-actions-v237 .btn,body.lounge-reference-v237 .lounge-card-actions-v237 .btn{height:40px;min-height:40px;padding:0 14px;border:1px solid #0b376d;border-radius:10px;background:#fff;color:#17324d;font:600 14px/1 Arial,sans-serif}
+.ge-p29-lounge-card .lounge-card-actions-v237 .btn:hover,body.lounge-reference-v237 .lounge-card-actions-v237 .btn:hover{background:#0b376d;color:#fff;border-color:#0b376d}
+.ge-p29-lounge-card .lounge-card-actions-v237 .btn.danger{background:#c62828;color:#fff;border-color:#c62828}
+.ge-p29-price-section{padding:16px;border:1px solid #d9e2ec;border-radius:10px;background:#f8fafc}
+.ge-p29-section-head b{font-size:14px;color:#17324d}.ge-p29-section-head small{font-size:12px;color:#7187a0}
+.ge-p29-price-row input{height:48px;min-height:48px;border:1px solid #0b376d;border-radius:10px;font-size:15px}.ge-p29-price-row .ge-p29-remove-price{height:40px;min-height:40px}
+.ge-p29-file-field{font-size:13px;color:#7187a0}.ge-p29-file-field input{height:48px;min-height:48px}
+.ge-view-select-r6{height:48px;min-height:48px;border:1px solid #0b376d;border-radius:10px;background:#fff;color:#17324d;font:600 16px/1 Arial,sans-serif;padding:0 18px;box-sizing:border-box}
+.ge-view-select-r6.active,.ge-view-select-r6[aria-pressed="true"]{background:#0b376d;color:#fff;border-color:#0b376d}
+.planning-domain-page .planning-toolbar .ge-btn,.planning-domain-page .planning-row-actions .ge-btn{height:40px;min-height:40px;font-size:14px;font-weight:600}
