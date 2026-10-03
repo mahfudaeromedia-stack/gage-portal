@@ -3464,8 +3464,16 @@ Validation limitation
 - Kept Monitoring checklist header as the canonical source used by Preview and Completion; regression contract retained.
 - Added R113 provider/reference regression contract.
 - Removed legacy `assets/global-ui-standard.js` and `assets/app.js` from the canonical package.
-### 2026-10-03 — Monitoring tab visual recovery
-- Monitoring tab menu was visually altered while the requested work was button standardization and Submission page work.
-- Recovered the tab geometry from the previously proven `assets/portal.css` implementation into the canonical `assets/global-ui-canonical.css`; no duplicate tab runtime/CSS was restored to `portal.css`.
-- Preserved the existing Monitoring tab structure and labels; no navigation/functionality was changed.
 
+## CBNR — Monitoring Results Visuals + Planning Delete Confirmation Correction
+- Monitoring Submission Results retains the existing result logic and checklist structure; only the presentation/component layer was corrected.
+- Submission KPI cards no longer use the legacy `ge-kpi` implementation and now use the canonical Monitoring KPI presentation.
+- Coverage now has a visible canonical pie implementation using the existing Domestic/International counts and remains filter-interactive.
+- Result Distribution and Station Coverage retain their existing data logic and now use clearer canonical bar geometry.
+- Submission signal/coverage controls use canonical button treatment instead of legacy button styling.
+- Planning Workspace delete confirmation was corrected to use the canonical delete confirmation engine with explicit `Delete` / `Cancel` actions; it no longer falls through to a Save/Cancel form.
+- Planning domain delete now executes the actual deletion only after confirmation; the previous confirmation path could display a generic form-style modal and did not invoke the delete callback.
+- Lounge/Tenant price-period deletion is restored to the canonical filled danger `Delete` action.
+- Added `R114_MONITORING_RESULTS_DELETE_CONTRACT_PASS` covering the Monitoring Results visuals and Planning Delete confirmation behavior.
+- Local `npm test` PASS: `CBNR_REGRESSION_GATE_PASS TESTS=59`.
+- Validation remains source/build regression validation only; live browser preview/UAT is not claimed as PASS.

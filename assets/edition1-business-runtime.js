@@ -3140,9 +3140,14 @@ function savePlanningRecord(){
  if(id)Object.assign((data[coll]||[]).find(x=>x.id===id),obj);else data[coll].push(obj);
  save();closePlanningRecordModal();geRenderPlanningPage();
 }
-function deletePlanningRecord(type,id){
- if(!gePlanningCanManage()||!confirm('Hapus planning record ini?'))return;
- const coll=GE_PLANNING_COLLECTION[type];data[coll]=(data[coll]||[]).filter(x=>x.id!==id);save();geRenderPlanningPage();
+async function deletePlanningRecord(type,id){
+ if(!gePlanningCanManage())return;
+ const coll=GE_PLANNING_COLLECTION[type],x=(data[coll]||[]).find(v=>String(v.id)===String(id));
+ if(!x)return;
+ const label=x.name||x.product||x.airport||x.touchpoint||x.code||'Planning Record';
+ const ok=typeof geConfirmDeleteV234==='function'?await geConfirmDeleteV234({title:'Delete Data',item:label,message:'Data yang dihapus tidak dapat dikembalikan.',confirmLabel:'Delete',cancelLabel:'Cancel'}):window.confirm(`Delete ${label}?`);
+ if(!ok)return;
+ data[coll]=(data[coll]||[]).filter(v=>String(v.id)!==String(id));save();geRenderPlanningPage();
 }
 function planAction(type,id){return gePlanningCanManage()?`<td><button class="ge-btn secondary compact-btn" onclick="openPlanningRecordModal('${type}',${id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deletePlanningRecord('${type}',${id})">Delete</button></td>`:''}
 

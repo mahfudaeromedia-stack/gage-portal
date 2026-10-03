@@ -230,7 +230,7 @@
       <div><label>Currency<select data-price-field="currency"><option value="">Pilih Mata Uang</option>${currencyMasterOptions(s.currency)}</select></label></div>
       <div><label>Price Basis<input data-price-field="priceBasis" value="${esc(s.priceBasis||'pax')}" placeholder="pax"></label></div>
       <div><label>Note<input data-price-field="priceNote" value="${esc(s.priceNote||'')}"></label></div>
-      <button type="button" class="ge-btn secondary compact-btn ge-p29-remove-price" ${rows.length===1?'disabled':''}>Delete</button>
+      <button type="button" class="ge-btn danger compact-btn ge-p29-remove-price" ${rows.length===1?'disabled':''}>Delete</button>
     </div>`).join('');
     box.querySelectorAll('.ge-p29-remove-price').forEach(btn=>btn.addEventListener('click',()=>{btn.closest('.ge-p29-price-row')?.remove();if(!box.querySelector('.ge-p29-price-row'))renderPriceRows(containerId,[{}]);}));
   }
@@ -297,14 +297,6 @@
     state.editId=null;replaceModalContent('loungeAddModalV221','Tambah Layanan Lounge/Tenant','geP29Add',{});
   };
   window.closeLoungeAddModalV221=function(){document.getElementById('loungeAddModalV221')?.classList.remove('show')};
-  window.deleteLoungeV239=async function(id){
-    if(!canEdit())return;
-    const x=(data.lounges||[]).find(a=>String(a.id)===String(id));if(!x)return;
-    const run=async()=>{data.lounges=(data.lounges||[]).filter(a=>String(a.id)!==String(id));try{save();}catch(e){notice('Data Tidak Tersimpan','Perubahan tidak dapat disimpan: '+(e.message||'Unknown error'),'warning');return}renderLounges?.();renderLoungeCardsV237?.();renderLoungePriceSummaryV243?.();notice('Layanan Dihapus',`${x.name||'Lounge/Tenant'} berhasil dihapus.`,'success')};
-    if(typeof geConfirmDeleteV234==='function'){const result=await geConfirmDeleteV234({title:'Delete Lounge/Tenant?',item:x.name||'Lounge/Tenant',message:'Data master, harga, periode kerja sama, dan referensi layanan ini akan dihapus.',confirmLabel:'Delete'});if(result===false)return;await run();}
-    else if(window.confirm(`Delete ${x.name||'Lounge/Tenant'}?`))await run();
-  };
-
   window.openLoungeEdit=function(id){
     if(!canEdit())return;
     const x=(data.lounges||[]).find(a=>String(a.id)===String(id));if(!x)return;
