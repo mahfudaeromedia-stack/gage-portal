@@ -3464,3 +3464,8 @@ Validation limitation
 - Kept Monitoring checklist header as the canonical source used by Preview and Completion; regression contract retained.
 - Added R113 provider/reference regression contract.
 - Removed legacy `assets/global-ui-standard.js` and `assets/app.js` from the canonical package.
+### 2026-10-03 — Monitoring tab visual recovery
+- Monitoring tab menu was visually altered while the requested work was button standardization and Submission page work.
+- Recovered the tab geometry from the previously proven `assets/portal.css` implementation into the canonical `assets/global-ui-canonical.css`; no duplicate tab runtime/CSS was restored to `portal.css`.
+- Preserved the existing Monitoring tab structure and labels; no navigation/functionality was changed.
+
