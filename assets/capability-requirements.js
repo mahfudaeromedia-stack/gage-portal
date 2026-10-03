@@ -19,7 +19,7 @@
   function notice(s){$('r70Status').textContent=s}
   function option(value,label,selected){return `<option value="${E(value)}" ${String(value)===String(selected)?'selected':''}>${E(label)}</option>`}
   const selection=(xs,selected)=>xs.map(([v,label])=>option(v,label,selected)).join('');
-  function modal(title,body,onSave){const d=$('r70Dialog');d.hidden=false;d.innerHTML=`<div class="r70-backdrop"><div class="r70-modal" role="dialog" aria-modal="true" aria-label="${E(title)}"><h2>${E(title)}</h2>${body}<p id="r70ModalStatus" role="status"></p><div class="r70-modal-actions"><button type="button" data-cancel class="ge-btn">Batal</button><button type="button" data-save class="ge-btn primary">Simpan</button></div></div></div>`;
+  function modal(title,body,onSave){const d=$('r70Dialog');d.hidden=false;d.innerHTML=`<div class="r70-backdrop"><div class="r70-modal" role="dialog" aria-modal="true" aria-label="${E(title)}"><h2>${E(title)}</h2>${body}<p id="r70ModalStatus" role="status"></p><div class="r70-modal-actions"><button type="button" data-cancel class="ge-btn">Cancel</button><button type="button" data-save class="ge-btn primary">Save</button></div></div></div>`;
     d.querySelector('[data-cancel]').onclick=()=>{d.hidden=true;d.replaceChildren()};d.querySelector('[data-save]').onclick=async e=>{e.target.disabled=true;try{await onSave(d);d.hidden=true;d.replaceChildren();render()}catch(err){d.querySelector('#r70ModalStatus').textContent=err.message;e.target.disabled=false}};
   }
   async function save(){GEStore.save(state);await GEStore.flush();notice('Perubahan berhasil disimpan ke Firestore.')}

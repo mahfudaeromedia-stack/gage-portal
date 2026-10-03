@@ -3424,3 +3424,36 @@ Do not revert unrelated files.
 
 Open login.html
 
+
+
+---
+
+## CBNR GLOBAL UI CONSOLIDATION — 2026-10-03
+
+Scope
+- Continued directly from test-1 baseline; no reset/rebuild from main.
+- Global source-to-consumer correction, not a single-page patch.
+
+Executed
+- Removed obsolete assets/global-ui-standard.js and its app loader.
+- Canonicalized legacy button class source usage toward ge-btn across source-bearing assets; legacy btn selectors were not retained as a visual masking layer.
+- Standardized affected user-facing button labels to English canonical terminology: Save, Cancel, Edit, Delete, Add Milestone, Show.
+- Fixed Initiative Timeline Delete handler exposure so the rendered Delete action calls the real canonical delete function and refreshes the timeline after persistence.
+- Renamed Planning Workspace generic "Field Configuration" section to "Agreement Revision" so agreement revision metadata is explicit rather than presented as a second generic form layer.
+- Removed duplicate editable category field for the GHA context where the page/category already establishes Ground Handling Agent.
+
+CBNR verification requirement
+- All shared changes must be rechecked against every consuming page before deployment; a shared edit is not treated as proof of A-Z page compliance.
+- Historical record remains this file only; no new per-batch historical/manifest file is created.
+
+
+---
+
+## CBNR A-Z SOURCE CONSOLIDATION — 2026-10-03
+
+- Removed obsolete duplicate `assets/app.js`; `assets/edition1-business-runtime.js` is the canonical business runtime source.
+- Removed remaining legacy `.btn` CSS selectors from the canonical UI layer and enforced the canonical `ge-btn` implementation across source assets.
+- Added global A-Z regression coverage (R111) that scans all source assets rather than validating a single page/component.
+- Rechecked Monitoring & Assessment, Submission, Initiative Timeline, Planning Workspace, Master Data/Reference and canonical registry contracts after the global source cleanup.
+
+- Replaced the Monitoring & Assessment registry page body that still rendered the old R43 foundation panel; the canonical `form-management.js` runtime is now the page implementation.

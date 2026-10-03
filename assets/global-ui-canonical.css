@@ -77,7 +77,7 @@ html body .ge-station-trigger-r12 i{position:absolute;right:13px;top:50%;width:0
 html body .ge-station-menu-r12{border-color:var(--ui-border);border-radius:8px;box-shadow:0 14px 28px rgba(6,43,99,.14)}
 
 /* One button contract. Geometry is balanced; weight is medium, not heavy or hairline. */
-html body .btn,html body button.btn,html body a.btn,html body input.btn,
+html body .ge-btn,html body button.ge-btn,html body a.ge-btn,html body input.ge-btn,
 html body .ge-btn,html body button.ge-btn,html body a.ge-btn{
   box-sizing:border-box;
   min-height:40px;height:40px;padding:0 16px;
@@ -87,16 +87,16 @@ html body .ge-btn,html body button.ge-btn,html body a.ge-btn{
   font-family:inherit;font-size:var(--ui-button-font);font-weight:var(--ui-button-weight);line-height:1;
   letter-spacing:0;text-decoration:none;white-space:nowrap;box-shadow:none;transform:none;appearance:none;-webkit-appearance:none;cursor:pointer;
 }
-html body .btn:not(.primary):not(.danger):not(.btn-danger),html body .ge-btn:not(.primary):not(.danger){background:#fff;color:var(--ui-navy);border-color:var(--ui-navy)}
-html body .btn:not(.primary):not(.danger):not(.btn-danger):hover,html body .btn:not(.primary):not(.danger):not(.btn-danger):focus-visible,
+html body .ge-btn:not(.primary):not(.danger):not(.ge-btn.danger),html body .ge-btn:not(.primary):not(.danger){background:#fff;color:var(--ui-navy);border-color:var(--ui-navy)}
+html body .ge-btn:not(.primary):not(.danger):not(.ge-btn.danger):hover,html body .ge-btn:not(.primary):not(.danger):not(.ge-btn.danger):focus-visible,
 html body .ge-btn:not(.primary):not(.danger):hover,html body .ge-btn:not(.primary):not(.danger):focus-visible{background:var(--ui-navy);color:#fff;border-color:var(--ui-navy)}
-html body .btn.primary,html body .ge-btn.primary{background:var(--ui-navy);color:#fff;border-color:var(--ui-navy)}
-html body .btn.primary:hover,html body .btn.primary:focus-visible,html body .ge-btn.primary:hover,html body .ge-btn.primary:focus-visible{background:var(--ui-navy-hover);color:#fff;border-color:var(--ui-navy-hover)}
-html body .btn.danger,html body .btn.btn-danger,html body .ge-btn.danger{background:var(--ui-danger);color:#fff;border-color:var(--ui-danger)}
-html body .btn.danger:hover,html body .btn.btn-danger:hover,html body .ge-btn.danger:hover{background:#8f1d14;color:#fff;border-color:#8f1d14}
-html body .btn:disabled,html body .ge-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
-html body .btn:focus-visible,html body .ge-btn:focus-visible{outline:2px solid rgba(8,43,89,.18);outline-offset:2px}
-html body .btn.compact,html body .ge-btn.compact,html body .row-actions .btn,html body td .btn{min-height:36px;height:36px;padding:0 12px;font-size:12.5px;font-weight:600;border-radius:7px}
+html body .ge-btn.primary,html body .ge-btn.primary{background:var(--ui-navy);color:#fff;border-color:var(--ui-navy)}
+html body .ge-btn.primary:hover,html body .ge-btn.primary:focus-visible,html body .ge-btn.primary:hover,html body .ge-btn.primary:focus-visible{background:var(--ui-navy-hover);color:#fff;border-color:var(--ui-navy-hover)}
+html body .ge-btn.danger,html body .ge-btn.ge-btn.danger,html body .ge-btn.danger{background:var(--ui-danger);color:#fff;border-color:var(--ui-danger)}
+html body .ge-btn.danger:hover,html body .ge-btn.ge-btn.danger:hover,html body .ge-btn.danger:hover{background:#8f1d14;color:#fff;border-color:#8f1d14}
+html body .ge-btn:disabled,html body .ge-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+html body .ge-btn:focus-visible,html body .ge-btn:focus-visible{outline:2px solid rgba(8,43,89,.18);outline-offset:2px}
+html body .ge-btn.compact,html body .ge-btn.compact,html body .row-actions .ge-btn,html body td .ge-btn{min-height:36px;height:36px;padding:0 12px;font-size:12.5px;font-weight:600;border-radius:7px}
 
 /* Grid / Details: one reusable toggle, never a select placed below a card. */
 html body .ge-view-toggle{display:inline-flex;align-items:center;gap:2px;padding:2px;border:1px solid #d0dbe6;border-radius:8px;background:#f5f8fb}
@@ -139,7 +139,7 @@ html body .lounge-master-view-label-v237{display:flex;align-items:center;gap:14p
 html body .lounge-master-view-label-v237>b,html body .lounge-master-view-label-v237 div>b{font-size:15px;font-weight:600;color:#18364f}
 html body .lounge-master-view-label-v237 span{font-size:11px;font-weight:400;color:#8a99a7}
 html body .lounge-master-title-v230 .bulk-action-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-html body .lounge-master-title-v230 .bulk-action-group .btn{min-width:112px}
+html body .lounge-master-title-v230 .bulk-action-group .ge-btn{min-width:112px}
 
 /* Gantt: flat cells/bars, no rounded legacy cells; year scale remains readable. */
 html body .ge-gantt-grid-r13,html body .ge-gantt-r9{border-radius:0;box-shadow:none}
@@ -175,12 +175,19 @@ html body #cleanPageOutlet .search-filter-option-v245:hover,html body #cleanPage
 html body #cleanPageOutlet .ge-page-head h1{font-size:20px;line-height:1.2;font-weight:600;letter-spacing:0;color:#18364f;margin:0}
 html body #cleanPageOutlet .ge-page-head p{font-size:13px;line-height:1.45;color:#7b8c9d;margin-top:6px}
 html body #cleanPageOutlet .ge-nav-section{font-size:10px;font-weight:600;letter-spacing:.04em;color:#9db3ce}
-html body #cleanPageOutlet .ge-btn,html body #cleanPageOutlet .btn{min-height:38px;height:38px;padding:0 14px;font-size:13px;font-weight:500;line-height:1.15}
-html body #cleanPageOutlet .ge-btn.compact,html body #cleanPageOutlet .btn.compact,html body #cleanPageOutlet td .btn,html body #cleanPageOutlet td .ge-btn{min-height:34px;height:34px;padding:0 11px;font-size:12.5px;font-weight:500}
+html body #cleanPageOutlet .ge-btn,html body #cleanPageOutlet .ge-btn{min-height:38px;height:38px;padding:0 14px;font-size:13px;font-weight:500;line-height:1.15}
+html body #cleanPageOutlet .ge-btn.compact,html body #cleanPageOutlet .ge-btn.compact,html body #cleanPageOutlet td .ge-btn,html body #cleanPageOutlet td .ge-btn{min-height:34px;height:34px;padding:0 11px;font-size:12.5px;font-weight:500}
 html body #cleanPageOutlet .map-region-select-v107{display:flex;align-items:end;gap:8px;margin:12px 0}
 html body #cleanPageOutlet .map-region-select-v107 label{display:grid;gap:5px;min-width:240px}
 html body #cleanPageOutlet .ge-ref-group-tab{font-size:12.5px;font-weight:500;letter-spacing:.01em}
 html body #cleanPageOutlet .ge-ref-tabs .ge-ref-group-tab.active{font-weight:600}
+html body #cleanPageOutlet .ge-table-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 10px;color:#718296;font-size:12px}
+html body #cleanPageOutlet .ge-table-controls label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:400;color:#718296}
+html body #cleanPageOutlet .ge-table-controls select{width:auto;min-width:62px;height:34px;min-height:34px;margin:0;padding:0 30px 0 9px;font-size:12px}
+html body #cleanPageOutlet .ge-table-nav{display:flex;align-items:center;gap:7px}
+html body #cleanPageOutlet .ge-table-nav button{width:32px;height:32px;min-height:32px;padding:0;border:1px solid #c9d5e1;border-radius:7px;background:#fff;color:var(--ui-navy);font-size:18px;cursor:pointer}
+html body #cleanPageOutlet .ge-table-nav button:disabled{opacity:.4;cursor:not-allowed}
+html body #cleanPageOutlet .ge-table-page{min-width:80px;text-align:center;color:#50677d;font-weight:500}
 
 /* R107 visual consolidation: dashboard interaction, form geometry and readiness status family. */
 html body #cleanPageOutlet .ge-form-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:nowrap}
@@ -248,7 +255,7 @@ html body #cleanPageOutlet .ge-submission-chart{border:1px solid #d6e0e9;border-
 html body #cleanPageOutlet .ge-chart-head h3{margin:0;font-size:15px;font-weight:600;color:#18364f}.ge-chart-head span{font-size:11px;color:#8998a7}
 html body #cleanPageOutlet .ge-bars{display:grid;gap:9px;margin-top:14px}.ge-bar-row{display:grid;grid-template-columns:64px 1fr 28px;gap:8px;align-items:center;font-size:11px;color:#536b7b}.ge-bar-row>div{height:9px;background:#edf2f6;border-radius:5px;overflow:hidden}.ge-bar-row i{display:block;height:100%;background:#164d86;border-radius:5px}.ge-bar-row b{font-size:11px;color:#18364f;text-align:right}
 html body #cleanPageOutlet .ge-submission-signals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}.ge-submission-signals>div{padding:11px 13px;border:1px solid #d6e0e9;border-radius:9px;background:#f8fafc}.ge-submission-signals b{display:block;font-size:12px;color:#18364f}.ge-submission-signals span{display:block;margin-top:3px;font-size:11px;color:#8796a5}
-html body #cleanPageOutlet .ge-submission-history-head{align-items:flex-end;margin-top:16px}
+html body #cleanPageOutlet .ge-submission-history-head{align-items:flex-end;margin-top:16px}.ge-table-controls{display:flex;align-items:center;gap:10px;color:#718296;font-size:12px}.ge-table-controls label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:400}.ge-table-controls select{width:64px;height:34px;min-height:34px;margin:0;padding:0 28px 0 9px}.ge-table-nav{display:flex;align-items:center;gap:7px}.ge-table-nav .ge-btn{width:32px;min-width:32px;padding:0}.ge-table-nav span{white-space:nowrap;color:#50677d}
 html body #cleanPageOutlet .ge-submission-detail-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;padding-top:14px;border-top:1px solid #e0e7ee}.ge-submission-detail-summary>div{padding:10px 12px;background:#f8fafc;border:1px solid #dfe6ed;border-radius:8px}.ge-submission-detail-summary small{display:block;color:#8796a5;font-size:11px}.ge-submission-detail-summary b{display:block;margin-top:3px;color:#18364f;font-size:14px}
 /* Attachment/file blocks never touch the card edge or sit flush against adjacent controls. */
 html body #cleanPageOutlet .attachment,
@@ -258,7 +265,7 @@ html body #cleanPageOutlet .upload-box,
 html body #cleanPageOutlet [class*="upload-box"]{margin:10px 0;padding:12px;border:1px solid #d6e0e9;border-radius:9px;background:#f8fafc;box-sizing:border-box}
 html body #cleanPageOutlet .attachment>*+*,html body #cleanPageOutlet .attachments>*+*,html body #cleanPageOutlet [class*="attachment"]>*+*{margin-top:7px}
 @media(max-width:1100px){html body #cleanPageOutlet .ge-monitor-kpis{grid-template-columns:repeat(3,1fr)}html body #cleanPageOutlet .ge-submission-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}html body #cleanPageOutlet .ge-network-toolbar{grid-template-columns:1.5fr 1fr 1fr}}
-@media(max-width:760px){html body #cleanPageOutlet .ge-monitor-kpis{grid-template-columns:1fr 1fr}html body #cleanPageOutlet .ge-monitor-flow,.ge-submission-viz-grid,.ge-submission-signals{grid-template-columns:1fr}.ge-monitor-flow i{display:none}html body #cleanPageOutlet .ge-network-toolbar,html body #cleanPageOutlet .ge-submission-toolbar{grid-template-columns:1fr}html body #cleanPageOutlet .ge-submission-history-head{align-items:stretch;flex-direction:column}}
+@media(max-width:760px){html body #cleanPageOutlet .ge-monitor-kpis{grid-template-columns:1fr 1fr}html body #cleanPageOutlet .ge-monitor-flow,.ge-submission-viz-grid,.ge-submission-signals{grid-template-columns:1fr}.ge-monitor-flow i{display:none}html body #cleanPageOutlet .ge-network-toolbar,html body #cleanPageOutlet .ge-submission-toolbar{grid-template-columns:1fr}html body #cleanPageOutlet .ge-submission-history-head{align-items:stretch;flex-direction:column}.ge-table-controls{justify-content:space-between}}
 /* Header: one period control; subtitle is the fixed internal service name. */
 html body.final-v257.final-shell-r5 .ge-title span{font-size:12px;line-height:1.2;color:#dbe8f7;font-weight:400;letter-spacing:0;opacity:1}
 html body.final-v257.final-shell-r5 .ge-session .filter{height:40px;min-width:132px;padding:0 10px;border:0;border-radius:8px;background:rgba(255,255,255,.06)}
@@ -418,18 +425,18 @@ body.e1-page>.top .ge-session .filter select:focus{outline:none;box-shadow:none}
 .planning-domain-form label>input,.planning-domain-form label>select{height:48px;min-height:48px;border:1px solid #0b376d;border-radius:10px;background:#fff;color:#17324d;font:500 16px/1.2 Arial,sans-serif;padding:0 14px;box-sizing:border-box}
 .planning-domain-form label>input::placeholder{color:#91a2b5;font-weight:400;opacity:1}
 .planning-modal h2,.lounge-add-modal-v221 h2{font-size:20px;line-height:1.3;font-weight:700;color:#17324d;margin:0 0 8px}
-.planning-modal [data-close],.planning-modal [data-save],.lounge-add-modal-v221 .btn{height:48px;min-height:48px;border-radius:10px;padding:0 18px;font:600 16px/1 Arial,sans-serif}
-.planning-modal [data-close],.lounge-add-modal-v221 .btn.secondary{background:#fff;color:#17324d;border:1px solid #0b376d}
-.planning-modal [data-save],.lounge-add-modal-v221 .btn.primary{background:#0b376d;color:#fff;border:1px solid #0b376d}
+.planning-modal [data-close],.planning-modal [data-save],.lounge-add-modal-v221 .ge-btn{height:48px;min-height:48px;border-radius:10px;padding:0 18px;font:600 16px/1 Arial,sans-serif}
+.planning-modal [data-close],.lounge-add-modal-v221 .ge-btn.secondary{background:#fff;color:#17324d;border:1px solid #0b376d}
+.planning-modal [data-save],.lounge-add-modal-v221 .ge-btn.primary{background:#0b376d;color:#fff;border:1px solid #0b376d}
 .lounge-add-modal-v221 label{font-size:13px;font-weight:500;color:#7187a0}
 .lounge-add-modal-v221 input,.lounge-add-modal-v221 select,.lounge-add-modal-v221 textarea{min-height:48px;height:48px;border:1px solid #0b376d;border-radius:10px;color:#17324d;background:#fff;font:500 16px/1.2 Arial,sans-serif;padding:0 14px;box-sizing:border-box}
 .lounge-add-modal-v221 textarea{height:auto;min-height:96px;padding:12px 14px}
 .lounge-add-modal-v221 input::placeholder,.lounge-add-modal-v221 textarea::placeholder{color:#91a2b5;font-weight:400;opacity:1}
 .ge-p29-lounge-card h3{font-size:16px;line-height:1.35;font-weight:700;color:#17324d;margin:8px 0 13px}
 .ge-p29-card-fields{gap:10px}.ge-p29-card-fields>div{grid-template-columns:minmax(90px,.7fr) minmax(0,1.3fr);gap:10px}.ge-p29-card-fields dt{font-size:12px;color:#7187a0}.ge-p29-card-fields dd{font-size:14px;font-weight:500;color:#17324d}
-.ge-p29-lounge-card .lounge-card-actions-v237 .btn,body.lounge-reference-v237 .lounge-card-actions-v237 .btn{height:40px;min-height:40px;padding:0 14px;border:1px solid #0b376d;border-radius:10px;background:#fff;color:#17324d;font:600 14px/1 Arial,sans-serif}
-.ge-p29-lounge-card .lounge-card-actions-v237 .btn:hover,body.lounge-reference-v237 .lounge-card-actions-v237 .btn:hover{background:#0b376d;color:#fff;border-color:#0b376d}
-.ge-p29-lounge-card .lounge-card-actions-v237 .btn.danger{background:#c62828;color:#fff;border-color:#c62828}
+.ge-p29-lounge-card .lounge-card-actions-v237 .ge-btn,body.lounge-reference-v237 .lounge-card-actions-v237 .ge-btn{height:40px;min-height:40px;padding:0 14px;border:1px solid #0b376d;border-radius:10px;background:#fff;color:#17324d;font:600 14px/1 Arial,sans-serif}
+.ge-p29-lounge-card .lounge-card-actions-v237 .ge-btn:hover,body.lounge-reference-v237 .lounge-card-actions-v237 .ge-btn:hover{background:#0b376d;color:#fff;border-color:#0b376d}
+.ge-p29-lounge-card .lounge-card-actions-v237 .ge-btn.danger{background:#c62828;color:#fff;border-color:#c62828}
 .ge-p29-price-section{padding:16px;border:1px solid #d9e2ec;border-radius:10px;background:#f8fafc}
 .ge-p29-section-head b{font-size:14px;color:#17324d}.ge-p29-section-head small{font-size:12px;color:#7187a0}
 .ge-p29-price-row input{height:48px;min-height:48px;border:1px solid #0b376d;border-radius:10px;font-size:15px}.ge-p29-price-row .ge-p29-remove-price{height:40px;min-height:40px}

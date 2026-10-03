@@ -238,11 +238,11 @@ function importAirportCSV(input){
 
 function renderNews(){
  const b=document.getElementById('headlineList');if(!b)return;
- b.innerHTML=(data.news||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).map((n,i)=>`<article class="card headline-card" style="${i===0?'grid-row:span 2':''}"><small>${n.date} • ${n.category}</small><h2>${n.title}</h2><p>${n.summary}</p><button class="btn secondary">Baca Selengkapnya</button></article>`).join('');
+ b.innerHTML=(data.news||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).map((n,i)=>`<article class="card headline-card" style="${i===0?'grid-row:span 2':''}"><small>${n.date} • ${n.category}</small><h2>${n.title}</h2><p>${n.summary}</p><button class="ge-btn secondary">Baca Selengkapnya</button></article>`).join('');
 }
 function renderNewsAdmin(){
  const t=document.getElementById('newsAdminRows');if(!t)return;
- t.innerHTML=(data.news||[]).map((n,i)=>`<tr><td>${i+1}</td><td>${n.title}</td><td>${n.category}</td><td>${n.date}</td><td><button class="btn secondary" onclick="editNews(${n.id})">Edit</button> <button class="btn" onclick="deleteNews(${n.id})">Hapus</button></td></tr>`).join('');
+ t.innerHTML=(data.news||[]).map((n,i)=>`<tr><td>${i+1}</td><td>${n.title}</td><td>${n.category}</td><td>${n.date}</td><td><button class="ge-btn secondary" onclick="editNews(${n.id})">Edit</button> <button class="ge-btn" onclick="deleteNews(${n.id})">Delete</button></td></tr>`).join('');
 }
 function saveNewsForm(){
  const form=document.getElementById('newsForm');if(!form)return;
@@ -400,11 +400,11 @@ function renderDocumentsHome(){
  const sel=document.getElementById('docCategoryHome');if(sel){const cur=sel.value;sel.innerHTML='<option value="">Semua Kategori</option>'+documentCategories().map(x=>`<option>${x}</option>`).join('');sel.value=cur}
  const box=document.getElementById('documentHomeList');if(!box)return;
  const rows=(data.documents||[]).filter(x=>(!q||(x.title+' '+x.fileName+' '+x.note).toLowerCase().includes(q))&&(!cat||x.category===cat));
- box.innerHTML=rows.length?rows.map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}${x.note?' • '+x.note:''}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><button class="btn secondary" onclick="${x.blobKey?`GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')`:`alert('Sample metadata: file aktual belum diunggah pada browser ini.')`}">Download</button></div>`).join(''):'<p>Belum ada dokumen.</p>';
+ box.innerHTML=rows.length?rows.map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}${x.note?' • '+x.note:''}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><button class="ge-btn secondary" onclick="${x.blobKey?`GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')`:`alert('Sample metadata: file aktual belum diunggah pada browser ini.')`}">Download</button></div>`).join(''):'<p>Belum ada dokumen.</p>';
 }
 function renderDocumentsAdmin(){
  const box=document.getElementById('documentAdminList');if(!box)return;
- box.innerHTML=(data.documents||[]).map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><div>${x.blobKey?`<button class="btn secondary" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')">Download</button>`:''} <button class="btn" data-role-min="Admin" onclick="deletePortalDocument(${x.id})">Hapus</button></div></div>`).join('');
+ box.innerHTML=(data.documents||[]).map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><div>${x.blobKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')">Download</button>`:''} <button class="ge-btn" data-role-min="Admin" onclick="deletePortalDocument(${x.id})">Delete</button></div></div>`).join('');
  if(typeof gxApplyRole==='function')gxApplyRole();
 }
 async function addPortalDocument(){
@@ -435,7 +435,7 @@ function loungeVisitorFiltered(){
 
 function renderLounges(){
  const t=document.getElementById('loungeRows');if(!t)return;const admin=(typeof gxRoleLevel==='function'&&gxRoleLevel((gxGetSession()||{}).role)>=gxRoleLevel('Admin'));
- t.innerHTML=loungeFiltered().map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.name}</b></td><td>${x.pic}</td><td>${x.airport}</td><td><span class="pill">${x.status}</span></td><td>${x.period}</td><td>${x.documentName?`<button class="btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Dokumen sample belum tersimpan pada browser ini.')`}">Download</button>`:'-'}</td>${admin?`<td><button class="btn" onclick="deleteLounge(${x.id})">Hapus</button></td>`:''}</tr>`).join('');
+ t.innerHTML=loungeFiltered().map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.name}</b></td><td>${x.pic}</td><td>${x.airport}</td><td><span class="pill">${x.status}</span></td><td>${x.period}</td><td>${x.documentName?`<button class="ge-btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Dokumen sample belum tersimpan pada browser ini.')`}">Download</button>`:'-'}</td>${admin?`<td><button class="ge-btn" onclick="deleteLounge(${x.id})">Delete</button></td>`:''}</tr>`).join('');
 }
 async function addLounge(){
  const f=document.getElementById('loungeDocument')?.files?.[0];let key='';if(f){key='lounge_'+Date.now();await GEFiles.put(key,f)}
@@ -605,7 +605,7 @@ function prepareEligibleConfirmation(parsed){
 function openWarningModal(message){
   const body=document.getElementById('eligibilityModalBody');
   body.innerHTML=`<div class="eligibility-result warning-scan"><div class="status-icon">!</div><h2>Perlu Verifikasi Manual</h2><p>${message}</p>
-    <div class="confirm-actions"><button class="btn secondary" onclick="closeEligibilityModal();document.getElementById('manualEntry')?.classList.add('show')">Buka Input Manual</button></div></div>`;
+    <div class="confirm-actions"><button class="ge-btn secondary" onclick="closeEligibilityModal();document.getElementById('manualEntry')?.classList.add('show')">Buka Input Manual</button></div></div>`;
   document.getElementById('eligibilityModal').classList.add('show');
 }
 
@@ -799,12 +799,12 @@ function renderLounges(){
  t.innerHTML=loungeFiltered().map((x,i)=>{
    const e=loungeExpiryClass(x);
    const doc=x.documentName
-    ? `<button class="btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Lampiran metadata tersedia, tetapi file belum tersimpan pada browser ini.')`}">Download</button><small>${x.documentName}</small>`
+    ? `<button class="ge-btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Lampiran metadata tersedia, tetapi file belum tersimpan pada browser ini.')`}">Download</button><small>${x.documentName}</small>`
     : '<span>-</span>';
    const actions=admin?`<td><div class="row-actions">
-      <button class="btn secondary" onclick="openLoungeEdit(${x.id})">Edit</button>
-      <label class="btn secondary" style="cursor:pointer">Upload<input type="file" style="display:none" onchange="uploadLoungeDocument(${x.id},this)"></label>
-      <button class="btn btn-danger" onclick="deleteLounge(${x.id})">Hapus</button>
+      <button class="ge-btn secondary" onclick="openLoungeEdit(${x.id})">Edit</button>
+      <label class="ge-btn secondary" style="cursor:pointer">Upload<input type="file" style="display:none" onchange="uploadLoungeDocument(${x.id},this)"></label>
+      <button class="ge-btn ge-btn danger" onclick="deleteLounge(${x.id})">Delete</button>
     </div></td>`:'';
    return `<tr class="${e.row}">
     <td>${i+1}</td><td><b>${x.name}</b></td><td>${x.pic||'-'}</td><td><b>${x.airport}</b></td>
@@ -1042,13 +1042,13 @@ function renderLounges(){
  t.innerHTML=loungeFiltered().map((x,i)=>{
   const e=loungeExpiryClass(x);
   const doc=x.documentName
-   ? `<button class="btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Lampiran file belum tersimpan pada browser ini.')`}">Download</button><small>${x.documentName}</small>`
+   ? `<button class="ge-btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Lampiran file belum tersimpan pada browser ini.')`}">Download</button><small>${x.documentName}</small>`
    : '<span>-</span>';
   const statusClass=String(x.documentStatus||'').toLowerCase().includes('tidak')||String(x.documentStatus||'').toLowerCase().includes('invalid')?'doc-status-invalid':'';
   const actions=admin?`<td><div class="row-actions">
-    <button class="btn secondary" onclick="openLoungeEdit(${x.id})">Edit</button>
-    <label class="btn secondary" style="cursor:pointer">Upload<input type="file" style="display:none" onchange="uploadLoungeDocument(${x.id},this)"></label>
-    <button class="btn btn-danger" onclick="deleteLounge(${x.id})">Hapus</button>
+    <button class="ge-btn secondary" onclick="openLoungeEdit(${x.id})">Edit</button>
+    <label class="ge-btn secondary" style="cursor:pointer">Upload<input type="file" style="display:none" onchange="uploadLoungeDocument(${x.id},this)"></label>
+    <button class="ge-btn ge-btn danger" onclick="deleteLounge(${x.id})">Delete</button>
    </div></td>`:'';
   return `<tr class="${e.row}">
    <td>${x.no??i+1}</td>
@@ -1184,6 +1184,116 @@ window.addEventListener('DOMContentLoaded',()=>{geBackfillHistoricalVisitorPrice
 
 
 /* ==============================================================
+   V2.10.2 — Universal table controls
+   Every table: 10 / 20 / 50 rows + clickable sortable headers.
+   The displayed "No" value stays attached to its original row.
+   ============================================================== */
+const GETableState = new WeakMap();
+
+function geComparable(text){
+  const s=String(text??'').trim();
+  const normalized=s.replace(/\s+/g,' ');
+  if(/^[-+]?\d+(?:[.,]\d+)?%?$/.test(normalized)){
+    return {type:'number', value:Number(normalized.replace('%','').replace(',','.'))};
+  }
+  const idDate=normalized.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(idDate)return {type:'number',value:new Date(+idDate[3],+idDate[2]-1,+idDate[1]).getTime()};
+  const iso=normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(iso)return {type:'number',value:new Date(+iso[1],+iso[2]-1,+iso[3]).getTime()};
+  const currency=normalized.match(/^(IDR|USD|SGD|AUD|JPY|CNY|SAR|MYR)\s*([\d.,]+)/i);
+  if(currency)return {type:'number',value:Number(currency[2].replace(/[.,]/g,''))};
+  return {type:'text',value:normalized.toLocaleLowerCase('id-ID')};
+}
+function geCompare(a,b){
+  if(a.type==='number'&&b.type==='number')return a.value-b.value;
+  return String(a.value).localeCompare(String(b.value),'id',{numeric:true,sensitivity:'base'});
+}
+function geTableApply(table){
+  const state=GETableState.get(table); if(!state)return;
+  const tbody=table.tBodies[0]; if(!tbody)return;
+  const rows=[...tbody.rows];
+  const total=rows.length;
+  const pages=Math.max(1,Math.ceil(total/state.size));
+  state.page=Math.min(state.page,pages);
+  const start=(state.page-1)*state.size, end=start+state.size;
+  rows.forEach((r,i)=>r.style.display=(i>=start&&i<end)?'':'none');
+
+  const from=total?start+1:0, to=Math.min(end,total);
+  state.info.textContent=`Menampilkan ${from}–${to} dari ${total} data`;
+  state.pageInfo.textContent=`Page ${state.page} / ${pages}`;
+  state.prev.disabled=state.page<=1;
+  state.next.disabled=state.page>=pages;
+}
+function geTableSort(table,col,th){
+  const state=GETableState.get(table); if(!state)return;
+  const tbody=table.tBodies[0]; if(!tbody)return;
+  const dir=(state.sortCol===col && state.sortDir==='asc')?'desc':'asc';
+  state.sortCol=col; state.sortDir=dir; state.page=1;
+  [...table.tHead.querySelectorAll('th')].forEach(h=>{h.classList.remove('sort-asc','sort-desc');h.removeAttribute('aria-sort')});
+  th.classList.add(dir==='asc'?'sort-asc':'sort-desc');
+  th.setAttribute('aria-sort',dir==='asc'?'ascending':'descending');
+
+  const rows=[...tbody.rows].map((row,idx)=>({row,idx,key:geComparable(row.cells[col]?.innerText||'')}));
+  rows.sort((a,b)=>{const c=geCompare(a.key,b.key); return (c===0?a.idx-b.idx:c)*(dir==='asc'?1:-1)});
+  state.muting=true;
+  rows.forEach(x=>tbody.appendChild(x.row));
+  state.muting=false;
+  geTableApply(table);
+}
+function geEnhanceTable(table){
+  if(GETableState.has(table) || !table.tHead || !table.tBodies.length)return;
+  const wrap=table.closest('.table-scroll,.card')||table.parentElement;
+  const controls=document.createElement('div');
+  controls.className='table-controls';
+  controls.innerHTML=`<div class="table-size-control"><span>Show</span>
+    <select aria-label="Jumlah data per halaman"><option>10</option><option>20</option><option>50</option></select>
+    <span>data</span></div>
+    <div class="table-page-control"><span class="table-info"></span>
+      <button type="button" class="table-page-btn prev" aria-label="Previous page">‹</button>
+      <span class="table-page-info"></span>
+      <button type="button" class="table-page-btn next" aria-label="Next page">›</button>
+    </div>`;
+  wrap.insertBefore(controls,table);
+
+  const state={
+    size:10,page:1,sortCol:null,sortDir:null,muting:false,
+    info:controls.querySelector('.table-info'),
+    pageInfo:controls.querySelector('.table-page-info'),
+    prev:controls.querySelector('.prev'),
+    next:controls.querySelector('.next')
+  };
+  GETableState.set(table,state);
+  controls.querySelector('select').addEventListener('change',e=>{state.size=Number(e.target.value);state.page=1;geTableApply(table)});
+  state.prev.addEventListener('click',()=>{if(state.page>1){state.page--;geTableApply(table)}});
+  state.next.addEventListener('click',()=>{state.page++;geTableApply(table)});
+
+  [...table.tHead.querySelectorAll('th')].forEach((th,col)=>{
+    th.classList.add('sortable-th');
+    th.tabIndex=0;
+    th.title='Klik untuk mengurutkan data';
+    th.addEventListener('click',()=>geTableSort(table,col,th));
+    th.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();geTableSort(table,col,th)}});
+  });
+
+  const obs=new MutationObserver(()=>{
+    if(state.muting)return;
+    state.page=1;
+    requestAnimationFrame(()=>geTableApply(table));
+  });
+  obs.observe(table.tBodies[0],{childList:true});
+  geTableApply(table);
+}
+function geEnhanceAllTables(){
+  document.querySelectorAll('table').forEach(geEnhanceTable);
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(geEnhanceAllTables,0);
+  const pageObserver=new MutationObserver(()=>geEnhanceAllTables());
+  pageObserver.observe(document.body,{childList:true,subtree:true});
+});
+
+
+/* ==============================================================
    V2.10.5 — Lounge Access categories + required eligibility ref
              Lounge Visitor Admin/Super Admin update/delete
    ============================================================== */
@@ -1245,8 +1355,8 @@ function prepareEligibleConfirmation(parsed){
           <small>Wajib diisi untuk kategori yang memerlukan validasi membership, partnership, atau EMD.</small>
         </label>
         <div class="confirm-actions">
-          <button class="btn" onclick="recordEligibleVisitor()">Konfirmasi & Rekam Visitor</button>
-          <button class="btn secondary" onclick="closeEligibilityModal()">Cancel</button>
+          <button class="ge-btn" onclick="recordEligibleVisitor()">Konfirmasi & Rekam Visitor</button>
+          <button class="ge-btn secondary" onclick="closeEligibilityModal()">Cancel</button>
         </div>
       </div>`}
   </div>`;
@@ -1332,7 +1442,7 @@ function renderLoungeVisitors(){
   <td>${x.airport}</td><td>${x.loungeName||'-'}</td><td>${x.category}</td>
   <td>${x.eligibilityReference||'-'}</td>
   <td class="price-cell">${x.priceDisplay||((x.currency&&x.pricePerPax)?`${x.currency} ${Number(x.pricePerPax).toLocaleString('en-US')}`:'Belum diisi')}</td>
-  ${canManage?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="geVisitorEdit('${x.id}')">Edit</button><button class="btn danger compact-btn" onclick="geVisitorDelete('${x.id}')">Hapus</button></td>`:''}
+  ${canManage?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="geVisitorEdit('${x.id}')">Edit</button><button class="ge-btn danger compact-btn" onclick="geVisitorDelete('${x.id}')">Delete</button></td>`:''}
  </tr>`).join('');
 
  const totals={};
@@ -1541,7 +1651,7 @@ function renderUserAccounts(){
  t.innerHTML=(data.users||[]).map((u,i)=>{
   const scope=u.scopeType==='ALL'?'All Area':u.scopeType==='LOUNGE'?`${(u.loungeIds||[]).length} Lounge`:u.scopeType==='AIRPORT'?(u.airports||[]).join(', '):(u.unit||'Custom');
   const tabs=(u.tabs||[]).includes('ALL')?'Semua TAB':(u.tabs||[]).map(v=>GE_TAB_OPTIONS.find(x=>x[0]===v)?.[1]||v).join(', ');
-  return `<tr><td>${i+1}</td><td><b>${u.name||'-'}</b></td><td>${u.employeeNo||'-'}</td><td>${u.username||'-'}</td><td>${u.email||'-'}</td><td>${u.role||'-'}</td><td>${u.unit||'-'}</td><td>${scope}</td><td>${tabs}</td><td><span class="pill">${u.status||'-'}${u.mustChangePassword?' • Change password':''}</span></td>${can?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openUserModal('${String(u.id).replace(/'/g,"\\\\'")}')">Edit</button><button class="btn secondary compact-btn" onclick="resetUserPassword('${String(u.id).replace(/'/g,"\\\\'")}')">Reset Password</button></td>`:''}</tr>`;
+  return `<tr><td>${i+1}</td><td><b>${u.name||'-'}</b></td><td>${u.employeeNo||'-'}</td><td>${u.username||'-'}</td><td>${u.email||'-'}</td><td>${u.role||'-'}</td><td>${u.unit||'-'}</td><td>${scope}</td><td>${tabs}</td><td><span class="pill">${u.status||'-'}${u.mustChangePassword?' • Change password':''}</span></td>${can?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openUserModal('${String(u.id).replace(/'/g,"\\\\'")}')">Edit</button><button class="ge-btn secondary compact-btn" onclick="resetUserPassword('${String(u.id).replace(/'/g,"\\\\'")}')">Reset Password</button></td>`:''}</tr>`;
  }).join('');
  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
@@ -1675,7 +1785,7 @@ function renderPersonnel(){
     <td>${i+1}</td><td>${x.employeeNo||'-'}</td><td><b>${x.name||'-'}</b></td>
     <td>${x.position||'-'}</td><td>${x.sitaCode||'-'}</td><td><b>${x.airport||'-'}</b></td>
     <td><span class="function-pill">${x.function||'-'}</span></td><td>${x.email||'-'}</td>
-    ${can?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openPersonnelModal(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deletePersonnel(${x.id})">Hapus</button></td>`:''}
+    ${can?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openPersonnelModal(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deletePersonnel(${x.id})">Delete</button></td>`:''}
   </tr>`).join('');
   if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
@@ -1743,7 +1853,7 @@ function renderUserAccounts(){
    const scope=u.scopeType==='ALL'?'ALL':u.scopeType==='LOUNGE'?'LOUNGE':u.scopeType==='AIRPORT'||u.scopeType==='STATION'?'AIRPORT':(u.scopeType||'CUSTOM');
    const assigned=(u.airports||[]).join(', ')||(u.loungeIds||[]).join(', ')||'—';
    const protectedUser=u.role==='Super Admin';
-   return `<tr><td>${i+1}</td><td><b>${geEsc(u.name||u.fullName||'-')}</b><small>${geEsc(u.employeeNo||'')}</small></td><td><b>${geEsc(u.username||'-')}</b><small>${geEsc(u.email||'-')}</small></td><td>${geEsc(u.role||'-')}</td><td>${geEsc(u.accessLevel||u.level||'-')}</td><td>${geEsc(u.unit||u.department||'-')}</td><td><b>${geEsc(scope)}</b></td><td>${geEsc(assigned)}</td><td><span class="pill">${geEsc(u.status||'-')}</span></td><td>${geEsc(u.lastLogin||u.lastLoginAt||'Not available')}</td>${can?`<td class="visitor-actions">${protectedUser?'<span class="pill">Protected</span>':`<button class="btn secondary compact-btn" onclick="openUserModal('${String(u.id).replace(/'/g,"\\'")}')">Edit</button><button class="btn secondary compact-btn" onclick="resetUserPassword('${String(u.id).replace(/'/g,"\\'")}')">Reset Password</button>`}</td>`:''}</tr>`;
+   return `<tr><td>${i+1}</td><td><b>${geEsc(u.name||u.fullName||'-')}</b><small>${geEsc(u.employeeNo||'')}</small></td><td><b>${geEsc(u.username||'-')}</b><small>${geEsc(u.email||'-')}</small></td><td>${geEsc(u.role||'-')}</td><td>${geEsc(u.accessLevel||u.level||'-')}</td><td>${geEsc(u.unit||u.department||'-')}</td><td><b>${geEsc(scope)}</b></td><td>${geEsc(assigned)}</td><td><span class="pill">${geEsc(u.status||'-')}</span></td><td>${geEsc(u.lastLogin||u.lastLoginAt||'Not available')}</td>${can?`<td class="visitor-actions">${protectedUser?'<span class="pill">Protected</span>':`<button class="ge-btn secondary compact-btn" onclick="openUserModal('${String(u.id).replace(/'/g,"\\'")}')">Edit</button><button class="ge-btn secondary compact-btn" onclick="resetUserPassword('${String(u.id).replace(/'/g,"\\'")}')">Reset Password</button>`}</td>`:''}</tr>`;
  }).join(''):`<tr><td colspan="11" class="ge-data-state-r13">Tidak ada akun pada Firestore yang sesuai filter.</td></tr>`;
  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
@@ -1773,7 +1883,7 @@ function renderDocumentsAdmin(){
  const ce=document.getElementById('docAdminCategory');if(ce){const cur=ce.value;ce.innerHTML='<option value="">Semua Kategori</option>'+cats.map(x=>`<option>${x}</option>`).join('');ce.value=cur}
  const se=document.getElementById('docAdminSource');if(se){const cur=se.value;se.innerHTML='<option value="">Semua Sumber</option>'+sources.map(x=>`<option>${x}</option>`).join('');se.value=cur}
  const rows=(data.documents||[]).filter(x=>(!q||`${x.title} ${x.fileName} ${x.note}`.toLowerCase().includes(q))&&(!cat||x.category===cat)&&(!src||x.source===src));
- box.innerHTML=rows.map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><div>${x.blobKey?`<button class="btn secondary" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')">Download</button>`:''} <button class="btn" data-role-min="Admin" onclick="deletePortalDocument(${x.id})">Hapus</button></div></div>`).join('');
+ box.innerHTML=rows.map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><div>${x.blobKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')">Download</button>`:''} <button class="ge-btn" data-role-min="Admin" onclick="deletePortalDocument(${x.id})">Delete</button></div></div>`).join('');
  if(typeof gxApplyRole==='function')gxApplyRole();
 }
 
@@ -2074,9 +2184,9 @@ function renderAdminInbox(){
  <td>${i+1}</td><td>${geDateTime(x.createdAt)}</td><td><span class="inbox-type">${geEsc(x.type||'-')}</span></td>
  <td><b>${geEsc(x.senderName||x.from||'-')}</b><small>${geEsc(x.senderRole||'')}</small></td><td>${geEsc(x.senderArea||x.area||'-')}</td><td>${geEsc(x.subject||x.title||'-')}</td>
  <td><span class="pill">${geEsc(x.status||'Unread')}</span></td><td class="inbox-actions">
- <button class="btn secondary compact-btn" data-inbox-open="${geEsc(x.id)}">Buka</button>
- ${x.type==='Article Proposal'&&x.status!=='Handled'?`<button class="btn compact-btn" data-inbox-review="${geEsc(x.id)}">Review</button>`:''}
- <button class="btn danger compact-btn" data-inbox-delete="${geEsc(x.id)}">Hapus</button>
+ <button class="ge-btn secondary compact-btn" data-inbox-open="${geEsc(x.id)}">Buka</button>
+ ${x.type==='Article Proposal'&&x.status!=='Handled'?`<button class="ge-btn compact-btn" data-inbox-review="${geEsc(x.id)}">Review</button>`:''}
+ <button class="ge-btn danger compact-btn" data-inbox-delete="${geEsc(x.id)}">Delete</button>
  </td></tr>`).join('')||'<tr><td colspan="8">Belum ada pesan sesuai filter.</td></tr>';
  if(!t.dataset.bound){t.dataset.bound='1';t.addEventListener('click',e=>{const row=e.target.closest('[data-inbox-id]');if(!row)return;const id=row.dataset.inboxId;if(e.target.closest('[data-inbox-delete]'))deleteInbox(id);else if(e.target.closest('[data-inbox-review]'))reviewProposal(id);else openInboxDetail(id)})}
  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);renderAdminOverview();
@@ -2091,8 +2201,8 @@ async function openInboxDetail(id){
  body.innerHTML=`<div class="inbox-detail-head"><span class="inbox-type">${geEsc(x.type||'-')}</span><h2>${geEsc(x.subject||x.title||'-')}</h2>
  <p>Dari <b>${geEsc(x.senderName||x.from||'-')}</b> • ${geEsc(x.senderArea||x.area||'-')} • ${geDateTime(x.createdAt)}</p></div>
  <div class="inbox-body-content">${x.type==='Article Proposal'?geSanitizeHTML(x.body||''):`<p>${geEsc(x.body||x.message||'').replace(/\n/g,'<br>')}</p>`}</div>
- ${!support&&!['Task Assignment','System Notification'].includes(x.type)&&x.senderId&&x.recipientId?`<section class="ge-inbox-thread"><h3>Percakapan</h3><div id="inboxThreadHistory">Memuat percakapan…</div><label>Balasan<textarea id="inboxReplyText" rows="3" placeholder="Tulis balasan"></textarea></label><button type="button" class="btn" id="inboxReplySend">Kirim Balasan</button><p id="inboxReplyStatus" role="status"></p></section>`:''}
- <div class="modal-actions">${support&&related?`<button class="btn" id="inboxSupportOpen">Buka Percakapan</button>`:''}${x.type==='Article Proposal'&&x.status!=='Handled'?`<button class="btn" id="inboxReviewOpen">Review Artikel</button>`:''}${x.type==='Task Assignment'&&related?`<button class="btn" id="inboxTaskOpen">Lihat Task</button>`:''}<button class="btn secondary" id="inboxCloseButton">Close</button></div>`;
+ ${!support&&!['Task Assignment','System Notification'].includes(x.type)&&x.senderId&&x.recipientId?`<section class="ge-inbox-thread"><h3>Percakapan</h3><div id="inboxThreadHistory">Memuat percakapan…</div><label>Balasan<textarea id="inboxReplyText" rows="3" placeholder="Tulis balasan"></textarea></label><button type="button" class="ge-btn" id="inboxReplySend">Kirim Balasan</button><p id="inboxReplyStatus" role="status"></p></section>`:''}
+ <div class="modal-actions">${support&&related?`<button class="ge-btn" id="inboxSupportOpen">Buka Percakapan</button>`:''}${x.type==='Article Proposal'&&x.status!=='Handled'?`<button class="ge-btn" id="inboxReviewOpen">Review Artikel</button>`:''}${x.type==='Task Assignment'&&related?`<button class="ge-btn" id="inboxTaskOpen">Lihat Task</button>`:''}<button class="ge-btn secondary" id="inboxCloseButton">Close</button></div>`;
  if(body.querySelector('#inboxThreadHistory')){const history=body.querySelector('#inboxThreadHistory'),status=body.querySelector('#inboxReplyStatus');const load=async()=>{try{const messages=await window.GEStore.loadInboxThread(x.id);history.innerHTML=messages.map(m=>`<article><b>${geEsc(m.senderName||'Pengirim')}</b><small>${geDateTime(m.createdAt)}</small><p>${geEsc(m.body||m.message||'').replace(/\n/g,'<br>')}</p></article>`).join('')}catch(err){status.textContent='Percakapan belum dapat dimuat: '+err.message;history.textContent=''}};load();body.querySelector('#inboxReplySend').onclick=async e=>{const message=body.querySelector('#inboxReplyText').value.trim();if(!message)return; e.target.disabled=true;try{await window.GEStore.replyInbox(x.id,message);body.querySelector('#inboxReplyText').value='';status.textContent='Balasan terkirim.';await load()}catch(err){status.textContent='Balasan belum terkirim: '+err.message}finally{e.target.disabled=false}}}
  body.querySelector('#inboxSupportOpen')?.addEventListener('click',()=>{closeInboxDetail();openSupportConversation(related)});
  body.querySelector('#inboxReviewOpen')?.addEventListener('click',()=>{closeInboxDetail();reviewProposal(id)});
@@ -2181,15 +2291,15 @@ function renderArticles(){
   <div class="featured-image">${f.coverKey?`<img id="articleCover_${f.id}" alt="${geEsc(f.title)}">`:'<div class="article-cover-placeholder">GROUND EXPERIENCE</div>'}</div>
   <div class="featured-copy"><span>Artikel Utama</span><h2>${geEsc(f.title)}</h2><p>${geEsc(geExcerpt(f.content,260))}</p>
    <div class="content-meta">By ${geEsc(f.authorInitial||'-')} • Created by ${geEsc(f.createdBy||'-')} • ${geDateTime(f.createdAt)}</div>
-   <button class="btn" onclick="viewArticle(${f.id})">Selengkapnya</button>
-   ${geIsAdmin()?`<div class="content-manage"><button class="btn secondary compact-btn" onclick="openArticleEditor(${f.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteArticle(${f.id})">Hapus</button></div>`:''}
+   <button class="ge-btn" onclick="viewArticle(${f.id})">Selengkapnya</button>
+   ${geIsAdmin()?`<div class="content-manage"><button class="ge-btn secondary compact-btn" onclick="openArticleEditor(${f.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteArticle(${f.id})">Delete</button></div>`:''}
   </div></article>`;
  if(f.coverKey)geSetImageFromKey(document.getElementById('articleCover_'+f.id),f.coverKey);
  grid.innerHTML=rows.slice(1).map(x=>`<article class="article-card card">
   <div class="article-card-image">${x.coverKey?`<img id="articleCover_${x.id}" alt="${geEsc(x.title)}">`:'<div class="article-cover-placeholder small">GX</div>'}</div>
   <div><h3>${geEsc(x.title)}</h3><p>${geEsc(geExcerpt(x.content,145))} <button class="read-more-link" onclick="viewArticle(${x.id})">selengkapnya klik</button></p>
   <div class="content-meta">By ${geEsc(x.authorInitial||'-')} • ${geDateTime(x.createdAt)}</div>
-  ${geIsAdmin()?`<div class="content-manage"><button class="btn secondary compact-btn" onclick="openArticleEditor(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteArticle(${x.id})">Hapus</button></div>`:''}</div>
+  ${geIsAdmin()?`<div class="content-manage"><button class="ge-btn secondary compact-btn" onclick="openArticleEditor(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteArticle(${x.id})">Delete</button></div>`:''}</div>
  </article>`).join('');
  rows.slice(1).forEach(x=>{if(x.coverKey)geSetImageFromKey(document.getElementById('articleCover_'+x.id),x.coverKey)});
 }
@@ -2241,7 +2351,7 @@ function renderAnnouncements(){
  const box=document.getElementById('announcementList');if(!box)return;
  const rows=(data.announcements||[]).filter(x=>x.status==='Published').sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
  box.innerHTML=rows.map(x=>`<article class="announcement-card card"><div class="announcement-date">${geDateTime(x.createdAt)}</div><h3>${geEsc(x.title)}</h3><div>${geSanitizeHTML(x.content)}</div>
- ${geIsAdmin()?`<div class="content-manage"><button class="btn secondary compact-btn" onclick="openAnnouncementEditor(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteAnnouncement(${x.id})">Hapus</button></div>`:''}</article>`).join('');
+ ${geIsAdmin()?`<div class="content-manage"><button class="ge-btn secondary compact-btn" onclick="openAnnouncementEditor(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteAnnouncement(${x.id})">Delete</button></div>`:''}</article>`).join('');
 }
 function openAnnouncementEditor(id=null){if(!geIsAdmin())return;const x=id?(data.announcements||[]).find(v=>v.id===id):null;announcementEditId.value=x?.id||'';announcementTitle.value=x?.title||'';announcementContent.innerHTML=x?.content||'';announcementEditorTitle.textContent=x?'Edit Pengumuman':'Tambah Pengumuman';announcementEditorModal.classList.add('show')}
 function closeAnnouncementEditor(){announcementEditorModal?.classList.remove('show')}
@@ -2251,7 +2361,7 @@ function deleteAnnouncement(id){if(geIsAdmin()&&confirm('Hapus pengumuman ini?')
 /* ---------- FAQ ---------- */
 function renderFaqs(){
  const box=document.getElementById('faqList');if(!box)return;
- box.innerHTML=(data.faqs||[]).filter(x=>x.status==='Published').map(x=>`<details class="faq-item card"><summary>${geEsc(x.question)}</summary><p>${geEsc(x.answer).replace(/\n/g,'<br>')}</p>${geIsAdmin()?`<div class="content-manage"><button class="btn secondary compact-btn" onclick="openFaqEditor(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteFaq(${x.id})">Hapus</button></div>`:''}</details>`).join('');
+ box.innerHTML=(data.faqs||[]).filter(x=>x.status==='Published').map(x=>`<details class="faq-item card"><summary>${geEsc(x.question)}</summary><p>${geEsc(x.answer).replace(/\n/g,'<br>')}</p>${geIsAdmin()?`<div class="content-manage"><button class="ge-btn secondary compact-btn" onclick="openFaqEditor(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteFaq(${x.id})">Delete</button></div>`:''}</details>`).join('');
 }
 function openFaqEditor(id=null){if(!geIsAdmin())return;const x=id?(data.faqs||[]).find(v=>v.id===id):null;faqEditId.value=x?.id||'';faqQuestion.value=x?.question||'';faqAnswer.value=x?.answer||'';faqEditorTitle.textContent=x?'Edit FAQ':'Tambah FAQ';faqEditorModal.classList.add('show')}
 function closeFaqEditor(){faqEditorModal?.classList.remove('show')}
@@ -2260,11 +2370,11 @@ function deleteFaq(id){if(geIsAdmin()&&confirm('Hapus FAQ ini?')){data.faqs=data
 
 /* ---------- Contact / Guestbook ---------- */
 function supportActor(){const u=geAuditUser();return {id:String(u.uid||u.id||''),name:u.name||u.username||u.email||'User',area:u.unit||(u.airports||[]).join(', ')||''}}
-function supportList(){const holder=document.getElementById('supportConversations');if(!holder)return;holder.innerHTML='<h3>Percakapan Bantuan</h3>'+((data.contactMessages||[]).length?(data.contactMessages||[]).map(x=>`<button type="button" class="btn secondary" data-support-id="${geEsc(x.id)}" style="display:block;margin:8px 0;width:100%;text-align:left">${geEsc(x.subject||'Permintaan Bantuan')} · ${geEsc(x.status||'Open')}</button>`).join(''):'<p>Belum ada percakapan.</p>');holder.querySelectorAll('[data-support-id]').forEach(b=>b.onclick=()=>openSupportConversation(b.dataset.supportId))}
+function supportList(){const holder=document.getElementById('supportConversations');if(!holder)return;holder.innerHTML='<h3>Percakapan Bantuan</h3>'+((data.contactMessages||[]).length?(data.contactMessages||[]).map(x=>`<button type="button" class="ge-btn secondary" data-support-id="${geEsc(x.id)}" style="display:block;margin:8px 0;width:100%;text-align:left">${geEsc(x.subject||'Permintaan Bantuan')} · ${geEsc(x.status||'Open')}</button>`).join(''):'<p>Belum ada percakapan.</p>');holder.querySelectorAll('[data-support-id]').forEach(b=>b.onclick=()=>openSupportConversation(b.dataset.supportId))}
 function openSupportConversation(id){
  const x=(data.contactMessages||[]).find(v=>String(v.id)===String(id));if(!x){alert('Percakapan tidak tersedia atau akses Anda telah berubah.');return}
  let modal=document.getElementById('supportConversationModal');if(!modal){modal=document.createElement('div');modal.id='supportConversationModal';modal.className='modal-backdrop';modal.innerHTML='<div class="modal-card" style="max-width:720px;max-height:85vh;overflow:auto"><button type="button" class="modal-x" id="supportClose">×</button><div id="supportConversationBody"></div></div>';document.body.appendChild(modal);modal.querySelector('#supportClose').onclick=()=>modal.classList.remove('show')}
- modal.querySelector('#supportConversationBody').innerHTML=`<h2>${geEsc(x.subject)}</h2><p>${geEsc(x.senderName||'-')} · ${geEsc(x.senderArea||'-')}</p><div>${(x.messages||[]).map(m=>`<div class="card" style="padding:12px;margin:8px 0"><b>${geEsc(m.senderName||'User')}</b><small> · ${geDateTime(m.at)}</small><p>${geEsc(m.body||'').replace(/\n/g,'<br>')}</p></div>`).join('')}</div><form id="supportReplyForm"><label>Balasan<textarea id="supportReplyText" required rows="3"></textarea></label><button class="btn" type="submit">Kirim Balasan</button></form>`;
+ modal.querySelector('#supportConversationBody').innerHTML=`<h2>${geEsc(x.subject)}</h2><p>${geEsc(x.senderName||'-')} · ${geEsc(x.senderArea||'-')}</p><div>${(x.messages||[]).map(m=>`<div class="card" style="padding:12px;margin:8px 0"><b>${geEsc(m.senderName||'User')}</b><small> · ${geDateTime(m.at)}</small><p>${geEsc(m.body||'').replace(/\n/g,'<br>')}</p></div>`).join('')}</div><form id="supportReplyForm"><label>Balasan<textarea id="supportReplyText" required rows="3"></textarea></label><button class="ge-btn" type="submit">Kirim Balasan</button></form>`;
  modal.querySelector('#supportReplyForm').onsubmit=async e=>{e.preventDefault();const input=modal.querySelector('#supportReplyText'),reply=input.value.trim();if(!reply)return;const actor=supportActor(),button=e.target.querySelector('button');button.disabled=true;try{x.messages=[...(x.messages||[]),{actorId:actor.id,senderName:actor.name,body:reply,at:new Date().toISOString()}];window.GEStore.save(data);await window.GEStore.flush();openSupportConversation(id);supportList()}catch(error){x.messages.pop();alert('Balasan gagal disimpan: '+error.message)}finally{button.disabled=false}};
  modal.classList.add('show');
 }
@@ -2719,7 +2829,7 @@ function geOpenAirportDetail217(code,marker){
     <div class="detail-row">Kontrak Lounge<b>${d.contracts} kontrak</b></div>
     <div class="detail-row">Pending Contract<b>${d.pending} item</b></div>
     <div class="detail-row">Koordinat<b>${Number(d.lat).toFixed(4)}, ${Number(d.lon).toFixed(4)}</b></div>
-    ${geIsSuperAdmin217()?`<div class="map-admin-note-v217">Pemindahan koordinat hanya aktif melalui tombol khusus ini.</div><button type="button" class="btn secondary compact-btn map-relocate-action-r104" onclick="geOpenMoveModal218('${d.code}',document.querySelector('.airport-marker[data-code=&quot;${d.code}&quot;]'))">Pindahkan Koordinat Station</button>`:''}
+    ${geIsSuperAdmin217()?`<div class="map-admin-note-v217">Pemindahan koordinat hanya aktif melalui tombol khusus ini.</div><button type="button" class="ge-btn secondary compact-btn map-relocate-action-r104" onclick="geOpenMoveModal218('${d.code}',document.querySelector('.airport-marker[data-code=&quot;${d.code}&quot;]'))">Pindahkan Koordinat Station</button>`:''}
     ${contractRows.length?`<div class="map-contract-mini"><span>Provider Lounge</span>${contractRows.slice(0,4).map(l=>`<div>${geEsc(l.name)}<b>${geContractNeedsFollowup(l)?'Follow-up':'OK'}</b></div>`).join('')}${contractRows.length>4?`<small>+${contractRows.length-4} provider lainnya</small>`:''}</div>`:''}`;
 }
 function selectAirport(code,marker){
@@ -3125,7 +3235,7 @@ function openPlanningRecordModal(type,id=null){
    }
    return`<label>${label}<input data-plan-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`;
   }).join('')
- }</div><div class="modal-actions sticky-actions"><button class="btn">Simpan</button><button type="button" class="btn secondary" onclick="closePlanningRecordModal()">Cancel</button></div></form>`;
+ }</div><div class="modal-actions sticky-actions"><button class="ge-btn">Save</button><button type="button" class="ge-btn secondary" onclick="closePlanningRecordModal()">Cancel</button></div></form>`;
  document.getElementById('planningRecordModal').classList.add('show');
 }
 function closePlanningRecordModal(){document.getElementById('planningRecordModal')?.classList.remove('show')}
@@ -3144,7 +3254,7 @@ function deletePlanningRecord(type,id){
  if(!gePlanningCanManage()||!confirm('Hapus planning record ini?'))return;
  const coll=GE_PLANNING_COLLECTION[type];data[coll]=(data[coll]||[]).filter(x=>x.id!==id);save();geRenderPlanningPage();
 }
-function planAction(type,id){return gePlanningCanManage()?`<td><button class="btn secondary compact-btn" onclick="openPlanningRecordModal('${type}',${id})">Edit</button><button class="btn danger compact-btn" onclick="deletePlanningRecord('${type}',${id})">Hapus</button></td>`:''}
+function planAction(type,id){return gePlanningCanManage()?`<td><button class="ge-btn secondary compact-btn" onclick="openPlanningRecordModal('${type}',${id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deletePlanningRecord('${type}',${id})">Delete</button></td>`:''}
 
 /* Landing */
 function renderPlanningOverview(){
@@ -3223,7 +3333,7 @@ function renderPlanningDocuments(){
  gePlanningPopulateSelect('planningDocCategory',rows.map(x=>x.category),'Semua Category');gePlanningPopulateSelect('planningDocAirport',rows.map(x=>x.airport||x.relatedAirport),'Semua Airport');
  const q=(planningDocSearch?.value||'').toLowerCase(),c=planningDocCategory?.value||'',a=planningDocAirport?.value||'';
  const filtered=rows.filter(x=>(!q||`${x.title} ${x.fileName} ${x.airport||''} ${x.relatedAirport||''}`.toLowerCase().includes(q))&&(!c||x.category===c)&&(!a||(x.airport||x.relatedAirport)===a));
- tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date||'-'}</td><td>${geEsc(x.category||'-')}</td><td><b>${geEsc(x.title||'-')}</b></td><td>${geEsc(x.airport||x.relatedAirport||'-')}</td><td>${geEsc(x.source||'-')}</td><td>${x.blobKey?`<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`:geEsc(x.fileName||'-')}</td></tr>`).join('');
+ tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date||'-'}</td><td>${geEsc(x.category||'-')}</td><td><b>${geEsc(x.title||'-')}</b></td><td>${geEsc(x.airport||x.relatedAirport||'-')}</td><td>${geEsc(x.source||'-')}</td><td>${x.blobKey?`<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`:geEsc(x.fileName||'-')}</td></tr>`).join('');
  gePlanningEmpty('planningDocumentEmpty',filtered);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
 
@@ -3334,12 +3444,12 @@ function geEnsureStationMaterialViewR65(){
  <div class="data-filter-grid"><input id="materialSearch" placeholder="Cari kode, barang, atau provider" oninput="renderStationMaterials()"><select id="materialAreaFilterV231" onchange="renderStationMaterials()"><option value="">Semua Area</option></select><select id="materialVendorFilterV231" onchange="renderStationMaterials()"><option value="">Semua Vendor</option></select><select id="materialStatusFilter" onchange="renderStationMaterials()"><option value="">Semua Status</option></select></div>
  <div class="modal-actions" id="materialActionsR65"></div><div class="table-scroll"><table><thead><tr><th>No</th><th>Kode</th><th>Nama Barang</th><th>Area</th><th>Provider</th><th>Mulai</th><th>Berakhir</th><th>Status</th><th>Dokumen</th><th>Kelola</th></tr></thead><tbody id="stationMaterialRows"></tbody></table></div><div id="stationMaterialEmpty"></div>`;
  document.getElementById('planning-master')?.insertAdjacentElement('afterend',section);
- if(geAdminV231())document.getElementById('materialActionsR65').innerHTML='<button class="btn secondary" type="button" id="materialTemplateR65">Download Template CSV</button><button class="btn secondary" type="button" id="materialUploadR65">Upload Data</button><button class="btn" type="button" id="materialAddR65">+ Add Data</button>';
+ if(geAdminV231())document.getElementById('materialActionsR65').innerHTML='<button class="ge-btn secondary" type="button" id="materialTemplateR65">Download Template CSV</button><button class="ge-btn secondary" type="button" id="materialUploadR65">Upload Data</button><button class="ge-btn" type="button" id="materialAddR65">+ Add Data</button>';
  document.getElementById('materialTemplateR65')?.addEventListener('click',()=>{const csv='Kode Barang,Nama Barang Cetak Kestasiunan,Area,Provider,Mulai,Berakhir,Status\r\n';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='station-material-template.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
  document.getElementById('materialUploadR65')?.addEventListener('click',()=>openBulkImportV223('station-material'));
  document.getElementById('materialAddR65')?.addEventListener('click',()=>openStationMaterialModalV231());
- document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="stationMaterialModalV231"><div class="modal-card"><button class="modal-x" type="button" onclick="closeStationMaterialModalV231()">×</button><h2 id="stationMaterialModalTitleV231">Station Material</h2><input id="stationMaterialEditIdV231" type="hidden"><div class="formgrid"><label>Kode Barang<input id="stationMaterialCodeV231"></label><label>Nama Barang<input id="stationMaterialNameV231"></label><label>Area<input id="stationMaterialAreaV231"></label><label>Provider<input id="stationMaterialVendorV231"></label><label>Periode<input id="stationMaterialPeriodV231"></label><label>Mulai<input id="stationMaterialStartV246" type="date"></label><label>Berakhir<input id="stationMaterialEndV246" type="date"></label><label>Status<input id="stationMaterialStatusV231"></label><label>Dokumen<input id="stationMaterialFileV231" type="file"></label></div><div class="modal-actions"><button class="btn" type="button" onclick="saveStationMaterialV231()">Simpan</button><button class="btn secondary" type="button" onclick="closeStationMaterialModalV231()">Cancel</button></div></div></div>
- <div class="modal-backdrop" id="bulkImportModalV223"><div class="modal-card bulk-import-modal-v223"><button class="modal-x" type="button" onclick="closeBulkImportV223()">×</button><h2 id="bulkImportTitleV223">Upload Data</h2><p id="bulkImportHelpV223"></p><input id="bulkImportFileV223" type="file" accept=".csv,.xlsx" onchange="previewBulkImportV223(this.files[0])"><div id="bulkImportPreviewV223"></div><div class="modal-actions"><button class="btn" id="bulkImportConfirmV223" type="button" disabled onclick="confirmBulkImportV243()">Import Data</button><button class="btn secondary" type="button" onclick="closeBulkImportV223()">Cancel</button></div></div></div>`);
+ document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="stationMaterialModalV231"><div class="modal-card"><button class="modal-x" type="button" onclick="closeStationMaterialModalV231()">×</button><h2 id="stationMaterialModalTitleV231">Station Material</h2><input id="stationMaterialEditIdV231" type="hidden"><div class="formgrid"><label>Kode Barang<input id="stationMaterialCodeV231"></label><label>Nama Barang<input id="stationMaterialNameV231"></label><label>Area<input id="stationMaterialAreaV231"></label><label>Provider<input id="stationMaterialVendorV231"></label><label>Periode<input id="stationMaterialPeriodV231"></label><label>Mulai<input id="stationMaterialStartV246" type="date"></label><label>Berakhir<input id="stationMaterialEndV246" type="date"></label><label>Status<input id="stationMaterialStatusV231"></label><label>Dokumen<input id="stationMaterialFileV231" type="file"></label></div><div class="modal-actions"><button class="ge-btn" type="button" onclick="saveStationMaterialV231()">Save</button><button class="ge-btn secondary" type="button" onclick="closeStationMaterialModalV231()">Cancel</button></div></div></div>
+ <div class="modal-backdrop" id="bulkImportModalV223"><div class="modal-card bulk-import-modal-v223"><button class="modal-x" type="button" onclick="closeBulkImportV223()">×</button><h2 id="bulkImportTitleV223">Upload Data</h2><p id="bulkImportHelpV223"></p><input id="bulkImportFileV223" type="file" accept=".csv,.xlsx" onchange="previewBulkImportV223(this.files[0])"><div id="bulkImportPreviewV223"></div><div class="modal-actions"><button class="ge-btn" id="bulkImportConfirmV223" type="button" disabled onclick="confirmBulkImportV243()">Import Data</button><button class="ge-btn secondary" type="button" onclick="closeBulkImportV223()">Cancel</button></div></div></div>`);
  const panel=new URLSearchParams(location.search).get('panel');if(panel==='material')section.scrollIntoView({block:'start'});
 }
 function geRenderPlanningPage(){
@@ -3597,7 +3707,7 @@ function geStorageNoticeV223(title,message,type='warning'){
       <h2 id="geStorageNoticeTitleV223"></h2>
       <p id="geStorageNoticeMessageV223"></p>
       <div class="modal-actions">
-        <button class="btn" onclick="document.getElementById('geStorageNoticeV223')?.classList.remove('show')">OK</button>
+        <button class="ge-btn" onclick="document.getElementById('geStorageNoticeV223')?.classList.remove('show')">OK</button>
       </div>
     </div>`;
     document.body.appendChild(modal);
@@ -4194,12 +4304,12 @@ function geDueLabelV224(x){
   return`<span class="due-badge">${d}</span>`;
 }
 function geInitiativeManageButtonsV224(x){
-  const parts=[`<button class="btn secondary compact-btn" onclick="openInitiativeTimelineV224(${x.id})">Detail / Timeline</button>`];
+  const parts=[`<button class="ge-btn secondary compact-btn" onclick="openInitiativeTimelineV224(${x.id})">Detail / Timeline</button>`];
   if(geInitiativeAdminV224()){
-    parts.push(`<button class="btn secondary compact-btn" onclick="openInitiativeModalV224(${x.id})">Edit</button>`);
-    parts.push(`<button class="btn danger compact-btn" onclick="deleteInitiativeV224(${x.id})">Hapus</button>`);
+    parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeModalV224(${x.id})">Edit</button>`);
+    parts.push(`<button class="ge-btn danger compact-btn" onclick="deleteInitiativeV224(${x.id})">Delete</button>`);
   }else if(geInitiativeProgressAllowedV224(x)){
-    parts.push(`<button class="btn secondary compact-btn" onclick="openInitiativeProgressV224(${x.id})">Edit Progress</button>`);
+    parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeProgressV224(${x.id})">Edit Progress</button>`);
   }
   return `<div class="initiative-actions-v224">${parts.join('')}</div>`;
 }
@@ -4328,7 +4438,7 @@ function geDocCardV227(d,kind,parentId,index){
       <div class="initiative-doc-file-v227">${geEsc(d.fileName||'Belum ada file')} ${d.version?`• ${geEsc(d.version)}`:''} <span class="doc-status-v227 ${String(d.status||'Current').toLowerCase()}">${geEsc(d.status||'Current')}</span></div>
       ${d.description?`<div class="initiative-doc-desc-v227">${geEsc(d.description)}</div>`:''}
     </div>
-    ${can?`<div class="initiative-doc-actions-v227"><button class="timeline-link-v224" onclick="openInitiativeDocumentV227(${parentId},'${kind}',${index})">Edit</button><button class="timeline-link-v224 danger" onclick="deleteInitiativeDocumentV227(${parentId},'${kind}',${index})">Hapus</button></div>`:''}
+    ${can?`<div class="initiative-doc-actions-v227"><button class="timeline-link-v224" onclick="openInitiativeDocumentV227(${parentId},'${kind}',${index})">Edit</button><button class="timeline-link-v224 danger" onclick="deleteInitiativeDocumentV227(${parentId},'${kind}',${index})">Delete</button></div>`:''}
   </div>`;
 }
 function geInitiativeDocumentsSectionV227(x){
@@ -4341,11 +4451,11 @@ function geInitiativeDocumentsSectionV227(x){
     <div class="initiative-doc-progress-v227"><i style="width:${r.pct}%"></i></div>
     <div class="initiative-doc-columns-v227">
       <section>
-        <div class="initiative-doc-column-head-v227"><div><h4>Dasar & Trigger Inisiatif</h4><p>Notice, IOC, memo, regulasi, temuan, arahan, atau correspondence yang memicu inisiatif.</p></div>${can?`<button class="btn secondary compact-btn" onclick="openInitiativeDocumentV227(${x.id},'trigger')">Tambah Dokumen</button>`:''}</div>
+        <div class="initiative-doc-column-head-v227"><div><h4>Dasar & Trigger Inisiatif</h4><p>Notice, IOC, memo, regulasi, temuan, arahan, atau correspondence yang memicu inisiatif.</p></div>${can?`<button class="ge-btn secondary compact-btn" onclick="openInitiativeDocumentV227(${x.id},'trigger')">Tambah Dokumen</button>`:''}</div>
         <div class="initiative-doc-list-v227">${x.triggerDocuments.length?x.triggerDocuments.map((d,i)=>geDocCardV227(d,'trigger',x.id,i)).join(''):'<div class="planning-empty">Belum ada dokumen trigger.</div>'}</div>
       </section>
       <section>
-        <div class="initiative-doc-column-head-v227"><div><h4>Dokumen Pelaksanaan</h4><p>PPA/FRA, TOR, kajian, BA, kontrak, BAST, dan dokumen pendukung lainnya.</p></div>${can?`<button class="btn secondary compact-btn" onclick="openInitiativeDocumentV227(${x.id},'supporting')">Tambah Dokumen</button>`:''}</div>
+        <div class="initiative-doc-column-head-v227"><div><h4>Dokumen Pelaksanaan</h4><p>PPA/FRA, TOR, kajian, BA, kontrak, BAST, dan dokumen pendukung lainnya.</p></div>${can?`<button class="ge-btn secondary compact-btn" onclick="openInitiativeDocumentV227(${x.id},'supporting')">Tambah Dokumen</button>`:''}</div>
         <div class="initiative-doc-list-v227">${x.supportingDocuments.length?x.supportingDocuments.map((d,i)=>geDocCardV227(d,'supporting',x.id,i)).join(''):'<div class="planning-empty">Belum ada dokumen pelaksanaan.</div>'}</div>
       </section>
     </div>
@@ -4423,7 +4533,7 @@ function openInitiativeTimelineV224(id){
     <div class="initiative-detail-head-v224">
       <div><span class="eyebrow">Initiative Detail</span><h2>${geEsc(x.name)}</h2>
       <p>${geEsc(x.tp)} • ${geEsc(x.airport||'All Airport')} • PIC ${geEsc(x.pic||'-')}</p></div>
-      ${geInitiativeAdminV224()?`<button class="btn" onclick="openInitiativeStepV224(${x.id})">Tambah Tahapan</button>`:''}
+      ${geInitiativeAdminV224()?`<button class="ge-btn" onclick="openInitiativeStepV224(${x.id})">Add Milestone</button>`:''}
     </div>
     <div class="initiative-detail-kpi-v224">
       <div><span>Target</span><b>${Number(x.plan||0)}%</b></div>
@@ -4438,7 +4548,7 @@ function openInitiativeTimelineV224(id){
           <div class="timeline-marker-v224"><span>${i+1}</span></div>
           <div class="timeline-card-v224">
             <div class="timeline-card-head-v224"><div><h4>${geEsc(s.title||'Tahapan')}</h4><span>${geEsc(s.status||'Not Started')}</span></div>
-            ${geInitiativeAdminV224()?`<div><button class="timeline-link-v224" onclick="openInitiativeStepV224(${x.id},${i})">Edit</button><button class="timeline-link-v224 danger" onclick="deleteInitiativeStepV224(${x.id},${i})">Hapus</button></div>`:''}</div>
+            ${geInitiativeAdminV224()?`<div><button class="timeline-link-v224" onclick="openInitiativeStepV224(${x.id},${i})">Edit</button><button class="timeline-link-v224 danger" onclick="deleteInitiativeStepV224(${x.id},${i})">Delete</button></div>`:''}</div>
             <div class="timeline-meta-v224"><span>PIC <b>${geEsc(s.pic||'-')}</b></span><span>Due <b>${s.dueDate||'-'}</b></span></div>
             ${s.remark?`<p>${geEsc(s.remark)}</p>`:''}
           </div>
@@ -4480,6 +4590,7 @@ function deleteInitiativeStepV224(id,index){
   const x=(data.initiatives||[]).find(v=>v.id===id);if(!x)return;
   x.workflow.splice(index,1);save();openInitiativeTimelineV224(id);
 }
+window.deleteInitiativeStepV224=deleteInitiativeStepV224;
 
 /* Updated CSV — Initiative + Milestone visibility */
 exportCSV=function(){
@@ -4718,7 +4829,7 @@ renderPlanningDocuments = function(){
     <td>${geEsc(x.source||'-')}</td>
     <td>${
       x.blobKey
-        ? `<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`
+        ? `<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`
         : geEsc(x.fileName||'-')
     }</td>
   </tr>`).join('');
@@ -4935,7 +5046,7 @@ renderAirports=function(){
   <td>${a.no||i+1}</td><td><b>${geEsc(a.code)}</b></td><td>${geEsc(a.city)}</td><td>${geEsc(a.wilayah)}</td><td>${geEsc(a.region||'-')}</td>
   <td>${can?`<select class="inline-status-select ${a.status==='Inactive'?'inactive':''}" onchange="geSetAirportStatus('${a.code}',this.value)"><option ${a.status==='Active'?'selected':''}>Active</option><option ${a.status==='Inactive'?'selected':''}>Inactive</option></select>`:`<span class="pill">${geEsc(a.status)}</span>`}</td>
   <td>${geEsc(a.gm)}</td><td>${Number(a.visitorLounge).toLocaleString('id-ID')}</td><td>${a.contracts}</td><td>${a.pending?`<span class="pending-count">${a.pending}</span>`:'<span class="clear-count">0</span>'}</td>
-  ${can?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openAirportModalV231(${a.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteAirportV231(${a.id})">Hapus</button></td>`:''}
+  ${can?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openAirportModalV231(${a.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteAirportV231(${a.id})">Delete</button></td>`:''}
  </tr>`).join('');
  const all=geAirportVisibleRows(),set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
  set('airportMasterTotal',all.length);set('airportMasterActive',all.filter(x=>x.status==='Active').length);set('airportMasterInactive',all.filter(x=>x.status==='Inactive').length);
@@ -4967,7 +5078,7 @@ renderStationMaterials=function(){
  gePlanningPopulateSelect('materialAreaFilterV231',rows.map(x=>x.area),'Semua Area');gePlanningPopulateSelect('materialVendorFilterV231',rows.map(x=>x.vendor),'Semua Vendor');gePlanningPopulateSelect('materialStatusFilter',rows.map(x=>x.status),'Semua Status');
  const q=(materialSearch?.value||'').toLowerCase(),a=materialAreaFilterV231?.value||'',v=materialVendorFilterV231?.value||'',s=materialStatusFilter?.value||'';
  const filtered=rows.filter(x=>(!q||`${x.code} ${x.product} ${x.vendor}`.toLowerCase().includes(q))&&(!a||x.area===a)&&(!v||x.vendor===v)&&(!s||x.status===s));
- tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.code)}</b></td><td>${geEsc(x.product)}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.vendor||'-')}</td><td>${geEsc(x.contractPeriod||'-')}</td><td><span class="planning-status">${geEsc(x.status||'-')}</span></td><td>${x.documentKey?`<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.documentKey}','${String(x.documentName||'document').replaceAll("'","")}')">Download</button>`:geEsc(x.documentName||'-')}</td>${geAdminV231()?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openStationMaterialModalV231(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteStationMaterialV231(${x.id})">Hapus</button></td>`:''}</tr>`).join('');
+ tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.code)}</b></td><td>${geEsc(x.product)}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.vendor||'-')}</td><td>${geEsc(x.contractPeriod||'-')}</td><td><span class="planning-status">${geEsc(x.status||'-')}</span></td><td>${x.documentKey?`<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.documentKey}','${String(x.documentName||'document').replaceAll("'","")}')">Download</button>`:geEsc(x.documentName||'-')}</td>${geAdminV231()?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openStationMaterialModalV231(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteStationMaterialV231(${x.id})">Delete</button></td>`:''}</tr>`).join('');
  gePlanningEmpty('stationMaterialEmpty',filtered);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 };
 
@@ -4993,7 +5104,7 @@ renderAirportSystems=function(){
  gePlanningPopulateSelect('systemAirportFilter',rows.map(x=>x.airport),'Semua Airport');gePlanningPopulateSelect('systemProviderFilterV231',rows.map(x=>x.provider),'Semua Provider');gePlanningPopulateSelect('systemAreaFilterV231',rows.map(x=>x.area),'Semua Area');
  const q=(systemSearch?.value||'').toLowerCase(),a=systemAirportFilter?.value||'',p=systemProviderFilterV231?.value||'',ar=systemAreaFilterV231?.value||'';
  const filtered=rows.filter(x=>(!q||`${x.airport} ${x.provider} ${x.checkin} ${x.boardingGate}`.toLowerCase().includes(q))&&(!a||x.airport===a)&&(!p||x.provider===p)&&(!ar||x.area===ar));
- tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.airport)}</b></td><td>${geEsc(x.sbd||'-')}</td><td>${geEsc(x.kiosk||'-')}</td><td>${geEsc(x.checkin||'-')}</td><td>${geEsc(x.boardingGate||'-')}</td><td>${geEsc(x.transferDesk||'-')}</td><td>${geEsc(x.provider||'-')}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.remarks||'-')}</td>${geAdminV231()?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openAirportSystemModalV231(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteAirportSystemV231(${x.id})">Hapus</button></td>`:''}</tr>`).join('');
+ tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.airport)}</b></td><td>${geEsc(x.sbd||'-')}</td><td>${geEsc(x.kiosk||'-')}</td><td>${geEsc(x.checkin||'-')}</td><td>${geEsc(x.boardingGate||'-')}</td><td>${geEsc(x.transferDesk||'-')}</td><td>${geEsc(x.provider||'-')}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.remarks||'-')}</td>${geAdminV231()?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openAirportSystemModalV231(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteAirportSystemV231(${x.id})">Delete</button></td>`:''}</tr>`).join('');
  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('systemTotalV231',rows.length);set('systemKioskV231',rows.filter(x=>String(x.kiosk).toLowerCase().includes('tersedia')).length);set('systemSbdV231',rows.filter(x=>String(x.sbd).toLowerCase().includes('tersedia')).length);set('systemMcoV231',rows.filter(x=>String(x.provider).toUpperCase()==='MCO').length);
  gePlanningEmpty('airportSystemEmpty',filtered);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 };
@@ -5017,7 +5128,7 @@ function openGasoModalV231(type,id=null){
  gasoModalFormV231.innerHTML=`<form onsubmit="event.preventDefault();saveGasoV231()"><div class="formgrid">${GE_GASO_FIELDS_V231[type].map(([key,label,kind])=>{
   const val=x?.[key]??'';if(kind==='textarea')return`<label>${label}<textarea data-gaso-field="${key}" rows="3">${geEsc(val)}</textarea></label>`;
   if(kind.startsWith('select:'))return`<label>${label}<select data-gaso-field="${key}">${kind.slice(7).split('|').map(o=>`<option ${val===o?'selected':''}>${o}</option>`).join('')}</select></label>`;
-  return`<label>${label}<input data-gaso-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`}).join('')}</div><div class="modal-actions sticky-actions"><button class="btn">Simpan</button><button type="button" class="btn secondary" onclick="closeGasoModalV231()">Cancel</button></div></form>`;
+  return`<label>${label}<input data-gaso-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`}).join('')}</div><div class="modal-actions sticky-actions"><button class="ge-btn">Save</button><button type="button" class="ge-btn secondary" onclick="closeGasoModalV231()">Cancel</button></div></form>`;
  gasoModalV231.classList.add('show');
 }
 function closeGasoModalV231(){gasoModalV231?.classList.remove('show')}
@@ -5028,7 +5139,7 @@ function saveGasoV231(){
  if(id)Object.assign(data[coll].find(x=>x.id===id),obj);else data[coll].push(obj);save();closeGasoModalV231();renderGasoAllV231();
 }
 function deleteGasoV231(type,id){if(!geAdminV231())return;const coll=GE_GASO_COLLECTION_V231[type],x=data[coll].find(v=>v.id===id);if(!x||!geDeleteConfirmV231(x.code||'GASO record'))return;data[coll]=data[coll].filter(v=>v.id!==id);save();renderGasoAllV231()}
-function gasoActionsV231(type,id){return geAdminV231()?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openGasoModalV231('${type}',${id})">Edit</button><button class="btn danger compact-btn" onclick="deleteGasoV231('${type}',${id})">Hapus</button></td>`:''}
+function gasoActionsV231(type,id){return geAdminV231()?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openGasoModalV231('${type}',${id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteGasoV231('${type}',${id})">Delete</button></td>`:''}
 function renderGasoMasterV231(){
  const t=document.getElementById('gasoMasterRowsV231');if(!t)return;const rows=data.gasoMaster||[];gePlanningPopulateSelect('gasoMasterRegionV231',rows.map(x=>x.region),'Semua Region');
  const q=(gasoMasterSearchV231?.value||'').toLowerCase(),r=gasoMasterRegionV231?.value||'',s=gasoMasterStatusV231?.value||'',f=rows.filter(x=>(!q||`${x.code} ${x.officeName} ${x.city} ${x.pic}`.toLowerCase().includes(q))&&(!r||x.region===r)&&(!s||x.status===s));
@@ -5091,7 +5202,7 @@ renderPlanningDocuments=function(){
  const tbody=document.getElementById('planningDocumentRows');if(!tbody)return;const rows=typeof gePlanningDocumentsV229==='function'?gePlanningDocumentsV229():(data.documents||[]);
  gePlanningPopulateSelect('planningDocCategory',rows.map(x=>x.category),'Semua Category');gePlanningPopulateSelect('planningDocAirport',rows.map(x=>x.airport),'Semua Airport');
  const q=(planningDocSearch?.value||'').toLowerCase(),c=planningDocCategory?.value||'',a=planningDocAirport?.value||'',filtered=rows.filter(x=>(!q||`${x.title} ${x.fileName} ${x.reference||''} ${x.source||''} ${x.airport||''}`.toLowerCase().includes(q))&&(!c||x.category===c)&&(!a||x.airport===a));
- tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date||'-'}</td><td>${geEsc(x.category||'-')}</td><td><b>${geEsc(x.title||'-')}</b>${x.reference?`<div class="planning-doc-ref-v229">${geEsc(x.reference)}</div>`:''}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.source||'-')}</td><td>${x.blobKey?`<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`:(x.fileName?`<button class="btn secondary compact-btn" disabled title="File binary belum tersimpan">${geEsc(x.fileName)}</button>`:'-')}</td>${geAdminV231()?`<td><button class="btn secondary compact-btn" onclick="geStorageNoticeV223('Dokumen Planning','Edit/hapus dokumen dilakukan pada modul sumber: ${String(x.source||'Document Master').replaceAll("'","")}.')">Kelola di Sumber</button></td>`:''}</tr>`).join('');
+ tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date||'-'}</td><td>${geEsc(x.category||'-')}</td><td><b>${geEsc(x.title||'-')}</b>${x.reference?`<div class="planning-doc-ref-v229">${geEsc(x.reference)}</div>`:''}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.source||'-')}</td><td>${x.blobKey?`<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`:(x.fileName?`<button class="ge-btn secondary compact-btn" disabled title="File binary belum tersimpan">${geEsc(x.fileName)}</button>`:'-')}</td>${geAdminV231()?`<td><button class="ge-btn secondary compact-btn" onclick="geStorageNoticeV223('Dokumen Planning','Edit/hapus dokumen dilakukan pada modul sumber: ${String(x.source||'Document Master').replaceAll("'","")}.')">Kelola di Sumber</button></td>`:''}</tr>`).join('');
  gePlanningEmpty('planningDocumentEmpty',filtered);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 };
 
@@ -5255,7 +5366,7 @@ function renderPurchaseV232(){
     return(!q||`${x.name} ${x.flight} ${x.reference}`.toLowerCase().includes(q))&&(!a||x.airport===a)&&(!st||x.status===st);
   });
   gePlanningPopulateSelect('purchaseAirportFilterV232',(data.loungePurchases||[]).map(x=>x.airport),'Semua Airport');
-  tbody.innerHTML=rows.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date}</td><td>${x.time}</td><td><b>${geEsc(x.name)}</b></td><td>${geEsc(x.flight||'-')}</td><td>${geEsc(x.airport)}</td><td>${geEsc(x.serviceName||'-')}</td><td>${geEsc(x.accessType)}</td><td>${geEsc(x.reference||'-')}</td><td>${geEsc(x.currency)} ${Number(x.amount||0).toLocaleString('id-ID')}</td><td>${geEsc(x.status)}</td><td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openPurchaseModalV232(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deletePurchaseV232(${x.id})">Hapus</button></td></tr>`).join('');
+  tbody.innerHTML=rows.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date}</td><td>${x.time}</td><td><b>${geEsc(x.name)}</b></td><td>${geEsc(x.flight||'-')}</td><td>${geEsc(x.airport)}</td><td>${geEsc(x.serviceName||'-')}</td><td>${geEsc(x.accessType)}</td><td>${geEsc(x.reference||'-')}</td><td>${geEsc(x.currency)} ${Number(x.amount||0).toLocaleString('id-ID')}</td><td>${geEsc(x.status)}</td><td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openPurchaseModalV232(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deletePurchaseV232(${x.id})">Delete</button></td></tr>`).join('');
   const all=data.loungePurchases||[],set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
   set('purchaseTotalV232',all.length);set('purchasePaidV232',all.filter(x=>x.status==='Paid').length);set('purchasePendingV232',all.filter(x=>x.status==='Pending').length);set('purchaseAirportCountV232',new Set(all.map(x=>x.airport)).size);
   gePlanningEmpty('purchaseEmptyV232',rows);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
@@ -5421,8 +5532,8 @@ function geConfirmDeleteV234(options={}){
           <p class="ge-delete-item-v234" id="geDeleteItemV234"></p>
           <p class="ge-delete-message-v234" id="geDeleteMessageV234"></p>
           <div class="ge-delete-actions-v234">
-            <button class="btn secondary ge-delete-cancel-v234" type="button"></button>
-            <button class="btn danger ge-delete-confirm-v234" type="button"></button>
+            <button class="ge-btn secondary ge-delete-cancel-v234" type="button"></button>
+            <button class="ge-btn danger ge-delete-confirm-v234" type="button"></button>
           </div>
         </div>`;
       document.body.appendChild(modal);
@@ -5744,7 +5855,7 @@ verifyBoardingPass=function(){
   if(parsed.indicator==='?')return geStorageNoticeV223('Eligibility Tidak Ditemukan','Indicator Y/N tidak ditemukan pada data boarding pass.');
   if(parsed.indicator==='N'){
     eligibilityModalBody.innerHTML=`<div class="lounge-denied-v236"><div class="status-icon">×</div><h2>Tidak Eligible Lounge</h2>${geParsedPassengerGridV236(parsed)}
-    <p>Akses Lounge/Tenant tidak dapat diberikan berdasarkan indicator eligibility.</p><div class="modal-actions"><button class="btn secondary" onclick="closeEligibilityModal();boardingScan.focus()">Scan Ulang</button><button class="btn" onclick="closeEligibilityModal()">Close</button></div></div>`;
+    <p>Akses Lounge/Tenant tidak dapat diberikan berdasarkan indicator eligibility.</p><div class="modal-actions"><button class="ge-btn secondary" onclick="closeEligibilityModal();boardingScan.focus()">Scan Ulang</button><button class="ge-btn" onclick="closeEligibilityModal()">Close</button></div></div>`;
     eligibilityModal.classList.add('show');return;
   }
   prepareEligibleConfirmation(parsed);
@@ -5756,7 +5867,7 @@ verifyManualPassenger=function(){
   parsed.route=parsed.origin&&parsed.destination?`${parsed.origin}-${parsed.destination}`:'';parsed.indicator=geEligibilityFromCabinMemberV236(parsed.cabin,parsed.member);
   if(!parsed.name||!parsed.flight||!parsed.seq||!parsed.cabin)return geStorageNoticeV223('Data Manual Belum Lengkap','Nama, Flight Number, Cabin, dan Sequence wajib diisi.');
   showPassengerPreview(parsed,parsed.indicator);
-  if(parsed.indicator!=='Y'){eligibilityModalBody.innerHTML=`<div class="lounge-denied-v236"><div class="status-icon">×</div><h2>Tidak Eligible Lounge</h2>${geParsedPassengerGridV236(parsed)}<p>Eligibility dihitung otomatis dari Cabin dan Member.</p><div class="modal-actions"><button class="btn" onclick="closeEligibilityModal()">Close</button></div></div>`;eligibilityModal.classList.add('show');return}
+  if(parsed.indicator!=='Y'){eligibilityModalBody.innerHTML=`<div class="lounge-denied-v236"><div class="status-icon">×</div><h2>Tidak Eligible Lounge</h2>${geParsedPassengerGridV236(parsed)}<p>Eligibility dihitung otomatis dari Cabin dan Member.</p><div class="modal-actions"><button class="ge-btn" onclick="closeEligibilityModal()">Close</button></div></div>`;eligibilityModal.classList.add('show');return}
   prepareEligibleConfirmation(parsed);
 };
 function geCategoryReferenceLabelV236(category){if(category==='Kerjasama MPA')return'Nama Maskapai / Mitra';if(category==='EMD')return'Nomor EMD';return'Nomor Member'}
@@ -5764,13 +5875,13 @@ prepareEligibleConfirmation=function(parsed){
   window._eligibleScan=parsed;const duplicate=isDuplicateVisitor(parsed);
   if(duplicate){
     eligibilityModalBody.innerHTML=`<div class="lounge-denied-v236 duplicate-v236"><div class="status-icon">!</div><h2>Duplicate Visitor</h2>${geParsedPassengerGridV236(parsed)}
-    <p>Kombinasi Nama Penumpang + Flight Number + Sequence Check-in sudah pernah direkam.</p><div class="modal-actions"><button class="btn" onclick="closeEligibilityModal()">Close</button></div></div>`;
+    <p>Kombinasi Nama Penumpang + Flight Number + Sequence Check-in sudah pernah direkam.</p><div class="modal-actions"><button class="ge-btn" onclick="closeEligibilityModal()">Close</button></div></div>`;
   }else{
     const initial=parsed.cabin==='C'?'Business Class':(['Platinum','Elite Plus'].includes(parsed.member)?parsed.member:'Business Class');
     eligibilityModalBody.innerHTML=`<div class="lounge-eligible-v236"><div class="lounge-modal-success-v236">✓</div><h2>Eligible Lounge/Tenant</h2><p>Konfirmasi kategori penumpang sebelum visitor direkam.</p>
     ${geParsedPassengerGridV236(parsed)}<div class="lounge-category-box-v236"><label>Kategori Penumpang<select id="eligibleCategoryV236" onchange="geEligibilityCategoryChangedV236()">${GE_LOUNGE_FINAL_CATEGORIES_V236.map(x=>`<option ${x===initial?'selected':''}>${x}</option>`).join('')}</select></label>
     <label id="eligibleReferenceWrapV236" style="display:none"><span id="eligibleReferenceLabelV236">Nomor Member</span><input id="eligibleReferenceV236"></label></div>
-    <div class="modal-actions"><button class="btn lounge-primary-v236" onclick="recordEligibleVisitorV236()">Konfirmasi & Rekam Visitor</button><button class="btn secondary" onclick="closeEligibilityModal()">Cancel</button></div></div>`;
+    <div class="modal-actions"><button class="ge-btn lounge-primary-v236" onclick="recordEligibleVisitorV236()">Konfirmasi & Rekam Visitor</button><button class="ge-btn secondary" onclick="closeEligibilityModal()">Cancel</button></div></div>`;
     setTimeout(geEligibilityCategoryChangedV236,0);
   }
   eligibilityModal.classList.add('show');
@@ -5840,7 +5951,7 @@ renderLoungeVisitors=function(){
     <td>${geEsc(x.route||((x.origin&&x.destination)?x.origin+'-'+x.destination:'-'))}</td><td>${geEsc(x.flight||'-')}</td>
     <td>${geEsc(x.cabin||'-')} / ${geEsc(x.seat||'-')}</td><td>${geEsc(x.seq||'-')}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.loungeName||'-')}</td>
     <td>${geEsc(x.category||'-')}</td><td>${geEsc(x.eligibilityReference||'-')}</td><td class="price-cell">${x.priceDisplay||((x.currency&&x.pricePerPax)?`${x.currency} ${Number(x.pricePerPax).toLocaleString('id-ID')}`:'Belum diisi')}</td>
-    ${admin?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openVisitorEdit(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteVisitor(${x.id})">Hapus</button></td>`:''}</tr>`).join('');
+    ${admin?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openVisitorEdit(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteVisitor(${x.id})">Delete</button></td>`:''}</tr>`).join('');
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};set('visitorCount',rows.length);set('visitorBusiness',rows.filter(x=>x.category==='Business Class').length);set('visitorTier',rows.filter(x=>x.category!=='Business Class').length);set('visitorFilteredTotal',rows.length);
   if(typeof renderVisitorCostSummary==='function')renderVisitorCostSummary(rows);if(typeof renderVisitorTrafficV232==='function')renderVisitorTrafficV232();if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 };
@@ -5872,7 +5983,7 @@ function renderFlightsV236(){
   const tbody=document.getElementById('flightRowsV236');if(!tbody)return;const all=(data.flightSchedule||[]).filter(geFlightVisibleV236),q=(flightSearchV236?.value||'').toLowerCase(),a=flightAirportV236?.value||'',s=flightStatusFilterV236?.value||'',d=flightDateFilterV236?.value||'';
   const rows=all.filter(x=>(!q||`${x.flight} ${x.from}-${x.to}`.toLowerCase().includes(q))&&(!a||(x.from===a||x.to===a))&&(!s||x.status===s)&&(!d||x.date===d));
   gePlanningPopulateSelect('flightAirportV236',[...all.map(x=>x.from),...all.map(x=>x.to)],'Semua Airport');gePlanningPopulateSelect('flightStatusFilterV236',all.map(x=>x.status),'Semua Status');
-  tbody.innerHTML=rows.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.flight)}</b></td><td>${geEsc(x.from)}-${geEsc(x.to)}</td><td>${x.date}</td><td>${x.std||'-'}</td><td>${x.etd||'-'}</td><td>${Number(x.capacity||0).toLocaleString('id-ID')}</td><td><span class="flight-status-v236 ${String(x.status||'').toLowerCase().replace(/\s+/g,'-')}">${geEsc(x.status||'-')}</span></td><td>${geCanManageFlightsV236()?`<div class="visitor-actions"><button class="btn secondary compact-btn" onclick="openFlightModalV236(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteFlightV236(${x.id})">Hapus</button></div>`:'-'}</td></tr>`).join('');gePlanningEmpty('flightEmptyV236',rows);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
+  tbody.innerHTML=rows.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.flight)}</b></td><td>${geEsc(x.from)}-${geEsc(x.to)}</td><td>${x.date}</td><td>${x.std||'-'}</td><td>${x.etd||'-'}</td><td>${Number(x.capacity||0).toLocaleString('id-ID')}</td><td><span class="flight-status-v236 ${String(x.status||'').toLowerCase().replace(/\s+/g,'-')}">${geEsc(x.status||'-')}</span></td><td>${geCanManageFlightsV236()?`<div class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openFlightModalV236(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteFlightV236(${x.id})">Delete</button></div>`:'-'}</td></tr>`).join('');gePlanningEmpty('flightEmptyV236',rows);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
 let GE_FLIGHT_BULK_ROWS_V236=[];
 function openFlightBulkV236(){if(!geCanManageFlightsV236())return;GE_FLIGHT_BULK_ROWS_V236=[];flightBulkFileV236.value='';flightBulkPreviewV236.innerHTML='Belum ada file dipilih.';flightBulkConfirmV236.disabled=true;flightBulkModalV236.classList.add('show')}
@@ -5942,12 +6053,12 @@ function renderLoungeCardsV237(){
         <dl><div><dt>Periode kerja sama</dt><dd>${geEsc(x.startDate||x.contractStart||x.start||'-')} — ${geEsc(x.endDate||x.contractEnd||x.end||'-')}</dd></div>
         <div><dt>Harga per pax</dt><dd>${geEsc(geLoungePriceV237(x))}</dd></div></dl>
         <div class="lounge-card-actions-v237">
-          ${typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="btn secondary compact-btn" onclick="openLoungeEdit?.(${Number(x.id)})">Edit</button>`:''}
+          ${typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn secondary compact-btn" onclick="openLoungeEdit?.(${Number(x.id)})">Edit</button>`:''}
         </div>
       </div>
     </article>`;
   }).join('') || '<div class="lounge-master-empty-v237">Belum ada data Lounge/Tenant pada filter ini.</div>';
-  const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Halaman ${GE_LOUNGE_CARD_PAGE_V237} dari ${pages} • ${rows.length} data`;
+  const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Page ${GE_LOUNGE_CARD_PAGE_V237} of ${pages} • ${rows.length} data`;
   const prev=document.getElementById('loungeCardPrevV237'),next=document.getElementById('loungeCardNextV237');
   if(prev)prev.disabled=GE_LOUNGE_CARD_PAGE_V237<=1;if(next)next.disabled=GE_LOUNGE_CARD_PAGE_V237>=pages;
 }
@@ -5972,7 +6083,7 @@ function geManualFallbackMarkupV238(){
       <label>Sequence Check-in<input id="manualSeq" placeholder="107"></label><label>Ticket Number<input id="manualTicket" placeholder="126xxxxxxxxxxx"></label>
       <label>Member<select id="manualMember"><option value="">Tidak Ada / Lainnya</option><option>Platinum</option><option>Elite Plus</option></select></label>
     </div><div class="scanner-note lounge-note-v236">Eligibility dihitung otomatis: Cabin C/Business = Eligible. Cabin Y/Economy = Eligible untuk Platinum atau Elite Plus; kombinasi lain = Tidak Eligible.</div>
-    <div class="scan-actions"><button class="btn lounge-primary-v236" onclick="verifyManualPassenger()">Verifikasi Data Manual</button><button class="btn secondary" onclick="resetLoungeAccess()">Cancel</button></div></div>`;
+    <div class="scan-actions"><button class="ge-btn lounge-primary-v236" onclick="verifyManualPassenger()">Verifikasi Data Manual</button><button class="ge-btn secondary" onclick="resetLoungeAccess()">Cancel</button></div></div>`;
 }
 toggleManualEntry=function(){
   stopCameraScanner?.();
@@ -6022,7 +6133,7 @@ renderLoungeCardsV237=function(){
   document.querySelectorAll('#loungeCardGridV237 .lounge-master-card-v237').forEach((card,i)=>{
     const x=rows[start+i]; if(!x)return;
     const actions=card.querySelector('.lounge-card-actions-v237');
-    if(actions && !actions.querySelector('.danger')) actions.insertAdjacentHTML('beforeend',`<button class="btn danger compact-btn" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button>`);
+    if(actions && !actions.querySelector('.danger')) actions.insertAdjacentHTML('beforeend',`<button class="ge-btn danger compact-btn" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button>`);
   });
 };
 
@@ -6199,7 +6310,7 @@ renderLoungeProcurement=function(){
   tbody.innerHTML=filtered.map((x,i)=>{
     const b=geBudgetApprovalForLounge({airport:x.airport,name:x.serviceName}),f=geServiceFollowupV243(x);
     const actions=gePlanningCanManage()
-      ? (x._source==='service'?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openServiceProcurementModalV243(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteServiceProcurementV243(${x.id})">Hapus</button></td>`:`<td><a class="btn secondary compact-btn" href="lounge-list.html">Kelola di Lounge Master</a></td>`)
+      ? (x._source==='service'?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openServiceProcurementModalV243(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteServiceProcurementV243(${x.id})">Delete</button></td>`:`<td><a class="ge-btn secondary compact-btn" href="lounge-list.html">Kelola di Lounge Master</a></td>`)
       :'';
     return `<tr><td>${i+1}</td><td><b>${geEsc(x.airport||'-')}</b></td><td>${geEsc(x.categoryService||'-')}</td><td>${geEsc(x.serviceName||'-')}</td><td>${geEsc(geServicePriceV243(x))}</td><td>${geEsc(x.startDate||'-')} — ${geEsc(x.endDate||'-')}</td><td><span class="planning-status">${f?'Follow-up':'Covered'}</span></td><td>${b?geEsc(b.title):'Belum terhubung'}</td><td>${geEsc(x.documentNumber||x.documentName||'-')}</td>${actions}</tr>`;
   }).join('');
@@ -6753,13 +6864,13 @@ saveInitiativeProgressV224=function(){const id=Number(initiativeProgressIdV224?.
 /* Station Material V2.46: start/end period and warning */
 const GE_OPEN_SM_V246=openStationMaterialModalV231;
 openStationMaterialModalV231=function(id=null){GE_OPEN_SM_V246(id);const x=id?(data.stationMaterials||[]).find(v=>v.id===id):null;if(document.getElementById('stationMaterialStartV246'))stationMaterialStartV246.value=x?.startDate||'';if(document.getElementById('stationMaterialEndV246'))stationMaterialEndV246.value=x?.endDate||''};
-renderStationMaterials=function(){const tbody=document.getElementById('stationMaterialRows');if(!tbody)return;gePlanningPopulateSelect('materialAreaFilterV231',(data.stationMaterials||[]).map(x=>x.area),'Semua Area');gePlanningPopulateSelect('materialVendorFilterV231',(data.stationMaterials||[]).map(x=>x.vendor),'Semua Provider');const q=(materialSearch?.value||'').toLowerCase(),a=materialAreaFilterV231?.value||'',v=materialVendorFilterV231?.value||'',s=materialStatusFilter?.value||'';const rows=(data.stationMaterials||[]).filter(x=>(!q||`${x.code} ${x.product} ${x.vendor}`.toLowerCase().includes(q))&&(!a||x.area===a)&&(!v||x.vendor===v)&&(!s||x.status===s));tbody.innerHTML=rows.map((x,i)=>{const w=geMonthsWarningV246(x.endDate);return `<tr class="contract-row-v246 ${w.cls}"><td>${i+1}</td><td><b>${geEsc(x.code||'')}</b></td><td>${geEsc(x.product||'')}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.vendor||'-')}</td><td>${x.startDate||'-'}</td><td><b>${x.endDate||'-'}</b><small class="contract-label-v246">${w.label}</small></td><td>${geEsc(x.status||'-')}</td><td>${x.documentKey?`<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.documentKey}','${geEsc(x.documentName||'document')}')">Download</button>`:'-'}</td>${geAdminV231()?`<td><div class="manage-inline-v246"><button class="btn secondary compact-btn" onclick="openStationMaterialModalV231(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteStationMaterialV231(${x.id})">Hapus</button></div></td>`:''}</tr>`}).join('');if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0)};
+renderStationMaterials=function(){const tbody=document.getElementById('stationMaterialRows');if(!tbody)return;gePlanningPopulateSelect('materialAreaFilterV231',(data.stationMaterials||[]).map(x=>x.area),'Semua Area');gePlanningPopulateSelect('materialVendorFilterV231',(data.stationMaterials||[]).map(x=>x.vendor),'Semua Provider');const q=(materialSearch?.value||'').toLowerCase(),a=materialAreaFilterV231?.value||'',v=materialVendorFilterV231?.value||'',s=materialStatusFilter?.value||'';const rows=(data.stationMaterials||[]).filter(x=>(!q||`${x.code} ${x.product} ${x.vendor}`.toLowerCase().includes(q))&&(!a||x.area===a)&&(!v||x.vendor===v)&&(!s||x.status===s));tbody.innerHTML=rows.map((x,i)=>{const w=geMonthsWarningV246(x.endDate);return `<tr class="contract-row-v246 ${w.cls}"><td>${i+1}</td><td><b>${geEsc(x.code||'')}</b></td><td>${geEsc(x.product||'')}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.vendor||'-')}</td><td>${x.startDate||'-'}</td><td><b>${x.endDate||'-'}</b><small class="contract-label-v246">${w.label}</small></td><td>${geEsc(x.status||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.documentKey}','${geEsc(x.documentName||'document')}')">Download</button>`:'-'}</td>${geAdminV231()?`<td><div class="manage-inline-v246"><button class="ge-btn secondary compact-btn" onclick="openStationMaterialModalV231(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteStationMaterialV231(${x.id})">Delete</button></div></td>`:''}</tr>`}).join('');if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0)};
 /* Announcement library */
 window.geAnnouncementLibraryV246=[
  {id:'preboarding',title:'Pre-Boarding Announcement',touchpoint:'Boarding Gate',type:'Group Boarding',variants:['Narrow Body','Wide Body'],languages:['Bahasa Indonesia','English'],summary:'Announcement sebelum boarding dimulai, termasuk prioritas dan urutan boarding group.',groups:['Priority — special assistance, infant/children, elderly, expectant mother','Group 1 — Business / premium frequent flyer priority','Group 2 — priority frequent flyer / priority service','Group 3–6 — Economy berdasarkan seat zone']},
  {id:'boarding',title:'Boarding Announcement',touchpoint:'Boarding Gate',type:'Group Boarding',variants:['Narrow Body','Wide Body'],languages:['Bahasa Indonesia','English'],summary:'Announcement saat proses boarding dimulai dengan urutan priority dan boarding group.',groups:['Priority Boarding','Group 1','Group 2','Group 3','Group 4','Group 5','Group 6']}
 ];
-function renderAnnouncementLibraryV246(){const box=document.getElementById('announcementLibraryV246');if(!box)return;const q=(document.getElementById('announcementSearchV246')?.value||'').toLowerCase(),type=document.getElementById('announcementTypeV246')?.value||'',aircraft=document.getElementById('announcementAircraftV246')?.value||'',lang=document.getElementById('announcementLanguageV246')?.value||'';const rows=geAnnouncementLibraryV246.filter(x=>(!q||`${x.title} ${x.touchpoint} ${x.type}`.toLowerCase().includes(q))&&(!type||x.touchpoint===type)&&(!aircraft||x.variants.includes(aircraft))&&(!lang||x.languages.includes(lang)));box.innerHTML=rows.map((x,i)=>`<article class="announcement-card-v246"><div class="announcement-no-v246">${String(i+1).padStart(2,'0')}</div><div><span class="eyebrow">${geEsc(x.touchpoint)} • ${geEsc(x.type)}</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.summary)}</p><div class="announcement-tags-v246">${x.variants.map(v=>`<span>${v}</span>`).join('')}${x.languages.map(v=>`<span>${v}</span>`).join('')}</div><button class="btn secondary compact-btn" onclick="openAnnouncementReferenceV246('${x.id}')">Buka Announcement</button></div></article>`).join('')};
+function renderAnnouncementLibraryV246(){const box=document.getElementById('announcementLibraryV246');if(!box)return;const q=(document.getElementById('announcementSearchV246')?.value||'').toLowerCase(),type=document.getElementById('announcementTypeV246')?.value||'',aircraft=document.getElementById('announcementAircraftV246')?.value||'',lang=document.getElementById('announcementLanguageV246')?.value||'';const rows=geAnnouncementLibraryV246.filter(x=>(!q||`${x.title} ${x.touchpoint} ${x.type}`.toLowerCase().includes(q))&&(!type||x.touchpoint===type)&&(!aircraft||x.variants.includes(aircraft))&&(!lang||x.languages.includes(lang)));box.innerHTML=rows.map((x,i)=>`<article class="announcement-card-v246"><div class="announcement-no-v246">${String(i+1).padStart(2,'0')}</div><div><span class="eyebrow">${geEsc(x.touchpoint)} • ${geEsc(x.type)}</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.summary)}</p><div class="announcement-tags-v246">${x.variants.map(v=>`<span>${v}</span>`).join('')}${x.languages.map(v=>`<span>${v}</span>`).join('')}</div><button class="ge-btn secondary compact-btn" onclick="openAnnouncementReferenceV246('${x.id}')">Buka Announcement</button></div></article>`).join('')};
 function openAnnouncementReferenceV246(id){const x=geAnnouncementLibraryV246.find(v=>v.id===id);if(!x)return;document.getElementById('announcementReferenceTitleV246').textContent=x.title;document.getElementById('announcementReferenceBodyV246').innerHTML=`<div class="announcement-reference-head-v246"><span>${x.touchpoint}</span><span>${x.type}</span></div><p>${geEsc(x.summary)}</p><h4>Urutan / Struktur Announcement</h4><div class="announcement-sequence-v246">${x.groups.map((g,i)=>`<div><b>${String(i+1).padStart(2,'0')}</b><span>${geEsc(g)}</span></div>`).join('')}</div><div class="announcement-note-v246">Script lengkap mengikuti master announcement resmi yang dikelola pada modul ini.</div>`;document.getElementById('announcementReferenceModalV246').classList.add('show')}
 function closeAnnouncementReferenceV246(){document.getElementById('announcementReferenceModalV246')?.classList.remove('show')}
 window.addEventListener('DOMContentLoaded',()=>{renderAnnouncementLibraryV246()});
@@ -7129,8 +7240,8 @@ function geApplyStandardContentV248(){
 
 function geEnsureStandardModalV248(){
   if(document.getElementById('standardContentModalV248')){gePromoteModalViewportV248(document.getElementById('standardContentModalV248'));gePromoteModalViewportV248(document.getElementById('announcementEditModalV248'));return}
-  document.body.insertAdjacentHTML('beforeend',`<div id="standardContentModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseStandardContentModalV248()">×</button><h2 id="standardContentModalTitleV248">Kelola Konten</h2><input type="hidden" id="standardContentModeV248"><input type="hidden" id="standardContentKeyV248"><div id="standardContentFieldsV248" class="formgrid"></div><div class="modal-actions sticky-actions"><button class="btn" onclick="geSaveStandardContentV248()">Simpan</button><button class="btn secondary" onclick="geCloseStandardContentModalV248()">Cancel</button></div></div></div>
-  <div id="announcementEditModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseAnnouncementEditV248()">×</button><h2 id="announcementEditTitleV248">Tambah Announcement</h2><input type="hidden" id="announcementEditIdV248"><div class="formgrid"><label>Judul<input id="annTitleV248"></label><label>Touch Point<input id="annTouchpointV248"></label><label>Jenis / Type<input id="annTypeV248"></label><label>Aircraft Type<textarea id="annVariantsV248" rows="2" placeholder="Narrow Body\nWide Body"></textarea></label><label>Bahasa<textarea id="annLanguagesV248" rows="2" placeholder="Bahasa Indonesia\nEnglish"></textarea></label><label class="span2">Ringkasan / Isi<textarea id="annSummaryV248" rows="4"></textarea></label><label class="span2">Poin / Urutan Announcement<textarea id="annGroupsV248" rows="7" placeholder="Satu poin per baris"></textarea></label></div><div class="modal-actions sticky-actions"><button class="btn" onclick="geSaveAnnouncementV248()">Simpan Announcement</button><button class="btn secondary" onclick="geCloseAnnouncementEditV248()">Cancel</button></div></div></div>`);
+  document.body.insertAdjacentHTML('beforeend',`<div id="standardContentModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseStandardContentModalV248()">×</button><h2 id="standardContentModalTitleV248">Kelola Konten</h2><input type="hidden" id="standardContentModeV248"><input type="hidden" id="standardContentKeyV248"><div id="standardContentFieldsV248" class="formgrid"></div><div class="modal-actions sticky-actions"><button class="ge-btn" onclick="geSaveStandardContentV248()">Save</button><button class="ge-btn secondary" onclick="geCloseStandardContentModalV248()">Cancel</button></div></div></div>
+  <div id="announcementEditModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseAnnouncementEditV248()">×</button><h2 id="announcementEditTitleV248">Tambah Announcement</h2><input type="hidden" id="announcementEditIdV248"><div class="formgrid"><label>Judul<input id="annTitleV248"></label><label>Touch Point<input id="annTouchpointV248"></label><label>Jenis / Type<input id="annTypeV248"></label><label>Aircraft Type<textarea id="annVariantsV248" rows="2" placeholder="Narrow Body\nWide Body"></textarea></label><label>Bahasa<textarea id="annLanguagesV248" rows="2" placeholder="Bahasa Indonesia\nEnglish"></textarea></label><label class="span2">Ringkasan / Isi<textarea id="annSummaryV248" rows="4"></textarea></label><label class="span2">Poin / Urutan Announcement<textarea id="annGroupsV248" rows="7" placeholder="Satu poin per baris"></textarea></label></div><div class="modal-actions sticky-actions"><button class="ge-btn" onclick="geSaveAnnouncementV248()">Simpan Announcement</button><button class="ge-btn secondary" onclick="geCloseAnnouncementEditV248()">Cancel</button></div></div></div>`);
   gePromoteModalViewportV248(document.getElementById('standardContentModalV248'));
   gePromoteModalViewportV248(document.getElementById('announcementEditModalV248'));
 }
@@ -7156,12 +7267,12 @@ function geSaveStandardContentV248(){
 async function geDeleteExtraStandardSectionV248(id){if(!geIsStandardAdminV248())return;const ok=typeof geConfirmDeleteV234==='function'?await geConfirmDeleteV234({title:'Hapus Sub Judul?',item:'Konten Standar Layanan',message:'Sub judul dan penjelasannya akan dihapus.'}):confirm('Hapus sub judul?');if(!ok)return;const sc=geEnsureStandardContentV248();sc.extraSections=sc.extraSections.filter(x=>String(x.id)!==String(id));save();geApplyStandardContentV248()}
 
 function geRenderExtraStandardSectionsV248(){
-  const sc=geEnsureStandardContentV248();['people','process','premises','skypriority'].forEach(panel=>{const host=document.getElementById('standard'+panel.charAt(0).toUpperCase()+panel.slice(1)+'Panel');if(!host)return;let box=host.querySelector('.standard-extra-sections-v248');if(!box){box=document.createElement('div');box.className='standard-extra-sections-v248';host.appendChild(box)}const rows=sc.extraSections.filter(x=>x.panel===panel);box.innerHTML=rows.map(x=>`<article class="card standard-extra-card-v248"><div><span class="eyebrow">${panel.toUpperCase()} STANDARD</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.description||'')}</p>${x.points?.length?`<ul>${x.points.map(p=>`<li>${geEsc(p)}</li>`).join('')}</ul>`:''}</div>${geIsStandardAdminV248()?`<div class="standard-inline-actions-v248"><button class="btn secondary compact-btn" onclick="geOpenStandardContentV248('extra','${x.id}')">Edit</button><button class="btn danger compact-btn" onclick="geDeleteExtraStandardSectionV248('${x.id}')">Hapus</button></div>`:''}</article>`).join('')});
+  const sc=geEnsureStandardContentV248();['people','process','premises','skypriority'].forEach(panel=>{const host=document.getElementById('standard'+panel.charAt(0).toUpperCase()+panel.slice(1)+'Panel');if(!host)return;let box=host.querySelector('.standard-extra-sections-v248');if(!box){box=document.createElement('div');box.className='standard-extra-sections-v248';host.appendChild(box)}const rows=sc.extraSections.filter(x=>x.panel===panel);box.innerHTML=rows.map(x=>`<article class="card standard-extra-card-v248"><div><span class="eyebrow">${panel.toUpperCase()} STANDARD</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.description||'')}</p>${x.points?.length?`<ul>${x.points.map(p=>`<li>${geEsc(p)}</li>`).join('')}</ul>`:''}</div>${geIsStandardAdminV248()?`<div class="standard-inline-actions-v248"><button class="ge-btn secondary compact-btn" onclick="geOpenStandardContentV248('extra','${x.id}')">Edit</button><button class="ge-btn danger compact-btn" onclick="geDeleteExtraStandardSectionV248('${x.id}')">Delete</button></div>`:''}</article>`).join('')});
 }
 function geRenderStandardAdminButtonsV248(){
   document.querySelectorAll('.standard-admin-toolbar-v248,.standard-card-edit-v248').forEach(x=>x.remove());if(!geIsStandardAdminV248())return;
-  const hero=document.querySelector('main.main>.hero');if(hero){hero.insertAdjacentHTML('beforeend','<button class="btn secondary compact-btn standard-admin-toolbar-v248" onclick="geOpenStandardContentV248(\'hero\',\'hero\')">Edit Teks Halaman</button>')}
-  ['people','process','premises','skypriority'].forEach(k=>{const btn=document.querySelector(`[data-standard-panel="${k}"]`);if(btn)btn.insertAdjacentHTML('beforeend',`<span class="standard-card-edit-v248" onclick="event.stopPropagation();geOpenStandardContentV248('selector','${k}')">Edit</span>`);const panel=document.getElementById('standard'+k.charAt(0).toUpperCase()+k.slice(1)+'Panel');if(panel){const anchor=panel.querySelector('.page-header,.title,.standard-coming-panel,.personnel-readiness-title');if(anchor)anchor.insertAdjacentHTML('beforeend',`<div class="standard-admin-toolbar-v248"><button class="btn secondary compact-btn" onclick="geOpenStandardContentV248('main','${k}')">Edit Sub Judul</button><button class="btn secondary compact-btn" onclick="geOpenStandardContentV248('extra','${k}')">Tambah Sub Judul</button>${k==='process'?'<button class="btn compact-btn" onclick="geOpenAnnouncementEditV248()">Tambah Announcement</button>':''}</div>`)} });
+  const hero=document.querySelector('main.main>.hero');if(hero){hero.insertAdjacentHTML('beforeend','<button class="ge-btn secondary compact-btn standard-admin-toolbar-v248" onclick="geOpenStandardContentV248(\'hero\',\'hero\')">Edit Teks Halaman</button>')}
+  ['people','process','premises','skypriority'].forEach(k=>{const btn=document.querySelector(`[data-standard-panel="${k}"]`);if(btn)btn.insertAdjacentHTML('beforeend',`<span class="standard-card-edit-v248" onclick="event.stopPropagation();geOpenStandardContentV248('selector','${k}')">Edit</span>`);const panel=document.getElementById('standard'+k.charAt(0).toUpperCase()+k.slice(1)+'Panel');if(panel){const anchor=panel.querySelector('.page-header,.title,.standard-coming-panel,.personnel-readiness-title');if(anchor)anchor.insertAdjacentHTML('beforeend',`<div class="standard-admin-toolbar-v248"><button class="ge-btn secondary compact-btn" onclick="geOpenStandardContentV248('main','${k}')">Edit Sub Judul</button><button class="ge-btn secondary compact-btn" onclick="geOpenStandardContentV248('extra','${k}')">Tambah Sub Judul</button>${k==='process'?'<button class="ge-btn compact-btn" onclick="geOpenAnnouncementEditV248()">Tambah Announcement</button>':''}</div>`)} });
 }
 
 /* ---------- Announcement CRUD ---------- */
@@ -7171,7 +7282,7 @@ renderAnnouncementLibraryV246=function(){
   const box=document.getElementById('announcementLibraryV246');if(!box)return;geAnnouncementLibraryV246=geAnnouncementRowsV248();
   const q=(document.getElementById('announcementSearchV246')?.value||'').toLowerCase(),type=document.getElementById('announcementTypeV246')?.value||'',aircraft=document.getElementById('announcementAircraftV246')?.value||'',lang=document.getElementById('announcementLanguageV246')?.value||'';
   const rows=geAnnouncementLibraryV246.filter(x=>(!q||`${x.title} ${x.touchpoint} ${x.type} ${x.summary}`.toLowerCase().includes(q))&&(!type||x.touchpoint===type)&&(!aircraft||(x.variants||[]).includes(aircraft))&&(!lang||(x.languages||[]).includes(lang)));
-  box.innerHTML=rows.map((x,i)=>`<article class="announcement-card-v246"><div class="announcement-no-v246">${String(i+1).padStart(2,'0')}</div><div><span class="eyebrow">${geEsc(x.touchpoint)} • ${geEsc(x.type)}</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.summary)}</p><div class="announcement-tags-v246">${(x.variants||[]).map(v=>`<span>${geEsc(v)}</span>`).join('')}${(x.languages||[]).map(v=>`<span>${geEsc(v)}</span>`).join('')}</div><div class="announcement-actions-v248"><button class="btn secondary compact-btn" onclick="openAnnouncementReferenceV246('${x.id}')">Buka Announcement</button>${geIsStandardAdminV248()?`<button class="btn secondary compact-btn" onclick="geOpenAnnouncementEditV248('${x.id}')">Edit</button><button class="btn danger compact-btn" onclick="geDeleteAnnouncementV248('${x.id}')">Hapus</button>`:''}</div></div></article>`).join('');
+  box.innerHTML=rows.map((x,i)=>`<article class="announcement-card-v246"><div class="announcement-no-v246">${String(i+1).padStart(2,'0')}</div><div><span class="eyebrow">${geEsc(x.touchpoint)} • ${geEsc(x.type)}</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.summary)}</p><div class="announcement-tags-v246">${(x.variants||[]).map(v=>`<span>${geEsc(v)}</span>`).join('')}${(x.languages||[]).map(v=>`<span>${geEsc(v)}</span>`).join('')}</div><div class="announcement-actions-v248"><button class="ge-btn secondary compact-btn" onclick="openAnnouncementReferenceV246('${x.id}')">Buka Announcement</button>${geIsStandardAdminV248()?`<button class="ge-btn secondary compact-btn" onclick="geOpenAnnouncementEditV248('${x.id}')">Edit</button><button class="ge-btn danger compact-btn" onclick="geDeleteAnnouncementV248('${x.id}')">Delete</button>`:''}</div></div></article>`).join('');
 };
 openAnnouncementReferenceV246=function(id){const x=geAnnouncementRowsV248().find(v=>String(v.id)===String(id));if(!x)return;document.getElementById('announcementReferenceTitleV246').textContent=x.title;document.getElementById('announcementReferenceBodyV246').innerHTML=`<div class="announcement-reference-head-v246"><span>${geEsc(x.touchpoint)}</span><span>${geEsc(x.type)}</span></div><p>${geEsc(x.summary)}</p><h4>Urutan / Struktur Announcement</h4><div class="announcement-sequence-v246">${(x.groups||[]).map((g,i)=>`<div><b>${String(i+1).padStart(2,'0')}</b><span>${geEsc(g)}</span></div>`).join('')}</div>`;document.getElementById('announcementReferenceModalV246').classList.add('show')};
 function geOpenAnnouncementEditV248(id=null){if(!geIsStandardAdminV248())return;geEnsureStandardModalV248();const x=id?geAnnouncementRowsV248().find(v=>String(v.id)===String(id)):null;announcementEditTitleV248.textContent=x?'Update Announcement':'Tambah Announcement';announcementEditIdV248.value=x?.id||'';annTitleV248.value=x?.title||'';annTouchpointV248.value=x?.touchpoint||'';annTypeV248.value=x?.type||'';annVariantsV248.value=(x?.variants||[]).join('\n');annLanguagesV248.value=(x?.languages||[]).join('\n');annSummaryV248.value=x?.summary||'';annGroupsV248.value=(x?.groups||[]).join('\n');announcementEditModalV248.classList.add('show')}
@@ -7189,7 +7300,7 @@ function pmSaveDraft(area){const x=pmState();x.updatedAt=new Date().toISOString(
 function pmPreview(){const x=pmState();pmActivity('Preview siap • '+(x.title||'perubahan portal')+'. Pada production preview akan dibuka pada staging route sebelum Publish.');}
 function pmPublish(){const x=pmState();x.status='Published';x.publishedAt=new Date().toISOString();pmWrite(x);const s=document.getElementById('portalPublishState');if(s)s.textContent='Published';pmActivity('Perubahan ditandai Published pada prototype V2.50.');if(s)s.textContent='Published';}
 function pmNewPage(){document.getElementById('pmTitle').value='';document.getElementById('pmDescription').value='';pmActivity('Draft page baru dibuat. Pilih layout/component sebelum Publish.');}
-function pmAddMenu(){const l=document.getElementById('pmMenuList');if(!l)return;const d=document.createElement('div');d.className='portal-menu-item';d.innerHTML='<span class="portal-drag">↕</span><b>Menu Baru</b><small>Draft</small><button class="btn secondary">Kelola</button>';l.appendChild(d);pmActivity('Menu baru ditambahkan ke draft layout.');}
+function pmAddMenu(){const l=document.getElementById('pmMenuList');if(!l)return;const d=document.createElement('div');d.className='portal-menu-item';d.innerHTML='<span class="portal-drag">↕</span><b>Menu Baru</b><small>Draft</small><button class="ge-btn secondary">Kelola</button>';l.appendChild(d);pmActivity('Menu baru ditambahkan ke draft layout.');}
 function pmRegisterAssets(){const f=[...(document.getElementById('pmAsset')?.files||[])];if(!f.length){pmActivity('Pilih asset terlebih dahulu.');return}const x=pmState();x.assets=(x.assets||[]).concat(f.map(a=>({name:a.name,size:a.size,type:a.type,registeredAt:new Date().toISOString()})));pmWrite(x);pmActivity(f.length+' asset diregister sebagai metadata prototype.');}
 function pmAssetList(){const a=pmState().assets||[];pmActivity(a.length?('Asset Library prototype: '+a.map(x=>x.name).join(', ')):'Asset Library masih kosong.');}
 
@@ -7213,7 +7324,7 @@ function geV251Ensure(){
 function geV251ReadImage(file,cb){if(!file)return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file)}
 function geV251EditVisual(key){if(!geV251Admin())return;const s=geV251Ensure().visuals[key];geV251OpenEditor('Edit Referensi Visual',s,(v)=>{Object.assign(s,v);save();geV251RenderTouchpointPage()})}
 function geV251OpenEditor(title,obj,onSave){
- let m=document.getElementById('geV251Editor');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Editor" class="modal-backdrop"><div class="modal-card"><button class="modal-x" onclick="geV251CloseEditor()">×</button><h2 id="geV251EditorTitle"></h2><div class="formgrid"><label>Judul<input id="geV251EdTitle"></label><label class="span2">Keterangan<textarea id="geV251EdCaption" rows="4"></textarea></label><label class="span2">Gambar<input id="geV251EdFile" type="file" accept="image/*"></label></div><div class="modal-actions"><button class="btn" id="geV251EdSave">Simpan</button><button class="btn secondary" onclick="geV251CloseEditor()">Cancel</button></div></div></div>`);m=document.getElementById('geV251Editor')}
+ let m=document.getElementById('geV251Editor');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Editor" class="modal-backdrop"><div class="modal-card"><button class="modal-x" onclick="geV251CloseEditor()">×</button><h2 id="geV251EditorTitle"></h2><div class="formgrid"><label>Judul<input id="geV251EdTitle"></label><label class="span2">Keterangan<textarea id="geV251EdCaption" rows="4"></textarea></label><label class="span2">Gambar<input id="geV251EdFile" type="file" accept="image/*"></label></div><div class="modal-actions"><button class="ge-btn" id="geV251EdSave">Save</button><button class="ge-btn secondary" onclick="geV251CloseEditor()">Cancel</button></div></div></div>`);m=document.getElementById('geV251Editor')}
  geV251EditorTitle.textContent=title;geV251EdTitle.value=obj.title||'';geV251EdCaption.value=obj.caption||'';geV251EdFile.value='';geV251EdSave.onclick=()=>{const done=(img)=>{onSave({title:geV251EdTitle.value.trim(),caption:geV251EdCaption.value.trim(),image:img||obj.image||''});geV251CloseEditor()};const f=geV251EdFile.files[0];f?geV251ReadImage(f,done):done(obj.image)};m.classList.add('show')
 }
 function geV251CloseEditor(){document.getElementById('geV251Editor')?.classList.remove('show')}
@@ -7227,7 +7338,7 @@ function geV251TPKey(j,n){return `${j}::${n}`}
 function geV251TPData(j,n){const s=geV251Ensure(),k=geV251TPKey(j,n);s.touchpoints[k] ||= {title:n,caption:'Area description • Airport • List Inisiatif',images:[]};return s.touchpoints[k]}
 function geV251EditTP(j,n){if(!geV251Admin())return;const x=geV251TPData(j,n);geV251OpenEditor(`Edit ${n}`,{title:x.title,caption:x.caption,image:x.images[0]?.src||''},v=>{x.title=v.title||n;x.caption=v.caption;if(v.image){if(x.images.length)x.images[0]={src:v.image,caption:v.caption};else x.images.push({src:v.image,caption:v.caption})}save();geV251RenderTouchpointPage()})}
 let geV251Gallery={items:[],i:0,t:null};
-function geV251OpenGallery(j,n){const x=geV251TPData(j,n);geV251Gallery.items=x.images.length?x.images:[{src:'',caption:x.caption}];geV251Gallery.i=0;let m=document.getElementById('geV251Gallery');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Gallery" class="modal-backdrop"><div class="modal-card ge-gallery-v251"><button class="modal-x" onclick="geV251CloseGallery()">×</button><h2 id="geV251GalleryTitle"></h2><div id="geV251GalleryMedia"></div><div class="ge-gallery-controls-v251"><button class="btn secondary compact-btn" onclick="geV251GalleryMove(-1)">←</button><span id="geV251GalleryDots" class="ge-gallery-dots-v251"></span><button class="btn secondary compact-btn" onclick="geV251GalleryMove(1)">→</button></div><p id="geV251GalleryCaption" class="ge-gallery-caption-v251"></p></div></div>`);m=document.getElementById('geV251Gallery')}geV251GalleryTitle.textContent=x.title;geV251GalleryDraw();m.classList.add('show');clearInterval(geV251Gallery.t);if(geV251Gallery.items.length>1)geV251Gallery.t=setInterval(()=>geV251GalleryMove(1),5000)}
+function geV251OpenGallery(j,n){const x=geV251TPData(j,n);geV251Gallery.items=x.images.length?x.images:[{src:'',caption:x.caption}];geV251Gallery.i=0;let m=document.getElementById('geV251Gallery');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Gallery" class="modal-backdrop"><div class="modal-card ge-gallery-v251"><button class="modal-x" onclick="geV251CloseGallery()">×</button><h2 id="geV251GalleryTitle"></h2><div id="geV251GalleryMedia"></div><div class="ge-gallery-controls-v251"><button class="ge-btn secondary compact-btn" onclick="geV251GalleryMove(-1)">←</button><span id="geV251GalleryDots" class="ge-gallery-dots-v251"></span><button class="ge-btn secondary compact-btn" onclick="geV251GalleryMove(1)">→</button></div><p id="geV251GalleryCaption" class="ge-gallery-caption-v251"></p></div></div>`);m=document.getElementById('geV251Gallery')}geV251GalleryTitle.textContent=x.title;geV251GalleryDraw();m.classList.add('show');clearInterval(geV251Gallery.t);if(geV251Gallery.items.length>1)geV251Gallery.t=setInterval(()=>geV251GalleryMove(1),5000)}
 function geV251GalleryDraw(){const a=geV251Gallery.items,i=geV251Gallery.i,x=a[i];geV251GalleryMedia.innerHTML=x.src?`<img class="ge-gallery-image-v251" src="${x.src}" alt="">`:`<div class="ge-gallery-image-v251" style="display:grid;place-items:center;color:#7b939d">Belum ada foto</div>`;geV251GalleryCaption.textContent=x.caption||'';geV251GalleryDots.textContent=a.map((_,k)=>k===i?'●':'○').join(' ')}
 function geV251GalleryMove(d){geV251Gallery.i=(geV251Gallery.i+d+geV251Gallery.items.length)%geV251Gallery.items.length;geV251GalleryDraw()}
 function geV251CloseGallery(){clearInterval(geV251Gallery.t);document.getElementById('geV251Gallery')?.classList.remove('show')}
@@ -7279,7 +7390,7 @@ function geV251C1EnsureTPModal(){
       </div>
       <div class="ge-tp-photo-head-v251c1"><b>Gallery Touch Point</b><span>Caption dapat berbeda untuk setiap foto.</span></div>
       <div id="geV251C1TPPhotoList" class="ge-tp-photo-list-v251c1"></div>
-      <div class="modal-actions sticky-actions"><button class="btn" onclick="geV251C1SaveTP()">Simpan</button><button class="btn secondary" onclick="geV251C1CloseTPEditor()">Cancel</button></div>
+      <div class="modal-actions sticky-actions"><button class="ge-btn" onclick="geV251C1SaveTP()">Save</button><button class="ge-btn secondary" onclick="geV251C1CloseTPEditor()">Cancel</button></div>
     </div></div>`);
   m=document.getElementById('geV251C1TPEditor');
   document.getElementById('geV251C1TPFiles').addEventListener('change',e=>{
@@ -7309,7 +7420,7 @@ function geV251C1RenderTPPhotoList(){
   box.innerHTML=rows.length?rows.map(r=>`<div class="ge-tp-photo-item-v251c1">
     <div class="ge-tp-photo-preview-v251c1">${r.kind==='new'?`<img src="${r.x.preview}" alt="">`:`<img data-tp-existing="${r.i}" alt="">`}</div>
     <label>Keterangan Foto<textarea rows="2" data-tp-caption="${r.kind}:${r.i}">${geEsc(r.x.caption||'')}</textarea></label>
-    <button class="btn danger compact-btn" type="button" onclick="geV251C1RemoveTPPhoto('${r.kind}',${r.i})">Hapus</button>
+    <button class="ge-btn danger compact-btn" type="button" onclick="geV251C1RemoveTPPhoto('${r.kind}',${r.i})">Delete</button>
   </div>`).join(''):'<div class="planning-empty">Belum ada foto. Pilih beberapa file pada field Tambah Foto.</div>';
   box.querySelectorAll('[data-tp-existing]').forEach(async img=>{const i=Number(img.dataset.tpExisting),item=GE_V251C1_TP_EDIT.existing[i];await geV251C1HydrateImage(img,item)});
 }
@@ -7329,7 +7440,7 @@ async function geV251C1SaveTP(){
 /* Gallery keeps each image's natural orientation/aspect ratio. */
 async function geV251OpenGallery(j,n){
   const x=geV251TPData(j,n);geV251Gallery.items=x.images.length?x.images:[{src:'',caption:x.caption}];geV251Gallery.i=0;
-  let m=document.getElementById('geV251Gallery');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Gallery" class="modal-backdrop"><div class="modal-card ge-gallery-v251 ge-gallery-natural-v251c1"><button class="modal-x" onclick="geV251CloseGallery()">×</button><h2 id="geV251GalleryTitle"></h2><div id="geV251GalleryMedia" class="ge-gallery-media-v251c1"></div><div class="ge-gallery-controls-v251"><button class="btn secondary compact-btn" onclick="geV251GalleryMove(-1)">←</button><span id="geV251GalleryDots" class="ge-gallery-dots-v251"></span><button class="btn secondary compact-btn" onclick="geV251GalleryMove(1)">→</button></div><p id="geV251GalleryCaption" class="ge-gallery-caption-v251"></p></div></div>`);m=document.getElementById('geV251Gallery')}
+  let m=document.getElementById('geV251Gallery');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Gallery" class="modal-backdrop"><div class="modal-card ge-gallery-v251 ge-gallery-natural-v251c1"><button class="modal-x" onclick="geV251CloseGallery()">×</button><h2 id="geV251GalleryTitle"></h2><div id="geV251GalleryMedia" class="ge-gallery-media-v251c1"></div><div class="ge-gallery-controls-v251"><button class="ge-btn secondary compact-btn" onclick="geV251GalleryMove(-1)">←</button><span id="geV251GalleryDots" class="ge-gallery-dots-v251"></span><button class="ge-btn secondary compact-btn" onclick="geV251GalleryMove(1)">→</button></div><p id="geV251GalleryCaption" class="ge-gallery-caption-v251"></p></div></div>`);m=document.getElementById('geV251Gallery')}
   geV251GalleryTitle.textContent=x.title;await geV251GalleryDraw();m.classList.add('show');clearInterval(geV251Gallery.t);if(geV251Gallery.items.length>1)geV251Gallery.t=setInterval(()=>geV251GalleryMove(1),5000);
 }
 async function geV251GalleryDraw(){
@@ -7389,7 +7500,7 @@ function pmLoadPageR2(){
 }
 function pmRenderSectionsR2(){
  const key=pmPage.value||'index.html',box=document.getElementById('pmSectionListR2');if(!box)return;const cfg=pmCfgR2().pages[key]||{},sections=cfg.sections||{},order=cfg.order||PM_PAGE_SECTIONS_R2[key]?.map(x=>x[0])||[];const labels=Object.fromEntries(PM_PAGE_SECTIONS_R2[key]||[]);
- box.innerHTML=order.map((id,i)=>{const s=sections[id]||{visible:true};return `<div class="pm-section-row-r2" data-id="${geEsc(id)}"><span class="portal-drag">↕</span><b>${geEsc(labels[id]||id)}</b><label class="pm-switch-r2"><input type="checkbox" ${s.visible===false?'':'checked'}><span></span></label><button class="btn secondary compact-btn" onclick="pmMoveSectionR2('${geEsc(id)}',-1)">↑</button><button class="btn secondary compact-btn" onclick="pmMoveSectionR2('${geEsc(id)}',1)">↓</button></div>`}).join('')||'<div class="portal-note">Section manager untuk page ini belum didefinisikan.</div>';
+ box.innerHTML=order.map((id,i)=>{const s=sections[id]||{visible:true};return `<div class="pm-section-row-r2" data-id="${geEsc(id)}"><span class="portal-drag">↕</span><b>${geEsc(labels[id]||id)}</b><label class="pm-switch-r2"><input type="checkbox" ${s.visible===false?'':'checked'}><span></span></label><button class="ge-btn secondary compact-btn" onclick="pmMoveSectionR2('${geEsc(id)}',-1)">↑</button><button class="ge-btn secondary compact-btn" onclick="pmMoveSectionR2('${geEsc(id)}',1)">↓</button></div>`}).join('')||'<div class="portal-note">Section manager untuk page ini belum didefinisikan.</div>';
 }
 function pmMoveSectionR2(id,dir){const key=pmPage.value,cfg=pmCfgR2();cfg.pages[key]||={};let order=cfg.pages[key].order||PM_PAGE_SECTIONS_R2[key]?.map(x=>x[0])||[];const i=order.indexOf(id),j=i+dir;if(i<0||j<0||j>=order.length)return;[order[i],order[j]]=[order[j],order[i]];cfg.pages[key].order=order;save();pmRenderSectionsR2()}
 function pmSaveSectionsR2(){const key=pmPage.value,cfg=pmCfgR2();cfg.pages[key]||={};cfg.pages[key].sections||={};document.querySelectorAll('#pmSectionListR2 .pm-section-row-r2').forEach(r=>cfg.pages[key].sections[r.dataset.id]={visible:r.querySelector('input')?.checked!==false});cfg.pages[key].order=[...document.querySelectorAll('#pmSectionListR2 .pm-section-row-r2')].map(r=>r.dataset.id);cfg.pages[key].draft=true;save();pmActivity('Layout page disimpan sebagai draft.')}
@@ -7403,12 +7514,12 @@ window.addEventListener('DOMContentLoaded',()=>{if(document.getElementById('pmPa
 
 /* ---------- Asset Library: actual IndexedDB files ---------- */
 async function pmRegisterAssetsR2(){const files=[...(pmAsset?.files||[])];if(!files.length)return pmActivity('Pilih asset terlebih dahulu.');const cfg=pmCfgR2();cfg.assets||=[];for(const f of files){const key=`portal_asset_${Date.now()}_${Math.random().toString(36).slice(2)}`;await GEFiles.put(key,f);cfg.assets.push({key,name:f.name,size:f.size,type:f.type,createdAt:new Date().toISOString()})}save();pmAsset.value='';pmActivity(`${files.length} asset tersimpan di IndexedDB browser.`);pmAssetListR2()}
-async function pmAssetListR2(){const box=document.getElementById('pmAssetLibraryR2');if(!box)return;const rows=pmCfgR2().assets||[];box.innerHTML=rows.length?(await Promise.all(rows.map(async x=>{let preview='';if(String(x.type).startsWith('image/')){try{const f=await GEFiles.get(x.key);if(f)preview=`<img src="${URL.createObjectURL(f)}" alt="">`}catch(e){}}return `<div class="pm-asset-card-r2">${preview||'<div class="pm-asset-file-r2">FILE</div>'}<div><b>${geEsc(x.name)}</b><small>${Math.round(x.size/1024)} KB</small></div><button class="btn danger compact-btn" onclick="pmDeleteAssetR2('${x.key}')">Hapus</button></div>`}))).join(''):'<div class="portal-note">Asset Library masih kosong.</div>'}
+async function pmAssetListR2(){const box=document.getElementById('pmAssetLibraryR2');if(!box)return;const rows=pmCfgR2().assets||[];box.innerHTML=rows.length?(await Promise.all(rows.map(async x=>{let preview='';if(String(x.type).startsWith('image/')){try{const f=await GEFiles.get(x.key);if(f)preview=`<img src="${URL.createObjectURL(f)}" alt="">`}catch(e){}}return `<div class="pm-asset-card-r2">${preview||'<div class="pm-asset-file-r2">FILE</div>'}<div><b>${geEsc(x.name)}</b><small>${Math.round(x.size/1024)} KB</small></div><button class="ge-btn danger compact-btn" onclick="pmDeleteAssetR2('${x.key}')">Delete</button></div>`}))).join(''):'<div class="portal-note">Asset Library masih kosong.</div>'}
 async function pmDeleteAssetR2(key){const cfg=pmCfgR2();cfg.assets=(cfg.assets||[]).filter(x=>x.key!==key);try{await GEFiles.del(key)}catch(e){}save();pmAssetListR2()}
 
 /* ---------- Initiative long text / announcement preview ---------- */
 const GE_RENDER_ANN_R2=renderAnnouncementLibraryV246;
-renderAnnouncementLibraryV246=function(){GE_RENDER_ANN_R2();document.querySelectorAll('#announcementLibraryV246 .announcement-card-v246 p').forEach(p=>{p.classList.add('ge-clamp-v251');if(!p.nextElementSibling?.classList.contains('ge-more-inline-r2')){const b=document.createElement('button');b.className='ge-more-inline-r2';b.textContent='… lihat selengkapnya ›';b.onclick=()=>p.closest('.announcement-card-v246')?.querySelector('.announcement-actions-v248 .btn')?.click();p.after(b)}})};
+renderAnnouncementLibraryV246=function(){GE_RENDER_ANN_R2();document.querySelectorAll('#announcementLibraryV246 .announcement-card-v246 p').forEach(p=>{p.classList.add('ge-clamp-v251');if(!p.nextElementSibling?.classList.contains('ge-more-inline-r2')){const b=document.createElement('button');b.className='ge-more-inline-r2';b.textContent='… lihat selengkapnya ›';b.onclick=()=>p.closest('.announcement-card-v246')?.querySelector('.announcement-actions-v248 .ge-btn')?.click();p.after(b)}})};
 
 /* ---------- Calendar Project Tracking R2 ---------- */
 let GE_CAL_VIEW_R2='month';
@@ -7424,9 +7535,9 @@ function geV251RenderCalendar(){
  }else if(GE_CAL_VIEW_R2==='week'){
   const start=new Date(base);start.setDate(base.getDate()-base.getDay());geCalendarTitleV251.textContent=`Minggu ${start.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}`;grid.className='calendar-week-r2';grid.innerHTML=Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toLocaleDateString('en-CA'),rows=events.filter(e=>String(e.date).slice(0,10)===iso);return `<div class="calendar-week-col-r2"><h4>${d.toLocaleDateString('id-ID',{weekday:'short',day:'numeric'})}</h4>${rows.map(geCalEventHTMLR2).join('')||'<small>Tidak ada agenda</small>'}</div>`}).join('');
  }else if(GE_CAL_VIEW_R2==='day'){
-  const iso=base.toLocaleDateString('en-CA'),rows=events.filter(e=>String(e.date).slice(0,10)===iso).sort((a,b)=>String(a.time||'99:99').localeCompare(String(b.time||'99:99')));geCalendarTitleV251.textContent=base.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});grid.className='calendar-day-r2';grid.innerHTML=rows.map(e=>`<div class="calendar-day-event-r2"><time>${geEsc(e.time||'All day')}</time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.category||e.source||'Event')} • ${geEsc(e.airport||'-')} • PIC ${geEsc(e.pic||'-')}</span></div><button class="btn secondary compact-btn" onclick='geV251OpenEventDetailR2(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Tidak ada agenda.</div>';
+  const iso=base.toLocaleDateString('en-CA'),rows=events.filter(e=>String(e.date).slice(0,10)===iso).sort((a,b)=>String(a.time||'99:99').localeCompare(String(b.time||'99:99')));geCalendarTitleV251.textContent=base.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});grid.className='calendar-day-r2';grid.innerHTML=rows.map(e=>`<div class="calendar-day-event-r2"><time>${geEsc(e.time||'All day')}</time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.category||e.source||'Event')} • ${geEsc(e.airport||'-')} • PIC ${geEsc(e.pic||'-')}</span></div><button class="ge-btn secondary compact-btn" onclick='geV251OpenEventDetailR2(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Tidak ada agenda.</div>';
  }else{
-  grid.style.display='none';agenda.style.display='grid';geCalendarTitleV251.textContent='Agenda';const rows=[...events].filter(e=>e.date).sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(0,120);agenda.innerHTML=rows.map(e=>`<div class="calendar-agenda-item-r2"><time><b>${new Date(e.date+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short'})}</b><span>${geEsc(e.time||'')}</span></time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.category||e.source)} • ${geEsc(e.airport||'-')} • ${geEsc(e.touchpoint||'-')}</span></div><button class="btn secondary compact-btn" onclick='geV251OpenEventDetailR2(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Belum ada agenda.</div>';
+  grid.style.display='none';agenda.style.display='grid';geCalendarTitleV251.textContent='Agenda';const rows=[...events].filter(e=>e.date).sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(0,120);agenda.innerHTML=rows.map(e=>`<div class="calendar-agenda-item-r2"><time><b>${new Date(e.date+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short'})}</b><span>${geEsc(e.time||'')}</span></time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.category||e.source)} • ${geEsc(e.airport||'-')} • ${geEsc(e.touchpoint||'-')}</span></div><button class="ge-btn secondary compact-btn" onclick='geV251OpenEventDetailR2(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Belum ada agenda.</div>';
  }
  const monthEvents=events.filter(e=>{const d=new Date(e.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===m});geCalendarSummaryV251.innerHTML=`<span>${monthEvents.length} agenda bulan ini</span><span>${monthEvents.filter(e=>e.source==='Initiative').length} due date inisiatif</span><span>${monthEvents.filter(e=>e.source==='Milestone').length} milestone</span><span>${monthEvents.filter(e=>e.source==='Manual').length} kegiatan manual</span>`;
 }
@@ -7726,7 +7837,7 @@ function geV2532RenderCalendar(){
     const iso=base.toLocaleDateString('en-CA'),rows=events.filter(e=>String(e.date||'').slice(0,10)===iso).sort((a,b)=>String(a.time||'99:99').localeCompare(String(b.time||'99:99')));
     geCalendarTitleV251.textContent=base.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     grid.className='calendar-day-r2';
-    grid.innerHTML=rows.map(e=>`<div class="calendar-day-event-r2"><time>${geEsc(e.time||'All day')}</time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.source||e.category||'Event')} • ${geEsc(e.airport||'-')} • PIC ${geEsc(e.pic||'-')}</span></div><button class="btn secondary compact-btn" onclick='geV2532OpenDetail(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Tidak ada agenda.</div>';
+    grid.innerHTML=rows.map(e=>`<div class="calendar-day-event-r2"><time>${geEsc(e.time||'All day')}</time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.source||e.category||'Event')} • ${geEsc(e.airport||'-')} • PIC ${geEsc(e.pic||'-')}</span></div><button class="ge-btn secondary compact-btn" onclick='geV2532OpenDetail(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Tidak ada agenda.</div>';
   } else {
     grid.style.display='none'; if(agenda)agenda.style.display='grid';
     geCalendarTitleV251.textContent='Agenda';
@@ -8734,7 +8845,7 @@ function installInitiativeControls(){
  if(title&&!$('geV2554UploadInitiative')){
    const add=title.querySelector('button[onclick*="openInitiativeModalV224"]');
    const wrap=document.createElement('div');wrap.className='v2554-initiative-actions';
-   wrap.innerHTML=`<a class="btn secondary compact-btn" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Template Excel</a><button class="btn secondary compact-btn" type="button" id="geV2554UploadInitiative">Upload CSV/Excel</button>`;
+   wrap.innerHTML=`<a class="ge-btn secondary compact-btn" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Template Excel</a><button class="ge-btn secondary compact-btn" type="button" id="geV2554UploadInitiative">Upload CSV/Excel</button>`;
    if(add){add.parentNode.insertBefore(wrap,add);wrap.appendChild(add)}
    else title.appendChild(wrap);
    $('geV2554UploadInitiative').onclick=openBulk;
@@ -8751,7 +8862,7 @@ function installInitiativeControls(){
    refreshInitiativeFilters();
    let rows=currentInitiativeRows().filter(geInitiativeScopedV224);
    const p=$('geV2554Priority')?.value||'';if(p)rows=rows.filter(x=>String(x.priority||'Normal')===p);
-   const t=$('initRows');if(t){if(window.GE_INITIATIVE_VIEW_R4==='list'&&rows.length){t.innerHTML=`<div class="ge-initiative-list-r4"><table><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${geEsc(x.name||'-')}</b></td><td>${geEsc(geScopesV252(x).join(', '))}</td><td>${geEsc(geTPsV252(x).join(', '))}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.pic||'-')}</td><td>${geEsc(x.dueDate||'-')}</td><td>${geEsc(String(x.real||0))}% / ${geEsc(String(x.plan||0))}%</td><td><button class="btn secondary compact-btn" onclick="openInitiativeModalV224(${Number(x.id)})">Edit</button><button class="btn secondary compact-btn" onclick="openInitiativeTimelineV224(${Number(x.id)})">Milestone</button></td></tr>`).join('')}</tbody></table></div>`;}else t.innerHTML=rows.length?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';}
+   const t=$('initRows');if(t){if(window.GE_INITIATIVE_VIEW_R4==='list'&&rows.length){t.innerHTML=`<div class="ge-initiative-list-r4"><table><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${geEsc(x.name||'-')}</b></td><td>${geEsc(geScopesV252(x).join(', '))}</td><td>${geEsc(geTPsV252(x).join(', '))}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.pic||'-')}</td><td>${geEsc(x.dueDate||'-')}</td><td>${geEsc(String(x.real||0))}% / ${geEsc(String(x.plan||0))}%</td><td><button class="ge-btn secondary compact-btn" onclick="openInitiativeModalV224(${Number(x.id)})">Edit</button><button class="ge-btn secondary compact-btn" onclick="openInitiativeTimelineV224(${Number(x.id)})">Milestone</button></td></tr>`).join('')}</tbody></table></div>`;}else t.innerHTML=rows.length?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';}
    renderInitiativeCharts(rows);
  };
  renderInitiatives();
@@ -8831,7 +8942,7 @@ function objectRows(rows,type){
 let bulk={init:[],milestone:[]};
 function ensureBulk(){
  if($('geV2554BulkModal'))return;
- document.body.insertAdjacentHTML('beforeend',`<div id="geV2554BulkModal" class="modal-backdrop"><div class="modal-card v2554-bulk-card"><button class="modal-x" type="button" id="geV2554BulkX">×</button><span class="eyebrow">BULK IMPORT INITIATIVE</span><h2>Upload CSV / Excel</h2><p class="section-subtitle">Gunakan template agar struktur Initiative dan Milestone konsisten.</p><label class="v2554-upload-box"><input id="geV2554BulkFile" type="file" accept=".xlsx,.csv"><b>Pilih file XLSX / CSV</b><span>XLSX mendukung sheet Initiatives + Milestones.</span></label><label>Mode Import<select id="geV2554Mode"><option value="upsert">Create & Update</option><option value="create">Create New Only</option><option value="update">Update Existing Only</option></select></label><div id="geV2554BulkStats" class="v2554-bulk-stats"></div><div class="v2554-preview"><table><thead><tr><th>Row</th><th>Code</th><th>Initiative</th><th>Validation</th></tr></thead><tbody id="geV2554PreviewBody"></tbody></table></div><div class="modal-actions sticky-actions"><a class="btn secondary" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Download Template</a><button class="btn" id="geV2554Import" disabled>Import Data</button><button class="btn secondary" id="geV2554BulkClose">Close</button></div></div></div>`);
+ document.body.insertAdjacentHTML('beforeend',`<div id="geV2554BulkModal" class="modal-backdrop"><div class="modal-card v2554-bulk-card"><button class="modal-x" type="button" id="geV2554BulkX">×</button><span class="eyebrow">BULK IMPORT INITIATIVE</span><h2>Upload CSV / Excel</h2><p class="section-subtitle">Gunakan template agar struktur Initiative dan Milestone konsisten.</p><label class="v2554-upload-box"><input id="geV2554BulkFile" type="file" accept=".xlsx,.csv"><b>Pilih file XLSX / CSV</b><span>XLSX mendukung sheet Initiatives + Milestones.</span></label><label>Mode Import<select id="geV2554Mode"><option value="upsert">Create & Update</option><option value="create">Create New Only</option><option value="update">Update Existing Only</option></select></label><div id="geV2554BulkStats" class="v2554-bulk-stats"></div><div class="v2554-preview"><table><thead><tr><th>Row</th><th>Code</th><th>Initiative</th><th>Validation</th></tr></thead><tbody id="geV2554PreviewBody"></tbody></table></div><div class="modal-actions sticky-actions"><a class="ge-btn secondary" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Download Template</a><button class="ge-btn" id="geV2554Import" disabled>Import Data</button><button class="ge-btn secondary" id="geV2554BulkClose">Close</button></div></div></div>`);
  $('geV2554BulkX').onclick=$('geV2554BulkClose').onclick=()=>$('geV2554BulkModal').classList.remove('show');
  $('geV2554BulkFile').onchange=e=>previewBulk(e.target.files[0]);
  $('geV2554Import').onclick=doImport;
@@ -9074,7 +9185,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       <div><label>Currency<input data-price-field="currency" maxlength="3" placeholder="IDR" value="${esc(s.currency||'')}"></label></div>
       <div><label>Price Basis<input data-price-field="priceBasis" value="${esc(s.priceBasis||'pax')}" placeholder="pax"></label></div>
       <div><label>Note<input data-price-field="priceNote" value="${esc(s.priceNote||'')}"></label></div>
-      <button type="button" class="btn secondary compact-btn ge-p29-remove-price" ${rows.length===1?'disabled':''}>Hapus</button>
+      <button type="button" class="ge-btn secondary compact-btn ge-p29-remove-price" ${rows.length===1?'disabled':''}>Delete</button>
     </div>`).join('');
     box.querySelectorAll('.ge-p29-remove-price').forEach(btn=>btn.addEventListener('click',()=>{btn.closest('.ge-p29-price-row')?.remove();if(!box.querySelector('.ge-p29-price-row'))renderPriceRows(containerId,[{}]);}));
   }
@@ -9093,7 +9204,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       <div><label>Effective To<input data-capacity-field="effectiveTo" type="date" value="${esc(r.effectiveTo||'')}"></label></div>
       <div><label>Capacity (pax)<input data-capacity-field="capacity" type="number" min="0" step="1" value="${esc(r.capacity??'')}"></label></div>
       <div><label>Note<input data-capacity-field="note" value="${esc(r.note||'')}"></label></div>
-      <button type="button" class="btn secondary compact-btn ge-p29-remove-capacity" ${rows.length===1?'disabled':''}>Hapus</button>
+      <button type="button" class="ge-btn secondary compact-btn ge-p29-remove-capacity" ${rows.length===1?'disabled':''}>Delete</button>
     </div>`).join('');
     box.querySelectorAll('.ge-p29-remove-capacity').forEach(btn=>btn.addEventListener('click',()=>{btn.closest('.ge-p29-capacity-row')?.remove();if(!box.querySelector('.ge-p29-capacity-row'))renderCapacityRows(containerId,[{}]);}));
   }
@@ -9126,12 +9237,12 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       <label class="ge-p29-span2">Remarks<textarea id="${prefix}Remarks" rows="3" placeholder="Tambahkan catatan bila diperlukan">${esc(m.remarks||'')}</textarea></label>
     </div>
     <section class="ge-p29-price-section">
-      <div class="ge-p29-section-head"><div><b>Price Schedule</b><small>Opsional. Gunakan ini bila satu Agreement memiliki lebih dari satu periode harga. Agreement Start/End tetap menjadi periode Agreement.</small></div><button type="button" class="btn secondary compact-btn" onclick="geP29AddPriceRow('${prefix}Prices')">+ Add Price Period</button></div>
+      <div class="ge-p29-section-head"><div><b>Price Schedule</b><small>Opsional. Gunakan ini bila satu Agreement memiliki lebih dari satu periode harga. Agreement Start/End tetap menjadi periode Agreement.</small></div><button type="button" class="ge-btn secondary compact-btn" onclick="geP29AddPriceRow('${prefix}Prices')">+ Add Price Period</button></div>
       <div id="${prefix}Prices" class="ge-p29-price-rows"></div>
       <div class="ge-p29-input-note">Satu sumber input: jika Price Schedule digunakan, jangan isi Harga Per Pax single price. Currency harus berupa kode mata uang ISO 4217 yang dikenali browser.</div>
     </section>
     <section class="ge-p29-price-section ge-p29-capacity-section">
-      <div class="ge-p29-section-head"><div><b>Capacity Schedule</b><small>Kapasitas dapat berubah per periode tanpa membuat master Lounge/Tenant baru.</small></div><button type="button" class="btn secondary compact-btn" onclick="geP29AddCapacityRow('${prefix}Capacity')">+ Add Capacity Period</button></div>
+      <div class="ge-p29-section-head"><div><b>Capacity Schedule</b><small>Kapasitas dapat berubah per periode tanpa membuat master Lounge/Tenant baru.</small></div><button type="button" class="ge-btn secondary compact-btn" onclick="geP29AddCapacityRow('${prefix}Capacity')">+ Add Capacity Period</button></div>
       <div id="${prefix}Capacity" class="ge-p29-price-rows"></div>
     </section>
     <label class="ge-p29-file-field">Lampiran Dokumen<input id="${prefix}Document" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"></label>`;
@@ -9158,7 +9269,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     card.innerHTML=`<button class="modal-x" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">×</button>
       <h2>${esc(title)}</h2><p class="section-subtitle">Lengkapi data layanan. Teks abu-abu di dalam field adalah panduan dan bukan nilai data.</p>
       <form id="${prefix}Form"><div id="${prefix}Errors"></div>${commonFormMarkup(prefix,model)}
-      <div class="modal-actions sticky-actions"><button class="btn" type="submit">${id==='loungeAddModalV221'?'Save':'Save Changes'}</button><button class="btn secondary" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">Cancel</button></div></form>`;
+      <div class="modal-actions sticky-actions"><button class="ge-btn" type="submit">${id==='loungeAddModalV221'?'Save':'Save Changes'}</button><button class="ge-btn secondary" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">Cancel</button></div></form>`;
     renderPriceRows(prefix+'Prices',model?.priceSchedules||[]);
     renderCapacityRows(prefix+'Capacity',model?.capacitySchedules||[]);
     document.getElementById(prefix+'Form').addEventListener('submit',e=>{e.preventDefault();id==='loungeAddModalV221'?saveAdd(prefix):saveEdit(prefix)});
@@ -9267,9 +9378,9 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       const priceText=price.status==='CURRENT'||price.status==='LEGACY'?safePriceDisplay(price.currency,price.price):price.status==='NOT_APPLICABLE'?'Not Available':price.status==='INVALID'?'Requires Review':'Not Available';
       const priceMeta=scheduleCount?`${scheduleCount} Price Period${scheduleCount===1?'':'s'}`:'';
       const review=rt.status==='REVIEW'?`<div class="ge-p29-review-note">Requires Review: ${esc(rt.reason)}</div>`:'';
-      const update=canEdit()?`<button class="btn secondary compact-btn" type="button" onclick="openLoungeEdit(${Number(x.id)})">Edit</button>`:'';
-      const del=typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="btn danger compact-btn" type="button" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button>`:'';
-      const detail=scheduleCount?`<button class="btn secondary compact-btn" type="button" onclick="geP29ViewPriceSchedule(${Number(x.id)})">View Price Schedule</button>`:'';
+      const update=canEdit()?`<button class="ge-btn secondary compact-btn" type="button" onclick="openLoungeEdit(${Number(x.id)})">Edit</button>`:'';
+      const del=typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn danger compact-btn" type="button" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button>`:'';
+      const detail=scheduleCount?`<button class="ge-btn secondary compact-btn" type="button" onclick="geP29ViewPriceSchedule(${Number(x.id)})">View Price Schedule</button>`:'';
       return `<article class="lounge-master-card-v237 ge-p29-lounge-card">
         <div class="lounge-master-code-v237">${esc(x.airport||'-')}</div>
         <div class="lounge-master-card-body-v237">
@@ -9287,7 +9398,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
         </div>
       </article>`;
     }).join('')||'<div class="lounge-master-empty-v237">Belum ada data Lounge/Tenant pada filter ini.</div>';
-    const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Halaman ${GE_LOUNGE_CARD_PAGE_V237} dari ${pages} • ${rows.length} data`;
+    const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Page ${GE_LOUNGE_CARD_PAGE_V237} of ${pages} • ${rows.length} data`;
     const prev=document.getElementById('loungeCardPrevV237'),next=document.getElementById('loungeCardNextV237');if(prev)prev.disabled=GE_LOUNGE_CARD_PAGE_V237<=1;if(next)next.disabled=GE_LOUNGE_CARD_PAGE_V237>=pages;
   }
   window.renderLoungeCardsV237=renderCards;
@@ -9297,8 +9408,8 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     const rows=filteredRows();
     tbody.innerHTML=rows.map((x,i)=>{
       const rt=resolveType(x),p=applicablePrice(x,new Date()),price=p.status==='CURRENT'||p.status==='LEGACY'?safePriceDisplay(p.currency,p.price):'Not Available';
-      const action=canEdit()?`<td><div class="row-actions"><button class="btn secondary" onclick="openLoungeEdit(${Number(x.id)})">Edit</button><button class="btn btn-danger" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button></div></td>`:'';
-      return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
+      const action=canEdit()?`<td><div class="row-actions"><button class="ge-btn secondary" onclick="openLoungeEdit(${Number(x.id)})">Edit</button><button class="ge-btn ge-btn danger" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button></div></td>`:'';
+      return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
     }).join('');
   }
   const geP29RenderTableBaseR4=renderTable;renderTable=function(){geP29RenderTableBaseR4();setTimeout(()=>window.geEnhanceAllTables?.(),0)};
@@ -9485,7 +9596,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
 
   function setup(){
     const heading=document.querySelector('.lounge-master-view-label-v237');
-    if(heading&&!document.getElementById('geP29ShowHistory')){const history=document.createElement('label');history.className='ge-p29-history-toggle';history.innerHTML='<input id="geP29ShowHistory" type="checkbox"> Tampilkan history agreement';heading.appendChild(history);document.getElementById('geP29ShowHistory').onchange=()=>renderLounges();}
+    if(heading&&!document.getElementById('geP29ShowHistory')){const history=document.createElement('label');history.className='ge-p29-history-toggle';history.innerHTML='<input id="geP29ShowHistory" type="checkbox"> Show agreement history';heading.appendChild(history);document.getElementById('geP29ShowHistory').onchange=()=>renderLounges();}
     const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template P29';}
     ['loungeRegionFilter','loungeAirportFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{GE_LOUNGE_CARD_PAGE_V237=1;renderLounges()})});
     try{if(typeof fillAirportSelects==='function')fillAirportSelects()}catch(e){}
@@ -9499,7 +9610,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     if(!schedules.length)return;
     let modal=document.getElementById('geP29PriceScheduleModal');if(!modal){modal=document.createElement('div');modal.id='geP29PriceScheduleModal';modal.className='modal-backdrop';modal.innerHTML='<div class="modal-card ge-p29-schedule-modal"></div>';document.body.appendChild(modal)}
     const checked=validateSchedules(schedules,validDate(x.startDate),validDate(x.endDate));
-    modal.querySelector('.modal-card').innerHTML=`<button class="modal-x" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">×</button><h2>Price Schedule</h2><p class="section-subtitle">${esc(x.name||'Lounge/Tenant')} • ${esc(x.documentNumber||'Agreement identity tidak tersedia')}</p>${checked.valid?`<div class="ge-p29-schedule-list">${checked.schedules.map((s,i)=>`<div class="ge-p29-schedule-item"><div><span>Period ${i+1}</span><b>${esc(dateLabel(s.effectiveFrom))} — ${esc(dateLabel(s.effectiveTo))}</b></div><div><span>Price</span><b>${esc(safePriceDisplay(s.currency,s.price))}</b></div><div><span>Basis</span><b>${esc(s.priceBasis||'pax')}</b></div>${s.priceNote?`<small>${esc(s.priceNote)}</small>`:''}</div>`).join('')}</div>`:`<div class="ge-p29-form-errors"><b>Requires Review</b><p>${esc(checked.errors.join('; '))}</p></div>`}<div class="modal-actions"><button class="btn secondary" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">Close</button></div>`;
+    modal.querySelector('.modal-card').innerHTML=`<button class="modal-x" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">×</button><h2>Price Schedule</h2><p class="section-subtitle">${esc(x.name||'Lounge/Tenant')} • ${esc(x.documentNumber||'Agreement identity tidak tersedia')}</p>${checked.valid?`<div class="ge-p29-schedule-list">${checked.schedules.map((s,i)=>`<div class="ge-p29-schedule-item"><div><span>Period ${i+1}</span><b>${esc(dateLabel(s.effectiveFrom))} — ${esc(dateLabel(s.effectiveTo))}</b></div><div><span>Price</span><b>${esc(safePriceDisplay(s.currency,s.price))}</b></div><div><span>Basis</span><b>${esc(s.priceBasis||'pax')}</b></div>${s.priceNote?`<small>${esc(s.priceNote)}</small>`:''}</div>`).join('')}</div>`:`<div class="ge-p29-form-errors"><b>Requires Review</b><p>${esc(checked.errors.join('; '))}</p></div>`}<div class="modal-actions"><button class="ge-btn secondary" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">Close</button></div>`;
     modal.classList.add('show');
   };
 
@@ -9684,7 +9795,7 @@ window.saveInitiativeStepV224=async function(){const d=store(),parent=String(doc
 window.geFocusInitiativeR65=function(id,milestone){
  const d=store(),row=(d.initiatives||[]).find(x=>String(x.id)===String(id)),notice=document.getElementById('geInitiativeFocusNoticeR65')||document.createElement('div');notice.id='geInitiativeFocusNoticeR65';notice.className='ge-card';notice.style.padding='12px';const host=document.getElementById('initRows');if(host&&!notice.isConnected)host.before(notice);
  if(!row){notice.textContent='Initiative yang dituju tidak tersedia atau Anda tidak memiliki akses.';return}
- window.GE_INITIATIVE_FOCUS_ID_R65=String(row.id);notice.innerHTML='<b>Menampilkan Initiative yang ditugaskan: '+esc(row.name)+'</b> <button type="button" class="btn secondary compact-btn" id="geClearInitiativeFocusR65">Tampilkan Semua</button>';
+ window.GE_INITIATIVE_FOCUS_ID_R65=String(row.id);notice.innerHTML='<b>Menampilkan Initiative yang ditugaskan: '+esc(row.name)+'</b> <button type="button" class="ge-btn secondary compact-btn" id="geClearInitiativeFocusR65">Show All</button>';
  notice.querySelector('#geClearInitiativeFocusR65').onclick=()=>{window.GE_INITIATIVE_FOCUS_ID_R65='';notice.remove();window.renderInitiatives?.()};
  window.renderInitiatives?.();
  const typedId=typeof row.id==='number'?Number(row.id):row.id;window.openInitiativeTimelineV224?.(typedId);
