@@ -3477,3 +3477,15 @@ Validation limitation
 - Added `R114_MONITORING_RESULTS_DELETE_CONTRACT_PASS` covering the Monitoring Results visuals and Planning Delete confirmation behavior.
 - Local `npm test` PASS: `CBNR_REGRESSION_GATE_PASS TESTS=59`.
 - Validation remains source/build regression validation only; live browser preview/UAT is not claimed as PASS.
+
+
+## CBNR — Current-day Master Data + Global Control Consolidation
+- Master Data now exposes the existing GHA / Provider, Service Alignment, and Cost Intelligence implementations that were already present in the canonical source but were not reachable from the visible reference tabs.
+- GHA table now displays the existing record `id` as `GHA ID`; no new identifier schema was invented.
+- Existing GHA records hydrate the Service Provider and Agreement reference identity views.
+- Personnel and BO Classification visible tabs now have their own canonical add/edit/read/delete source path instead of falling through to the Airport Cost handler.
+- Monitoring action buttons that were still raw buttons were converted at source to canonical `ge-btn` variants; structural section/field selector buttons remain component-specific selectors.
+- Canonical standard field/button geometry is consolidated to 42px; 36px remains the explicit compact variant.
+- Added R115 and R116 regression contracts.
+- Local `npm test` PASS: `CBNR_REGRESSION_GATE_PASS TESTS=61`.
+- Browser/live UAT is still not claimed as PASS.

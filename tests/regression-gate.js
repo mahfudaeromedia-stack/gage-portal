@@ -43,6 +43,38 @@ assert(business.includes('await geConfirmDeleteV234'),'Planning Workspace delete
 console.log('R114_MONITORING_RESULTS_DELETE_CONTRACT_PASS');
 `});
 
+// R115 — Master Data GHA/Provider + reference identity accessibility
+
+tests.push({name:'r115-master-data-gha-reference-contract.js',source:`'use strict';
+const fs=require('fs'),assert=require('assert');
+const master=fs.readFileSync('assets/master-reference.js','utf8');
+assert(master.includes('data-ref-tab="gha">GHA / Provider'),'Master Data must expose the canonical GHA / Provider tab.');
+assert(master.includes('data-ref-tab="alignment">Service Alignment'),'Master Data must expose Service Alignment reference data.');
+assert(master.includes('data-ref-tab="costs">Cost Intelligence'),'Master Data must expose Cost Intelligence reference data.');
+assert(master.includes("selected==='gha'?['Select','GHA ID','Station','GHA / Provider'"),'GHA table must expose the existing canonical record ID as GHA ID.');
+assert(master.includes("if(kind==='serviceProviders')push((state?.groundHandlers||[])")&&master.includes("'GHA / Provider Master'"),'Service Provider ID master must hydrate from canonical GHA / Provider records.');
+assert(master.includes("if(kind==='agreements')push((state?.groundHandlers||[]).filter(x=>x?.agreement)")&&master.includes("'GHA Agreement Reference'"),'Agreement reference master must expose existing GHA agreement records.');
+assert(master.includes("function addPersonnel")&&master.includes("function addBOClassification"),'Personnel and BO Classification tabs must have canonical add/edit handlers.');
+assert(master.includes("kind==='personnel'?(state.referenceCatalog||[]).filter")&&master.includes("kind==='bo-classification'?(state.referenceCatalog||[]).filter"),'Personnel/BO tabs must read from their canonical referenceCatalog kinds.');
+assert(master.includes("tab==='personnel'?addPersonnel():tab==='bo-classification'?addBOClassification"),'Personnel/BO Add actions must not fall through to Airport Cost.');
+console.log('R115_MASTER_DATA_GHA_REFERENCE_CONTRACT_PASS');
+`});
+
+// R116 — Global control geometry + Monitoring action-source cleanup
+
+tests.push({name:'r116-global-control-monitoring-action-contract.js',source:`'use strict';
+const fs=require('fs'),assert=require('assert');
+const css=fs.readFileSync('assets/global-ui-canonical.css','utf8');
+const forms=fs.readFileSync('assets/form-management.js','utf8');
+assert(css.includes('--ge-control-h:42px'),'Canonical standard control height must be 42px.');
+assert(css.includes('html body #cleanPageOutlet .ge-btn{min-height:42px;height:42px'),'Canonical standard button height must match the standard field height.');
+assert(css.includes('.ge-btn.compact{min-height:36px;height:36px'),'Compact buttons must remain a distinct compact variant, not a second standard geometry.');
+for(const token of ['.planning-domain-form label>input','.lounge-add-modal-v221 input','.ge-form-builder .ge-assess-form input','.ge-form-question input:not([type=checkbox])']) assert(css.includes(token),'Canonical field geometry missing '+token);
+const raw=[...forms.matchAll(/<button[^>]*>/g)].map(m=>m[0]).filter(x=>!x.includes('ge-btn')&&!x.includes('ge-assess-tab')&&!x.includes('ge-monitor-kpi')&&!x.includes('ge-form-section-select')&&!x.includes('ge-form-field-select'));
+assert(raw.length===0,'Monitoring action buttons without canonical ge-btn source remain: '+raw.join(' | '));
+console.log('R116_GLOBAL_CONTROL_MONITORING_ACTION_CONTRACT_PASS');
+`});
+
 let failed=0;
 for(const test of tests){
   const file=path.join(root,'tests',test.name);
