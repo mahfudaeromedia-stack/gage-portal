@@ -75,6 +75,33 @@ assert(raw.length===0,'Monitoring action buttons without canonical ge-btn source
 console.log('R116_GLOBAL_CONTROL_MONITORING_ACTION_CONTRACT_PASS');
 `});
 
+
+// R117 — Form Templates layout recovery + station reference + Lounge filter + Master Data boot
+
+tests.push({name:'r117-current-day-ui-reference-recovery-contract.js',source:`'use strict';
+const fs=require('fs'),assert=require('assert');
+const forms=fs.readFileSync('assets/form-management.js','utf8');
+const css=fs.readFileSync('assets/global-ui-canonical.css','utf8');
+const lounge=fs.readFileSync('assets/lounge-planning-v29.js','utf8');
+const master=fs.readFileSync('assets/master-reference.js','utf8');
+// Form Templates: restore the reference three-column builder without changing business field order/schema.
+assert(css.includes('.ge-form-builder .ge-form-builder-grid{'),'Form Templates builder must have a canonical grid layout.');
+assert(css.includes('grid-template-columns:minmax(250px,.78fr) minmax(500px,2.15fr) minmax(290px,1fr)'),'Form Templates builder must retain palette / canvas / inspector columns.');
+assert(css.includes('.ge-form-builder .ge-assess-form{')&&css.includes('grid-template-columns:minmax(0,1fr) minmax(0,1fr)'),'Form Templates metadata fields must remain two-column.');
+assert(css.includes('.ge-form-builder .ge-assess-form>label.wide{grid-column:1/-1}'),'Form Templates wide fields must span both metadata columns.');
+assert(!css.includes('.ge-form-builder-grid{') || css.includes('html body #cleanPageOutlet .ge-form-builder .ge-form-builder-grid{'),'Builder geometry must remain scoped to the Form Templates page.');
+// Station dropdown source: canonical hydrated Airport/Station master, with core fallback only when needed.
+assert(forms.includes("const store=rows('airports')")&&forms.includes("window.GECore?.list?.('airports')"),'Form Template station picker must use canonical Airport/Station master with a safe fallback.');
+// Lounge/Tenant: do not create a second station picker on top of the existing canonical searchable filter.
+assert(lounge.includes('function masterAirportRows()'),'Lounge/Tenant station filter must use one canonical master source.');
+assert(lounge.includes("put(region,(data.lounges||[]).map(x=>x.region||x.wilayah),'All Regions')"),'Lounge/Tenant Region filter must be populated from the actual data.');
+assert(!lounge.includes('setupStationMultiSelectR12();'),'Lounge/Tenant must not create the obsolete duplicate station filter wrapper.');
+// Master Data: the actual page initially contains the two group buttons, not refRows; init must mount into that panel.
+assert(master.includes("document.querySelector('.ge-ref-tabs')?.closest('.ge-panel')")&&master.includes("current?.closest?.('.ge-panel')||current||tabPanel"),'Master Data init must mount against the existing two-group page panel.');
+console.log('R117_CURRENT_DAY_UI_REFERENCE_RECOVERY_CONTRACT_PASS');
+`});
+
+
 let failed=0;
 for(const test of tests){
   const file=path.join(root,'tests',test.name);

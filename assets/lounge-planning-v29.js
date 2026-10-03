@@ -340,11 +340,18 @@
     notice('Layanan Diperbarui',`${check.model.serviceType} — ${check.model.name} berhasil diperbarui.`,'success');
   }
 
+  function masterAirportRows(){
+    let rows=[];
+    try{rows=(data.airports||[]).map(x=>({code:String(x.code||x.airportCode||x.iata||x.stationCode||x.id||'').trim().toUpperCase(),name:String(x.name||x.airportName||x.city||'').trim()}));}catch(e){}
+    if(!rows.length){try{rows=(GECore?.list?.('airports')||[]).map(x=>({code:String(x.code||x.airportCode||x.iata||x.stationCode||x.id||'').trim().toUpperCase(),name:String(x.name||x.airportName||x.city||'').trim()}));}catch(e){}}
+    const seen=new Set();return rows.filter(x=>x.code&&!seen.has(x.code)&&(seen.add(x.code),true));
+  }
   function populateFilterOptions(){
-    const provider=document.getElementById('loungeNameFilter'),status=document.getElementById('loungeStatusFilter');
+    const provider=document.getElementById('loungeNameFilter'),status=document.getElementById('loungeStatusFilter'),region=document.getElementById('loungeRegionFilter');
     const put=(el,values,label)=>{if(!el)return;const cur=el.value,items=[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));el.innerHTML=`<option value="">${label}</option>`+items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');el.value=items.includes(cur)?cur:''};
-    put(provider,(data.lounges||[]).map(x=>x.name),'Semua Nama Layanan / Provider');
-    put(status,(data.lounges||[]).map(x=>x.documentStatus),'Semua Status Dokumen');
+    put(region,(data.lounges||[]).map(x=>x.region||x.wilayah),'All Regions');
+    put(provider,(data.lounges||[]).map(x=>x.name),'All Service Providers');
+    put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Status');
   }
 
   function filterType(){return document.querySelector('[data-ge-p29-service-filter].active')?.dataset.geP29ServiceFilter||''}
@@ -596,15 +603,11 @@
   };
 
   function populateStationFilterOptions(){
-    const select=document.getElementById('loungeAirportFilter');
-    if(!select)return;
+    const select=document.getElementById('loungeAirportFilter');if(!select)return;
     const current=new Set([...(select.selectedOptions||[])].map(o=>String(o.value||'').trim().toUpperCase()).filter(Boolean));
-    let rows=[];
-    try{rows=(data.airports||[]).map(x=>({code:String(x.code||x.airportCode||x.iata||x.stationCode||x.id||'').trim().toUpperCase(),name:String(x.name||x.airportName||x.city||'').trim()}));}catch(e){}
-    try{if(typeof GECore?.list==='function')rows=rows.concat((GECore.list('airports')||[]).map(x=>({code:String(x.code||x.airportCode||x.iata||x.stationCode||x.id||'').trim().toUpperCase(),name:String(x.name||x.airportName||x.city||'').trim()})));}catch(e){}
-    rows=rows.concat((data.lounges||[]).map(x=>({code:String(x.airport||'').trim().toUpperCase(),name:''})));
-    const seen=new Set(),unique=rows.filter(x=>x.code&&!seen.has(x.code)&&(seen.add(x.code),true)).sort((a,b)=>a.code.localeCompare(b.code));
-    select.innerHTML=unique.map(x=>`<option value="${esc(x.code)}" ${current.has(x.code)?'selected':''}>${esc(x.code+(x.name?' — '+x.name:''))}</option>`).join('');
+    const unique=masterAirportRows().sort((a,b)=>a.code.localeCompare(b.code));
+    select.innerHTML=unique.map(x=>`<option value="${esc(x.code)}">${esc(x.code+(x.name?' — '+x.name:''))}</option>`).join('');
+    [...select.options].forEach(o=>o.selected=current.has(o.value));
   }
 
   function setupFilterCombosR12(){
@@ -651,15 +654,14 @@
   }
 
   function setup(){
-    setupFilterCombosR12();
+    populateFilterOptions();
     populateStationFilterOptions();
-    setupStationMultiSelectR12();
     setupTypeFilter();
     const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template P29';}
     ['loungeRegionFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{loungeCardPage=1;renderLounges()})});
     try{if(typeof fillAirportSelects==='function')fillAirportSelects()}catch(e){}
+    populateFilterOptions();
     populateStationFilterOptions();
-    setupStationMultiSelectR12();
     renderLounges();
   }
 

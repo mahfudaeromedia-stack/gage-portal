@@ -3489,3 +3489,10 @@ Validation limitation
 - Added R115 and R116 regression contracts.
 - Local `npm test` PASS: `CBNR_REGRESSION_GATE_PASS TESTS=61`.
 - Browser/live UAT is still not claimed as PASS.
+
+## 2026-10-03 — CBNR R117 current-day UI/reference recovery
+- Form Templates builder layout restored to the established reference structure: metadata remains two-column and the editor remains Palette → Sections/Questions → Inspector; no Monitoring checklist field schema/order was changed.
+- Form Template station picker now reads the canonical hydrated Airport / Station master with a safe GECore fallback.
+- Lounge/Tenant filter runtime no longer creates the duplicate legacy station picker wrapper; Region/Provider/Status options are populated from actual Lounge/Tenant data and Station options from the canonical Airport / Station source.
+- Master Data runtime now mounts against the existing two-group page panel (`Jenis & Referensi` / `ID & MASTER REFERENSI`) instead of waiting for a nonexistent `refRows` placeholder.
+- Regression gate R117 added. Local `npm test` PASS: 62 tests.
