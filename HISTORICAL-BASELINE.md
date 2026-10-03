@@ -3425,35 +3425,32 @@ Do not revert unrelated files.
 Open login.html
 
 
-
 ---
 
-## CBNR GLOBAL UI CONSOLIDATION — 2026-10-03
+## CBNR CURRENT REVISION — Monitoring Checklist Header + UI Source Consolidation
 
-Scope
-- Continued directly from test-1 baseline; no reset/rebuild from main.
-- Global source-to-consumer correction, not a single-page patch.
+Scope executed against the existing canonical test-1/current working tree; no clean-slate rebuild.
 
-Executed
-- Removed obsolete assets/global-ui-standard.js and its app loader.
-- Canonicalized legacy button class source usage toward ge-btn across source-bearing assets; legacy btn selectors were not retained as a visual masking layer.
-- Standardized affected user-facing button labels to English canonical terminology: Save, Cancel, Edit, Delete, Add Milestone, Show.
-- Fixed Initiative Timeline Delete handler exposure so the rendered Delete action calls the real canonical delete function and refreshes the timeline after persistence.
-- Renamed Planning Workspace generic "Field Configuration" section to "Agreement Revision" so agreement revision metadata is explicit rather than presented as a second generic form layer.
-- Removed duplicate editable category field for the GHA context where the page/category already establishes Ground Handling Agent.
+1. Monitoring & Assessment — Checklist Header
+- Added one canonical `checklistHeader()` renderer in `assets/form-management.js`.
+- Preview now visibly renders a Checklist Header before checklist sections.
+- Header fields are sourced from the existing checklist/work model: Monitoring Work, Station, Due Date, Frequency, Assessment Indicator, Journey Scope, Touch Point, plus title/purpose/category.
+- Completion and submission detail use the same header renderer; no second header implementation was introduced.
 
-CBNR verification requirement
-- All shared changes must be rechecked against every consuming page before deployment; a shared edit is not treated as proof of A-Z page compliance.
-- Historical record remains this file only; no new per-batch historical/manifest file is created.
+2. Monitoring & Assessment — Legacy button source cleanup
+- Template Edit/View action now uses the canonical `ge-btn compact` source class.
+- Section Delete and field Delete now use canonical danger button source classes.
+- No CSS-only masking was used to disguise the previous button source.
 
+3. Monitoring & Assessment — Geometry/source consolidation
+- Removed the duplicated Monitoring/form-builder geometry block from `assets/portal.css`.
+- Canonical Monitoring checklist/header/form geometry is now defined in `assets/global-ui-canonical.css`.
+- Checklist metadata and form controls use one canonical height family in the Monitoring implementation.
 
----
+4. Regression gate
+- Added `R112_MONITORING_CHECKLIST_HEADER_CANONICAL_CONTRACT_PASS`.
+- `npm test` PASS: `CBNR_REGRESSION_GATE_PASS TESTS=57`.
+- Existing R108 Monitoring/Network contract remains PASS.
 
-## CBNR A-Z SOURCE CONSOLIDATION — 2026-10-03
-
-- Removed obsolete duplicate `assets/app.js`; `assets/edition1-business-runtime.js` is the canonical business runtime source.
-- Removed remaining legacy `.btn` CSS selectors from the canonical UI layer and enforced the canonical `ge-btn` implementation across source assets.
-- Added global A-Z regression coverage (R111) that scans all source assets rather than validating a single page/component.
-- Rechecked Monitoring & Assessment, Submission, Initiative Timeline, Planning Workspace, Master Data/Reference and canonical registry contracts after the global source cleanup.
-
-- Replaced the Monitoring & Assessment registry page body that still rendered the old R43 foundation panel; the canonical `form-management.js` runtime is now the page implementation.
+Validation limitation
+- This revision has source/build validation only. Live browser preview/UAT has not been claimed as PASS.
