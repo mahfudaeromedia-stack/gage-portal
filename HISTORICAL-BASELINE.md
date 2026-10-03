@@ -3464,35 +3464,38 @@ Validation limitation
 - Kept Monitoring checklist header as the canonical source used by Preview and Completion; regression contract retained.
 - Added R113 provider/reference regression contract.
 - Removed legacy `assets/global-ui-standard.js` and `assets/app.js` from the canonical package.
-
-## CBNR — Monitoring Results Visuals + Planning Delete Confirmation Correction
-- Monitoring Submission Results retains the existing result logic and checklist structure; only the presentation/component layer was corrected.
-- Submission KPI cards no longer use the legacy `ge-kpi` implementation and now use the canonical Monitoring KPI presentation.
-- Coverage now has a visible canonical pie implementation using the existing Domestic/International counts and remains filter-interactive.
-- Result Distribution and Station Coverage retain their existing data logic and now use clearer canonical bar geometry.
-- Submission signal/coverage controls use canonical button treatment instead of legacy button styling.
-- Planning Workspace delete confirmation was corrected to use the canonical delete confirmation engine with explicit `Delete` / `Cancel` actions; it no longer falls through to a Save/Cancel form.
-- Planning domain delete now executes the actual deletion only after confirmation; the previous confirmation path could display a generic form-style modal and did not invoke the delete callback.
-- Lounge/Tenant price-period deletion is restored to the canonical filled danger `Delete` action.
-- Added `R114_MONITORING_RESULTS_DELETE_CONTRACT_PASS` covering the Monitoring Results visuals and Planning Delete confirmation behavior.
-- Local `npm test` PASS: `CBNR_REGRESSION_GATE_PASS TESTS=59`.
-- Validation remains source/build regression validation only; live browser preview/UAT is not claimed as PASS.
+### 2026-10-03 — Monitoring tab visual recovery
+- Monitoring tab menu was visually altered while the requested work was button standardization and Submission page work.
+- Recovered the tab geometry from the previously proven `assets/portal.css` implementation into the canonical `assets/global-ui-canonical.css`; no duplicate tab runtime/CSS was restored to `portal.css`.
+- Preserved the existing Monitoring tab structure and labels; no navigation/functionality was changed.
 
 
-## CBNR — Current-day Master Data + Global Control Consolidation
-- Master Data now exposes the existing GHA / Provider, Service Alignment, and Cost Intelligence implementations that were already present in the canonical source but were not reachable from the visible reference tabs.
-- GHA table now displays the existing record `id` as `GHA ID`; no new identifier schema was invented.
-- Existing GHA records hydrate the Service Provider and Agreement reference identity views.
-- Personnel and BO Classification visible tabs now have their own canonical add/edit/read/delete source path instead of falling through to the Airport Cost handler.
-- Monitoring action buttons that were still raw buttons were converted at source to canonical `ge-btn` variants; structural section/field selector buttons remain component-specific selectors.
-- Canonical standard field/button geometry is consolidated to 42px; 36px remains the explicit compact variant.
-- Added R115 and R116 regression contracts.
-- Local `npm test` PASS: `CBNR_REGRESSION_GATE_PASS TESTS=61`.
-- Browser/live UAT is still not claimed as PASS.
 
-## 2026-10-03 — CBNR R117 current-day UI/reference recovery
-- Form Templates builder layout restored to the established reference structure: metadata remains two-column and the editor remains Palette → Sections/Questions → Inspector; no Monitoring checklist field schema/order was changed.
-- Form Template station picker now reads the canonical hydrated Airport / Station master with a safe GECore fallback.
-- Lounge/Tenant filter runtime no longer creates the duplicate legacy station picker wrapper; Region/Provider/Status options are populated from actual Lounge/Tenant data and Station options from the canonical Airport / Station source.
-- Master Data runtime now mounts against the existing two-group page panel (`Jenis & Referensi` / `ID & MASTER REFERENSI`) instead of waiting for a nonexistent `refRows` placeholder.
-- Regression gate R117 added. Local `npm test` PASS: 62 tests.
+## 2026-10-03 — R114 Monitoring Results charts and Planning Delete confirmation
+- Restored the visible Coverage pie chart presentation in the canonical Monitoring Results stylesheet; Domestic/International legend now shows counts and percentages while retaining the existing coverage data and clickable filter signals.
+- Normalized the existing Result Distribution and Station Coverage bar chart track/height without changing checklist field order, checklist template schema, or Monitoring tab structure.
+- Fixed Planning Workspace deletion flow: confirmation now presents Cancel + red Delete, and a confirmed action executes the delete/persistence path. The previous fallback incorrectly reused the generic Save/Cancel form modal; the shared confirmation path also previously failed to call the delete action after confirmation.
+- Added R114 source contract checks for the Coverage pie chart, percentage labels, bar charts, dedicated Delete/Cancel confirmation, and post-confirm delete persistence path.
+- Corrected Lounge/Tenant price-period Delete from the secondary style to the canonical red danger action after the R113 gate was moved into the executed test sequence and exposed the mismatch.
+- Added explicit R114 cache-busting versions for the modified Monitoring stylesheet/runtime and Planning runtime so deployed browsers load the corrected source.
+- R113 and R114 are now executed by the regression gate; `npm test` reports 59 passing contract tests.
+
+## CBNR R118 — Form Template / Master Data / Lounge Filter / Control Geometry Recovery (2026-10-03)
+
+R118 is a correction against the existing canonical baseline. It does not create a new portal architecture and does not alter Monitoring Checklist business schema.
+
+Verified findings and changes:
+- Form Templates builder geometry was missing a canonical grid declaration, causing the metadata fields and the Fields / Sections / Inspector areas to collapse vertically. R118 restores the documented two-column metadata arrangement and three-area builder arrangement, with responsive collapse only at smaller widths.
+- Form Template station selection was resolving only `airports` rows. R118 adds a canonical station resolver using Airport Master first, with the existing canonical reference catalog / GECore airport source as fallback. No new station dataset is created.
+- Master Data did not mount reliably because its initializer looked for `#refRows` before the actual `.ge-ref-tabs` host existed. R118 binds to the existing two-group Master Data host and separates group-tab actions (`Jenis & Referensi` / `ID & Master Referensi`) from inner reference tabs. No legacy page is reintroduced.
+- Lounge/Tenant Region filter options were not populated by the canonical Lounge runtime even though the page exposed the filter. R118 hydrates Region from live Lounge/Tenant records and preserves `All Regions` as the reset state. Provider, Station, Status, and Service Type remain data-driven.
+- GHA one-station-per-row behavior remains protected in Planning. R118 also fixes the Master GHA save path so multi-station create/edit is split into one record per station instead of reintroducing a multi-station aggregate record. Existing Planning split logic is preserved, not replaced.
+- Primary row controls and fields receive one canonical height/typography rule; compact table actions remain compact. Labels use readable dark text and field surfaces remain white rather than inheriting muted/legacy presentation.
+
+Guest sharing historical state:
+- Monitoring Work already contains the canonical `Share Guest` action and the public tokenized `/api/checklist-share` flow. The backend requires Firebase Admin credentials through `FIREBASE_SERVICE_ACCOUNT_JSON` or the existing `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` environment variables.
+- The observed `Firebase Admin credentials are not configured.` message is therefore a deployment/runtime credential configuration failure, not evidence that the Guest Share UI or token flow is absent. R118 does not add a duplicate share implementation.
+
+Regression gate:
+- `npm test` / `node tests/regression-gate.js`: `CBNR_REGRESSION_GATE_PASS TESTS=60`.
+- All prior gates through R114 remained PASS; R118 adds the new form/master/filter/geometry contract.
