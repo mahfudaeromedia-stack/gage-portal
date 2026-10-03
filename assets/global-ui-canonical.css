@@ -422,6 +422,14 @@ body.e1-page>.top .ge-session .filter select:focus{outline:none;box-shadow:none}
 
 /* Planning Workspace + Lounge/Tenant canonical field and action geometry. */
 .planning-domain-form label{font-size:13px;font-weight:500;color:#7187a0}
+.planning-domain-form{gap:10px 16px}
+.planning-domain-form label{display:grid;grid-template-rows:auto auto;gap:5px;margin:0;align-content:start;line-height:1.2}
+.planning-domain-form .planning-stations{gap:5px}
+.planning-modal{overflow:visible}
+.planning-modal .planning-domain-form{overflow:visible}
+.planning-station-picker{position:relative;z-index:20}
+.planning-station-picker.is-open{z-index:120001}
+.planning-station-picker .ge-searchable-menu{z-index:120002}
 .planning-domain-form label>input,.planning-domain-form label>select{height:48px;min-height:48px;border:1px solid #0b376d;border-radius:10px;background:#fff;color:#17324d;font:500 16px/1.2 Arial,sans-serif;padding:0 14px;box-sizing:border-box}
 .planning-domain-form label>input::placeholder{color:#91a2b5;font-weight:400;opacity:1}
 .planning-modal h2,.lounge-add-modal-v221 h2{font-size:20px;line-height:1.3;font-weight:700;color:#17324d;margin:0 0 8px}
