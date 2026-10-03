@@ -11,4 +11,24 @@ for(const test of tests){
   const r=spawnSync(process.execPath,['--input-type=commonjs','--eval',code],{cwd:root,stdio:'inherit',env:process.env});
   if(r.status!==0){failed++;console.error(`REGRESSION_GATE_FAIL ${test.name}`);break;}
 }
+// R113 — Lounge/Tenant reference + Provider form/card consolidation
+tests.push({name:'r113-lounge-provider-reference-contract.js',source:`'use strict';
+const fs=require('fs'),assert=require('assert');
+const lounge=fs.readFileSync('assets/lounge-planning-v29.js','utf8');
+const planning=fs.readFileSync('assets/planning-domains.js','utf8');
+const master=fs.readFileSync('assets/master-reference.js','utf8');
+const css=fs.readFileSync('assets/global-ui-canonical.css','utf8');
+assert(lounge.includes('>Save</button>') && lounge.includes('>Cancel</button>'),'Lounge Add/Edit must use canonical Save/Cancel actions.');
+assert(lounge.includes('class="ge-btn danger compact-btn ge-p29-remove-price"'),'Lounge price-period delete must use canonical danger button.');
+assert(lounge.includes('placeholder="Nama provider / layanan"'),'Lounge/provider empty fields must use placeholder, not example value.');
+assert(planning.includes("groundHandlers:['id','stations','name','scope','pic','agreement','from','until','currency','basePrice','sla','ahan']"),'Provider form field order must follow Lounge/Tenant reference structure.');
+assert(planning.includes('planning-provider-card') && planning.includes('lounge-master-card-v237 ge-p29-lounge-card'),'Provider cards must reuse Lounge/Tenant card structure.');
+assert(master.includes("field('Station / BO','stations'") && master.includes("field('Company / Provider','name'"),'Master GHA Add/Edit must start from Station/BO then Provider like the canonical provider form.');
+assert(master.includes('class="ge-btn danger compact"') && master.includes('>Delete</button>'),'AHAN row delete must use canonical danger Delete action.');
+for(const token of ['.ge-p29-form-grid input','.ge-ref-form input','.ge-btn.primary','.ge-btn.secondary','.ge-btn.danger']) assert(css.includes(token),'Shared UI geometry missing '+token);
+assert(!fs.existsSync('assets/global-ui-standard.js'),'Legacy global UI enhancer must be physically removed.');
+assert(!fs.existsSync('assets/app.js'),'Legacy app runtime must be physically removed.');
+console.log('R113_LOUNGE_PROVIDER_REFERENCE_CONTRACT_PASS');
+`});
+
 if(failed){process.exitCode=1;}else console.log(`CBNR_REGRESSION_GATE_PASS TESTS=${tests.length}`);

@@ -468,3 +468,31 @@ html body #cleanPageOutlet .ge-form-builder .ge-form-multi summary{min-height:48
 html body #cleanPageOutlet .ge-form-question input:not([type=checkbox]),html body #cleanPageOutlet .ge-form-question select,html body #cleanPageOutlet .ge-form-question textarea{min-height:48px;height:48px;border-radius:10px}
 html body #cleanPageOutlet .ge-form-question textarea{height:auto;min-height:96px}
 @media(max-width:760px){html body #cleanPageOutlet .ge-checklist-header-grid{grid-template-columns:1fr}html body #cleanPageOutlet .ge-checklist-header-grid>div.wide{grid-column:auto}}
+
+/* CBNR: Lounge/Tenant + Provider controls use one field/button geometry. */
+html body #cleanPageOutlet .ge-p29-form-grid label,
+html body #cleanPageOutlet .ge-ref-form label{display:block;min-width:0;}
+html body #cleanPageOutlet .ge-p29-form-grid input,
+html body #cleanPageOutlet .ge-p29-form-grid select,
+html body #cleanPageOutlet .ge-p29-form-grid textarea,
+html body #cleanPageOutlet .ge-ref-form input,
+html body #cleanPageOutlet .ge-ref-form select,
+html body #cleanPageOutlet .ge-ref-form textarea{height:42px;min-height:42px;}
+html body #cleanPageOutlet .ge-p29-form-grid textarea,
+html body #cleanPageOutlet .ge-ref-form textarea{height:auto;min-height:92px;padding-top:10px;padding-bottom:10px;}
+html body #cleanPageOutlet .ge-p29-remove-price{height:36px;min-height:36px;align-self:end;}
+html body #cleanPageOutlet .ge-btn{min-height:36px;height:36px;padding:0 14px;border-radius:8px;font-size:13px;font-weight:600;}
+html body #cleanPageOutlet .ge-btn.primary{background:var(--ui-navy);border-color:var(--ui-navy);color:#fff;}
+html body #cleanPageOutlet .ge-btn.secondary{background:#fff;border-color:var(--ui-navy);color:var(--ui-navy);}
+html body #cleanPageOutlet .ge-btn.danger{background:var(--ui-danger);border-color:var(--ui-danger);color:#fff;}
+html body #cleanPageOutlet .ge-p29-price-row{align-items:end;}
+
+/* CBNR lounge/provider table + filter geometry: same control height and compact readable cells. */
+html body #cleanPageOutlet .ge-p29-filter select,
+html body #cleanPageOutlet .ge-p29-filter input,
+html body #cleanPageOutlet [id^="lounge"] select,
+html body #cleanPageOutlet [id^="lounge"] input{min-height:42px;height:42px;box-sizing:border-box;}
+html body #cleanPageOutlet .ge-p29-lounge-card .lounge-card-actions-v237 .ge-btn{min-width:84px;}
+html body #cleanPageOutlet .ge-p29-lounge-card .ge-p29-card-fields dt{font-size:11px;line-height:1.25;}
+html body #cleanPageOutlet .ge-p29-lounge-card .ge-p29-card-fields dd{font-size:12px;line-height:1.35;}
+html body #cleanPageOutlet .planning-provider-card .lounge-master-card-body-v237{min-width:0;}

@@ -3454,3 +3454,13 @@ Scope executed against the existing canonical test-1/current working tree; no cl
 
 Validation limitation
 - This revision has source/build validation only. Live browser preview/UAT has not been claimed as PASS.
+
+## CBNR — Lounge/Provider reference correction + Monitoring checklist header
+- Corrected Lounge/Tenant Add/Edit action labels to canonical `Save` / `Cancel` and standardized price-period deletion to filled danger `Delete`.
+- Corrected Lounge/Tenant empty-entry examples to use placeholders rather than field values.
+- Reordered Planning GHA/Provider fields to follow the established Lounge/Tenant form structure: Station/BO → Provider → Scope → PIC → Agreement → Effective Period → Currency → Price → SLA → AHAN.
+- Reused the Lounge/Tenant card structure for Service & Provider / GHA cards instead of introducing a separate card visual system.
+- Corrected Master Reference GHA Add/Edit ordering to the same provider structure and standardized AHAN deletion.
+- Kept Monitoring checklist header as the canonical source used by Preview and Completion; regression contract retained.
+- Added R113 provider/reference regression contract.
+- Removed legacy `assets/global-ui-standard.js` and `assets/app.js` from the canonical package.
