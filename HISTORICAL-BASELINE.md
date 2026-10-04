@@ -3426,15 +3426,11 @@ Open login.html
 
 
 
-## CBNR CHANGE — PLANNING WORKSPACE PAGE DEFINITION
-
-2026-10-04 — Canonical Planning Workspace page builder
-- Planning Workspace now supports persisted page/domain definitions without creating additional HTML pages.
-- A new page is stored in the existing `referenceCatalog` as a `planningDomain` definition and retains its selected workspace/template.
-- New pages reopen through the canonical `app.html?page=planning-workspace&domain=<id>` route.
-- The new page reuses the selected workspace collection, fields, reference behavior, and canonical template.
-- Planning Workspace hub exposes `+ Add Page` per workspace and lists custom pages under their owning workspace.
-- Existing built-in pages and document IDs remain unchanged.
-- Added regression contract `R109_PLANNING_PAGE_BUILDER_CONTRACT_PASS`.
-- Full `npm test` PASS: 57 contracts.
-
+## 2026-10-04 — CBNR Checklist Share + Planning Domain Identity Clarification
+- Planning Workspace page/domain IDs (`PD-*`) are page-definition identifiers, not Master Data IDs.
+- Planning page definitions are persisted separately as `planningDomains`; they must not be flagged/stored as Master Data `referenceCatalog` entities.
+- Monitoring Works actions are canonical `Complete`, `Share`, and `Delete`.
+- `Share` supports `User GE`, `User GE + Guest`, and `Hanya Guest`, then `Generate Link`.
+- Generated links target the dedicated `monitoring-checklist` route.
+- Guest submissions require a syntactically valid email.
+- GE users submit using their authenticated account; `User GE` requires login; `User GE + Guest` allows either authenticated GE user or guest.
