@@ -1,0 +1,17 @@
+const fs=require('fs'),assert=require('assert');
+const forms=fs.readFileSync('assets/form-management.js','utf8');
+const planning=fs.readFileSync('assets/planning-domains.js','utf8');
+const master=fs.readFileSync('assets/master-reference.js','utf8');
+const css=fs.readFileSync('assets/portal.css','utf8');
+assert(forms.includes('data-multi-ok')&&forms.includes('data-multi-cancel'),'Form Template multi-select must expose OK and Cancel.');
+assert(forms.includes('data-answer-checkbox-ok')&&forms.includes('data-answer-checkbox-cancel'),'Form Template Multiple choice fields must expose OK and Cancel.');
+assert(forms.includes("JSON.parse(box?.dataset.committed||'[]')"),'Form answers must use the committed checkbox state, not unconfirmed live selections.');
+assert(planning.includes('data-planning-station-ok')&&planning.includes('data-planning-station-cancel'),'Planning station multi-select must expose OK and Cancel.');
+assert(planning.includes("dataset.committed||'[]'"),'Planning station selection must persist only the committed selection.');
+assert(master.includes('ge-ref-multi-cancel')&&master.includes('ge-ref-multi-ok'),'Master Data multi-select must expose OK and Cancel.');
+assert(master.includes('const restore=()=>'),'Master Data Cancel must restore the previously committed selection.');
+assert(css.includes('.ge-checkbox-picker-actions')&&css.includes('.ge-checkbox-group'),'Canonical checkbox-group action styling must exist.');
+assert(css.includes('.ge-assess-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0}'),'Form field grid spacing must use the reduced canonical spacing.');
+assert(css.includes('.ge-assess-form label,.ge-assess-finding label{display:grid;gap:3px;'),'Form label/control spacing must be compact.');
+assert(css.includes('.ge-form-question{margin:10px 0;'),'Form question vertical spacing must be compact.');
+console.log('CHECKBOX_FIELD_STANDARD_CONTRACT_PASS');
