@@ -9519,6 +9519,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     };
   }
 
+  window.geInitLoungeP29=setup;
   window.addEventListener('DOMContentLoaded',()=>setTimeout(setup,0));
 })();
 

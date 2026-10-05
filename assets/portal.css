@@ -5621,20 +5621,16 @@ body.lounge-reference-v237 .lounge-expiry-warning b{color:#855c17}
 /* Form Templates only: checkbox picker confirmation actions. */
 .ge-form-multi .ge-checkbox-picker-actions{display:flex;justify-content:flex-end;align-items:center;gap:7px;padding-top:8px;margin-top:7px;border-top:1px solid #e3eaf0;background:#fff}.ge-form-multi .ge-checkbox-picker-actions .ge-btn{min-height:32px}
 
-
-/* CBNR: Monitoring Work share dialog — scoped to the share flow only. */
-#r43Monitoring .ge-share-modal-backdrop{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(8,24,45,.56)}
-#r43Monitoring .ge-share-modal{width:min(100%,520px);max-height:min(90vh,760px);overflow:auto;background:#fff;color:#172b45;border:1px solid #d8e1eb;border-radius:12px;box-shadow:0 24px 70px rgba(5,20,40,.28)}
-#r43Monitoring .ge-share-modal-head,#r43Monitoring .ge-share-modal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid #e4eaf1}
-#r43Monitoring .ge-share-modal-head h2{margin:0;font-size:18px;font-weight:700}
-#r43Monitoring .ge-share-modal-body{display:grid;gap:12px;padding:18px 20px}
-#r43Monitoring .ge-share-modal-body>p{margin:0;color:#53657a}
-#r43Monitoring .ge-choice-row{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid #dce4ed;border-radius:8px;cursor:pointer}
-#r43Monitoring .ge-choice-row input{width:16px;min-width:16px;height:16px;min-height:16px;margin:3px 0 0}
-#r43Monitoring .ge-choice-row span{display:grid;gap:3px}
-#r43Monitoring .ge-choice-row small{color:#66788b;font-size:12px}
-#r43Monitoring .ge-share-modal-body .ge-field-label{display:grid;gap:6px;font-weight:600}
-#r43Monitoring .ge-share-modal-body [data-share-email]{width:100%;min-height:38px;height:38px;padding:8px 10px;border:1px solid #cbd6e2;border-radius:6px}
-#r43Monitoring .ge-share-modal-foot{justify-content:flex-end;border-top:1px solid #e4eaf1;border-bottom:0}
-#r43Monitoring .ge-share-modal [data-share-message] a{display:block;margin-top:8px}
-@media(max-width:560px){#r43Monitoring .ge-share-modal-backdrop{padding:10px}#r43Monitoring .ge-share-modal-head,#r43Monitoring .ge-share-modal-foot{padding:13px 15px}#r43Monitoring .ge-share-modal-body{padding:15px}}
+/* Monitoring & Assessment: keep legacy action buttons on this page inside the canonical button language. */
+#r43Monitoring .ge-form-builder-grid .ge-form-palette button:not(.ge-btn),
+#r43Monitoring .ge-form-builder-grid .ge-form-canvas button:not(.ge-btn),
+#r43Monitoring .ge-form-builder-grid .ge-form-inspector button:not(.ge-btn),
+#r43Monitoring .ge-assess-card table button:not(.ge-btn),
+#r43Monitoring .ge-assess-item>button:not(.ge-btn),
+#r43Monitoring .ge-form-ref-list button:not(.ge-btn){min-height:34px;padding:0 11px;border:1px solid #0b376d;border-radius:7px;background:#fff;color:#17324d;font:600 12px/1.15 inherit;cursor:pointer;box-sizing:border-box}
+#r43Monitoring .ge-form-builder-grid .ge-form-palette button:not(.ge-btn):hover,
+#r43Monitoring .ge-form-builder-grid .ge-form-canvas button:not(.ge-btn):hover,
+#r43Monitoring .ge-form-builder-grid .ge-form-inspector button:not(.ge-btn):hover,
+#r43Monitoring .ge-assess-card table button:not(.ge-btn):hover,
+#r43Monitoring .ge-assess-item>button:not(.ge-btn):hover,
+#r43Monitoring .ge-form-ref-list button:not(.ge-btn):hover{background:#0b376d;color:#fff}

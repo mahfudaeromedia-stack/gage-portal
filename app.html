@@ -49,6 +49,7 @@
   }
   if(['cx-import','customer-experience'].includes(route)){await loadSrc('assets/edition1-store.js?v=r49');await window.GEStore.hydrate(['customerExperience']);}
   for(const item of def.scripts||[]){ if(item.src){await loadSrc(item.src);} else if(item.code){(0,eval)(item.code);} }
+  if(route==='lounge-list') await window.geInitLoungeP29?.();
   if(['station-360','service-experience','capability-classification'].includes(route)){await loadSrc('assets/edition1-store.js?v=r47');try{await window.GEStore?.hydrate(['monitoringTemplates','monitoringAssessments','formTemplates','formSubmissions','airports','serviceAlignments','facilities','assets','airportSystems','lounges','personnel','touchpoints','customerExperience']);}catch(e){console.warn('[Airport Experience source]',e);}}
   if(!isSharedChecklist&&['airport-experience','station-360','service-experience','capability-classification','monitoring-assessment'].includes(route)){await loadSrc('assets/airport-experience-foundation.js?v=r56');}
   if(['monitoring-assessment','monitoring-checklist'].includes(route)){await loadSrc('assets/form-management.js?v=r59');await window.geFormManagementInit?.();}
