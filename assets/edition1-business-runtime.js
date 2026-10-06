@@ -191,10 +191,6 @@ function exportCSV(){
  downloadBlob(csv,'GE_Inisiatif.csv','text/csv;charset=utf-8');
 }
 
-function renderAirports(){
- const t=document.getElementById('airportRows');if(!t)return;
- t.innerHTML=(data.airports||[]).map((a,i)=>`<tr><td>${i+1}</td><td><b>${a.code}</b></td><td>${a.city}</td><td>${a.region}</td><td><span class="pill">${a.status}</span></td><td>${a.lounge}</td><td>${a.pending}</td></tr>`).join('');
-}
 function addAirport(){
  const a={code:(document.getElementById('acode')?.value||'').trim().toUpperCase(),city:(document.getElementById('acity')?.value||'').trim(),region:document.getElementById('areg')?.value||'Domestik',status:'Active',lounge:0,pending:'-'};
  if(!a.code||!a.city){alert('Kode dan kota airport harus diisi.');return}
@@ -1747,22 +1743,6 @@ function renderUserAccounts(){
  }).join(''):`<tr><td colspan="11" class="ge-data-state-r13">Tidak ada akun pada Firestore yang sesuai filter.</td></tr>`;
  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
-function renderAirports(){
-  const t=document.getElementById('airportRows');if(!t)return;
-  const q=(document.getElementById('airportSearch')?.value||'').toLowerCase();
-  const reg=document.getElementById('airportRegionFilter')?.value||'';
-  const st=document.getElementById('airportStatusFilter')?.value||'';
-  const rows=(data.airports||[]).filter(a=>
-    (typeof gxAirportAllowed!=='function'||gxAirportAllowed(a.code)) &&
-    (!q||`${a.code} ${a.city}`.toLowerCase().includes(q))&&(!reg||a.region===reg)&&(!st||a.status===st)
-  );
-  const rsel=document.getElementById('airportRegionFilter');
-  if(rsel){const cur=rsel.value;const vals=[...new Set((data.airports||[]).map(x=>x.region).filter(Boolean))].sort();rsel.innerHTML='<option value="">Semua Wilayah</option>'+vals.map(x=>`<option>${x}</option>`).join('');rsel.value=cur}
-  const ssel=document.getElementById('airportStatusFilter');
-  if(ssel){const cur=ssel.value;const vals=[...new Set((data.airports||[]).map(x=>x.status).filter(Boolean))].sort();ssel.innerHTML='<option value="">Semua Status</option>'+vals.map(x=>`<option>${x}</option>`).join('');ssel.value=cur}
-  t.innerHTML=rows.map((a,i)=>`<tr><td>${i+1}</td><td><b>${a.code}</b></td><td>${a.city}</td><td>${a.region}</td><td><span class=pill>${a.status}</span></td><td>${a.lounge}</td><td>${a.pending}</td></tr>`).join('');
-  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
-}
 function renderDocumentsAdmin(){
  const box=document.getElementById('documentAdminList');if(!box)return;
  const q=(document.getElementById('docAdminSearch')?.value||'').toLowerCase();
@@ -1778,43 +1758,6 @@ function renderDocumentsAdmin(){
 }
 
 /* Branch Office personnel readiness */
-function personnelAirportMatrix(){
-  const rows=(data.personnel||[]).filter(p=>String(p.airport||'').trim().toUpperCase()!=='HO' && String(p.airport||'').trim());
-  const map={};
-  rows.forEach(p=>{
-    const airport=String(p.airport||'').trim().toUpperCase();
-    map[airport]??={airport,functions:new Set(),count:0};
-    const fn=String(p.function||'').trim().toUpperCase();
-    if(GE_CORE_BO_FUNCTIONS.includes(fn))map[airport].functions.add(fn);
-    map[airport].count++;
-  });
-  return Object.values(map).map(x=>{
-    const n=GE_CORE_BO_FUNCTIONS.filter(f=>x.functions.has(f)).length;
-    const classification=n>=4?'BO A':n===3?'BO B':'BO C';
-    return {...x,functionCount:n,classification};
-  }).sort((a,b)=>String(a.airport||'').localeCompare(String(b.airport||''),'id'));
-}
-function renderPersonnelReadiness(){
-  const tbody=document.getElementById('readinessRows');if(!tbody)return;
-  const matrix=personnelAirportMatrix();
-  const q=(document.getElementById('readinessSearch')?.value||'').toUpperCase();
-  const cf=document.getElementById('readinessClassFilter')?.value||'';
-  const filtered=matrix.filter(x=>(!q||x.airport.includes(q))&&(!cf||x.classification===cf));
-  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
-  set('readinessAirportCount',matrix.length);
-  const nonHO=(data.personnel||[]).filter(p=>String(p.airport||'').trim().toUpperCase()!=='HO');
-  GE_CORE_BO_FUNCTIONS.forEach(fn=>set('readiness'+fn,nonHO.filter(p=>String(p.function||'').trim().toUpperCase()===fn).length));
-  const a=matrix.filter(x=>x.classification==='BO A').length,b=matrix.filter(x=>x.classification==='BO B').length,c=matrix.filter(x=>x.classification==='BO C').length;
-  set('classACount',a);set('classBCount',b);set('classCCount',c);
-  const pct=matrix.length?Math.round(a/matrix.length*100):0;set('personnelCoveragePct',pct+'%');
-  const donut=document.getElementById('personnelCoverageDonut');if(donut)donut.style.setProperty('--coverage',pct);
-  tbody.innerHTML=filtered.map((x,i)=>`<tr>
-    <td>${i+1}</td><td><b>${x.airport}</b></td><td><span class="bo-class ${x.classification.replace(' ','-').toLowerCase()}">${x.classification}</span></td>
-    ${GE_CORE_BO_FUNCTIONS.map(fn=>`<td>${x.functions.has(fn)?'<span class="ready-yes">Ada</span>':'<span class="ready-no">Belum</span>'}</td>`).join('')}
-    <td>${x.count}</td>
-  </tr>`).join('');
-  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
-}
 
 /* Strong RBAC navigation: hide all inaccessible links/groups. */
 function gxApplyNavigationV212(){
@@ -2370,26 +2313,6 @@ function airportMasterFiltered(){
     (!q||`${a.code} ${a.city} ${a.gm}`.toLowerCase().includes(q))&&
     (!w||a.wilayah===w)&&(!r||a.region===r)&&(!s||a.status===s)
   );
-}
-function renderAirports(){
-  const t=document.getElementById('airportRows');if(!t)return;
-  populateAirportMasterFilters();
-  const rows=airportMasterFiltered(),can=typeof gxCanManage==='function'&&gxCanManage();
-  t.innerHTML=rows.map((a,i)=>`<tr>
-    <td>${a.no||i+1}</td>
-    <td><b>${a.code}</b></td><td>${a.city}</td><td>${a.wilayah}</td><td>${a.region||'-'}</td>
-    <td>${can?`<select class="inline-status-select ${a.status==='Inactive'?'inactive':''}" onchange="geSetAirportStatus('${a.code}',this.value)"><option ${a.status==='Active'?'selected':''}>Active</option><option ${a.status==='Inactive'?'selected':''}>Inactive</option></select>`:`<span class="pill ${a.status==='Inactive'?'danger':''}">${a.status}</span>`}</td>
-    <td>${a.gm}</td><td>${Number(a.visitorLounge).toLocaleString('id-ID')}</td><td>${a.contracts}</td>
-    <td>${a.pending?`<span class="pending-count">${a.pending}</span>`:'<span class="clear-count">0</span>'}</td>
-  </tr>`).join('');
-
-  const all=geAirportVisibleRows(),set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
-  set('airportMasterTotal',all.length);
-  set('airportMasterActive',all.filter(x=>x.status==='Active').length);
-  set('airportMasterInactive',all.filter(x=>x.status==='Inactive').length);
-  set('airportMasterContracts',all.reduce((s,x)=>s+x.contracts,0));
-  set('airportMasterPending',all.reduce((s,x)=>s+x.pending,0));
-  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
 
 /* ---------- Dynamic world map ---------- */

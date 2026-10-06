@@ -52,7 +52,7 @@
   if(route==='lounge-list') await window.geInitLoungeP29?.();
   if(['station-360','service-experience','capability-classification'].includes(route)){await loadSrc('assets/edition1-store.js?v=r47');try{await window.GEStore?.hydrate(['monitoringTemplates','monitoringAssessments','formTemplates','formSubmissions','airports','serviceAlignments','facilities','assets','airportSystems','lounges','personnel','touchpoints','customerExperience']);}catch(e){console.warn('[Airport Experience source]',e);}}
   if(!isSharedChecklist&&['airport-experience','station-360','service-experience','capability-classification','monitoring-assessment'].includes(route)){await loadSrc('assets/airport-experience-foundation.js?v=r56');}
-  if(['monitoring-assessment','monitoring-checklist'].includes(route)){await loadSrc('assets/form-management.js?v=r59');await window.geFormManagementInit?.();}
+  if(['monitoring-assessment','monitoring-checklist'].includes(route)){await loadSrc('assets/form-management.js?v=r110');await window.geFormManagementInit?.();}
   if(['inisiatif','calendar','monitoring-assessment','service-experience','capability-classification'].includes(route)&&window.gxCanManage?.()){await loadSrc('assets/edition1-store.js?v=r59');await loadSrc('assets/master-reference.js?v=r61');try{await window.GXMasterReference?.syncCatalog()}catch(e){console.warn('[Ground Touch Point sync]',e)}}
   if(route==='master-data')await window.GXMasterReference?.init();
   if(route==='attention-settings'){await loadSrc('assets/attention-settings.js?v=r60');await window.geAttentionSettingsInit?.();}
