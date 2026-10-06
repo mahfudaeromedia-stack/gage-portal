@@ -23,7 +23,16 @@
   if(route==='data'&&['Head Office','GE Team','Ground Experience Team'].includes(window.gxGetSession?.()?.role)&&window.gxGetSession?.()?.accessLevel==='Admin'){outlet.innerHTML='<div class="clean-page-error"><h2>Data Management tidak tersedia untuk GE Admin</h2></div>';reveal();return;}
   const def=window.P40_CLEAN_PAGES[route];
   if(!def){outlet.innerHTML='<div class="clean-page-error"><h2>Page tidak ditemukan</h2><p>'+route+'</p></div>';reveal();return;}
+  document.querySelectorAll('body > .modal-backdrop[data-ge-hoisted], body > .ge-id-backdrop[data-ge-hoisted], body > [data-modal-root][data-ge-hoisted]').forEach(el=>el.remove());
   document.title=def.title+' — Ground Experience Portal'; outlet.innerHTML=def.html;
+  const hoistActiveModals=()=>{
+    outlet.querySelectorAll('.modal-backdrop.show, .ge-id-backdrop.show, [data-modal-root].show').forEach(el=>{
+      if(el.parentElement!==document.body){el.dataset.geHoisted='1';document.body.appendChild(el);}
+    });
+  };
+  hoistActiveModals();
+  const modalObserver=new MutationObserver(hoistActiveModals);
+  modalObserver.observe(outlet,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
   if(route==='admin'&&window.gxGetSession?.()?.role!=='Super Admin'){outlet.querySelectorAll('.admin-section-tab').forEach(b=>{if(/Activity Log|Portal Management/.test(b.textContent))b.remove()});outlet.querySelector('#adminSectionAudit')?.remove();outlet.querySelector('#adminSectionPortal')?.remove();}
   if(route==='index'){const dashboard=outlet.querySelector('#dashboardRoot');if(dashboard&&!dashboard.children.length)dashboard.innerHTML='<section class="ge-dash-panel"><h2>Memuat dashboard…</h2><p>Mengambil data terbaru untuk tampilan Anda.</p></section>';}
   // Destination content is prepared, but the route remains hidden until route-specific styles/scripts are ready.
