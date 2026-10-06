@@ -456,7 +456,86 @@ body.e1-page>.top .ge-session .filter select:focus{outline:none;box-shadow:none}
 .ge-view-select-r6.active,.ge-view-select-r6[aria-pressed="true"]{background:#0b376d;color:#fff;border-color:#0b376d}
 .planning-domain-page .planning-toolbar .ge-btn,.planning-domain-page .planning-row-actions .ge-btn{height:40px;min-height:40px;font-size:14px;font-weight:600}
 
-/* CBNR: searchable dropdowns must render above cards, tables and shell content. */
-.ge-searchable{position:relative;z-index:2}
-.ge-searchable.is-open{z-index:2147481000}
-.ge-searchable.is-open .ge-searchable-menu{z-index:2147481100}
+
+/* CBNR UI correction: hidden notification controls must actually disappear; the old badge rule overrode the HTML hidden state. */
+html body.final-v257.final-shell-r5 .ge-top-action[hidden]{display:none}
+html body.final-v257.final-shell-r5 .ge-notify-badge[hidden]{display:none}
+html body.final-v257.final-shell-r5 .ge-user-pop #geMenuNotifications[hidden]{display:none}
+
+/* Submission Results: every interactive control uses the canonical button language; no native/default buttons. */
+html body #cleanPageOutlet .ge-pie-key,
+html body #cleanPageOutlet .ge-submission-signal{
+  box-sizing:border-box;min-height:38px;height:auto;border:1px solid #0b376d;border-radius:8px;background:#fff;color:#17324d;
+  font:500 13px/1.2 Arial,sans-serif;cursor:pointer;text-align:left;
+}
+html body #cleanPageOutlet .ge-pie-key{display:flex;align-items:center;gap:8px;padding:7px 10px}
+html body #cleanPageOutlet .ge-pie-key:hover,
+html body #cleanPageOutlet .ge-submission-signal:hover{background:#0b376d;color:#fff}
+html body #cleanPageOutlet .ge-pie-key b,
+html body #cleanPageOutlet .ge-submission-signal b{font-weight:600}
+html body #cleanPageOutlet .ge-submission-signals{grid-template-columns:repeat(4,minmax(0,1fr))}
+html body #cleanPageOutlet .ge-submission-signals>button{padding:10px 13px;display:flex;flex-direction:column;gap:3px;justify-content:center}
+html body #cleanPageOutlet .ge-submission-signals>button span{margin:0;font-size:11px;color:#8796a5}
+html body #cleanPageOutlet .ge-submission-signals>button:hover span{color:#fff}
+
+/* Form Builder: legacy unclassed controls inherit the same secondary/compact language. */
+html body #cleanPageOutlet .ge-form-builder button:not(.ge-btn){
+  min-height:34px;height:34px;padding:0 11px;border:1px solid #0b376d;border-radius:8px;background:#fff;color:#17324d;
+  font:500 12.5px/1.15 Arial,sans-serif;cursor:pointer;box-sizing:border-box
+}
+html body #cleanPageOutlet .ge-form-builder button:not(.ge-btn):hover{background:#0b376d;color:#fff}
+html body #cleanPageOutlet .ge-form-builder .ge-form-section-select,
+html body #cleanPageOutlet .ge-form-builder .ge-form-field-select{height:auto;min-height:34px;text-align:left}
+
+/* Planning Add/Edit modal uses the same field/action geometry as Lounge/Tenant. */
+html body .planning-dialog-body-level .ge-id-backdrop{position:fixed;inset:0;z-index:120000;display:grid;place-items:center;padding:20px;background:rgba(7,30,56,.52)}
+html body .planning-dialog-body-level .planning-modal{width:min(820px,95vw);max-height:calc(100vh - 40px);overflow:auto;border-radius:10px;padding:20px;background:#fff;box-shadow:0 22px 60px rgba(0,0,0,.24);color:#17324d}
+html body .planning-dialog-body-level .planning-modal label{font-size:13px;font-weight:500;color:#7187a0}
+html body .planning-dialog-body-level .planning-modal input:not([type=checkbox]):not([type=radio]),
+html body .planning-dialog-body-level .planning-modal select,
+html body .planning-dialog-body-level .planning-modal textarea{box-sizing:border-box;min-height:48px;height:48px;border:1px solid #0b376d;border-radius:10px;background:#fff;color:#17324d;font:500 16px/1.2 Arial,sans-serif;padding:0 14px}
+html body .planning-dialog-body-level .planning-modal textarea{height:auto;min-height:96px;padding:12px 14px}
+html body .planning-dialog-body-level .planning-modal input::placeholder,
+html body .planning-dialog-body-level .planning-modal textarea::placeholder{color:#91a2b5;font-weight:400;opacity:1}
+html body .planning-dialog-body-level .planning-modal .ge-id-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid #dbe4ee}
+html body .planning-dialog-body-level .planning-modal .ge-id-actions .ge-btn{height:48px;min-height:48px;border-radius:10px;padding:0 18px;font:600 16px/1 Arial,sans-serif}
+html body .planning-dialog-body-level .planning-modal .ge-id-actions .ge-btn:not(.primary){background:#fff;color:#17324d;border:1px solid #0b376d}
+html body .planning-dialog-body-level .planning-modal .ge-id-actions .ge-btn.primary{background:#0b376d;color:#fff;border:1px solid #0b376d}
+
+/* Lounge/Tenant filter labels: field size, text and spacing stay identical across Service & Provider. */
+html body #cleanPageOutlet .lounge-filter-grid-ref{align-items:end}
+html body #cleanPageOutlet .lounge-filter-grid-ref>label{display:grid;grid-template-rows:auto 48px;gap:6px;min-width:0;margin:0;color:#7187a0;font-size:13px;font-weight:500}
+html body #cleanPageOutlet .lounge-filter-grid-ref>label>select,
+html body #cleanPageOutlet .lounge-filter-grid-ref .ge-searchable-trigger{height:48px;min-height:48px;box-sizing:border-box;font:500 16px/1.2 Arial,sans-serif}
+html body #cleanPageOutlet .lounge-filter-grid-ref .ge-searchable{height:48px}
+html body #cleanPageOutlet .lounge-filter-grid-ref .ge-searchable-menu{z-index:130000}
+html body #cleanPageOutlet .lounge-master-page-head{margin-bottom:14px}
+html body #cleanPageOutlet .lounge-master-page-head .ge-page-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+html body #cleanPageOutlet .lounge-master-page-head .bulk-action-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* No record action in Lounge/Tenant may introduce a third action such as View Price Schedule. */
+html body #cleanPageOutlet .lounge-card-actions-v237{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+@media(max-width:900px){
+  html body #cleanPageOutlet .ge-submission-signals{grid-template-columns:repeat(2,minmax(0,1fr))}
+  html body #cleanPageOutlet .lounge-filter-grid-ref{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  html body #cleanPageOutlet .ge-submission-signals{grid-template-columns:1fr}
+  html body #cleanPageOutlet .lounge-filter-grid-ref{grid-template-columns:1fr}
+}
+
+
+/* Submission KPI cards are a separate four-card results row; do not inherit the legacy dashboard KPI grid. */
+html body #cleanPageOutlet .ge-monitor-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}
+html body #cleanPageOutlet .ge-monitor-kpis .ge-kpi{
+  min-width:0;min-height:112px;height:auto;padding:16px 14px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:5px;
+  border:1px solid #d6e0e9;border-radius:10px;background:#fff;color:#17324d;box-shadow:none;transform:none;box-sizing:border-box;
+  font:inherit;text-align:left;cursor:pointer
+}
+html body #cleanPageOutlet .ge-monitor-kpis .ge-kpi:hover{background:#f7faff;box-shadow:0 2px 8px rgba(18,43,70,.08);transform:none}
+html body #cleanPageOutlet .ge-monitor-kpis .ge-kpi b{font-size:16px;line-height:1.2;color:#18364f;font-weight:600;display:block;margin:0}
+html body #cleanPageOutlet .ge-monitor-kpis .ge-kpi strong{font-size:24px;line-height:1.05;color:#18364f;font-weight:600;display:block}
+html body #cleanPageOutlet .ge-monitor-kpis .ge-kpi span{font-size:11px;line-height:1.35;color:#8796a5;display:block;margin:0}
+@media(max-width:900px){html body #cleanPageOutlet .ge-monitor-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){html body #cleanPageOutlet .ge-monitor-kpis{grid-template-columns:1fr}}

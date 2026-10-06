@@ -4199,13 +4199,13 @@ function geDueLabelV224(x){
   return`<span class="due-badge">${d}</span>`;
 }
 function geInitiativeManageButtonsV224(x){
-  const listMode=window.GE_INITIATIVE_LIST_ACTION_MODE===true;
+  const listView=window.GE_INITIATIVE_VIEW_R4==='list'||document.getElementById('geInitiativeViewSelectR6')?.value==='list';
   const parts=[];
-  if(!listMode)parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeTimelineV224(${x.id})">Detail / Timeline</button>`);
+  if(!listView)parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeTimelineV224(${x.id})">Detail / Timeline</button>`);
   if(geInitiativeAdminV224()){
     parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeModalV224(${x.id})">Edit</button>`);
     parts.push(`<button class="ge-btn danger compact-btn" onclick="deleteInitiativeV224(${x.id})">Delete</button>`);
-  }else if(geInitiativeProgressAllowedV224(x)){
+  }else if(!listView&&geInitiativeProgressAllowedV224(x)){
     parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeProgressV224(${x.id})">Edit Progress</button>`);
   }
   return `<div class="initiative-actions-v224">${parts.join('')}</div>`;
@@ -6154,10 +6154,11 @@ function gePopulateLoungeProviderFilterV243(){
 }
 loungeFiltered=function(){
   const region=document.getElementById('loungeRegionFilter')?.value||'';
-  const station=document.getElementById('loungeAirportFilter')?.value||'';
+  const stationEl=document.getElementById('loungeAirportFilter');
+  const stationValues=[...(stationEl?.selectedOptions||[])].map(o=>String(o.value||'').toUpperCase()).filter(Boolean);
   const provider=document.getElementById('loungeNameFilter')?.value||'';
   const status=document.getElementById('loungeStatusFilter')?.value||'';
-  return (data.lounges||[]).filter(x=>(!region||x.region===region)&&(!station||x.airport===station)&&(!provider||String(x.name||'')===provider)&&(!status||x.documentStatus===status));
+  return (data.lounges||[]).filter(x=>(!region||String(x.region||'')===region)&&(!stationValues.length||stationValues.includes(String(x.airport||'').toUpperCase()))&&(!provider||String(x.name||'')===provider)&&(!status||String(x.documentStatus||'')===status));
 };
 geLoungeCardSourceV237=function(){return loungeFiltered()};
 
@@ -8759,7 +8760,7 @@ function installInitiativeControls(){
    refreshInitiativeFilters();
    let rows=currentInitiativeRows().filter(geInitiativeScopedV224);
    const p=$('geV2554Priority')?.value||'';if(p)rows=rows.filter(x=>String(x.priority||'Normal')===p);
-   const t=$('initRows');if(t){if(window.GE_INITIATIVE_VIEW_R4==='list'&&rows.length){t.innerHTML=`<div class="ge-initiative-list-r4"><table><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${geEsc(x.name||'-')}</b></td><td>${geEsc(geScopesV252(x).join(', '))}</td><td>${geEsc(geTPsV252(x).join(', '))}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.pic||'-')}</td><td>${geEsc(x.dueDate||'-')}</td><td>${geEsc(String(x.real||0))}% / ${geEsc(String(x.plan||0))}%</td><td><button class="ge-btn secondary compact-btn" onclick="openInitiativeModalV224(${Number(x.id)})">Edit</button><button class="ge-btn secondary compact-btn" onclick="openInitiativeTimelineV224(${Number(x.id)})">Milestone</button></td></tr>`).join('')}</tbody></table></div>`;}else t.innerHTML=rows.length?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';}
+   const t=$('initRows');if(t){if(window.GE_INITIATIVE_VIEW_R4==='list'&&rows.length){t.innerHTML=`<div class="ge-initiative-list-r4"><table><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${geEsc(x.name||'-')}</b></td><td>${geEsc(geScopesV252(x).join(', '))}</td><td>${geEsc(geTPsV252(x).join(', '))}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.pic||'-')}</td><td>${geEsc(x.dueDate||'-')}</td><td>${geEsc(String(x.real||0))}% / ${geEsc(String(x.plan||0))}%</td><td>${typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):''}</td></tr>`).join('')}</tbody></table></div>`;}else t.innerHTML=rows.length?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';}
    renderInitiativeCharts(rows);
  };
  renderInitiatives();
@@ -9228,15 +9229,15 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
   function geLoungeSearchableR4(hostId){
     const host=document.getElementById(hostId);if(!host)return;const sourceId=host.dataset.sourceSelect,source=document.getElementById(sourceId),trigger=host.querySelector('[data-searchable-trigger]'),menu=host.querySelector('[data-searchable-menu]'),search=menu?.querySelector('input'),options=menu?.querySelector('.ge-searchable-options');
     if(!source||!trigger||!menu||!search||!options||host.dataset.ready==='1')return;host.dataset.ready='1';const multiple=source.multiple;
-    const sync=()=>{const selected=[...source.options].filter(o=>o.selected),has=multiple?selected.length>0:!!source.value;trigger.textContent=multiple?(selected.length?`${selected.length} station selected`:'All Stations'):(source.selectedOptions[0]?.textContent||'All Providers');trigger.classList.toggle('is-placeholder',!has);options.innerHTML='';const q=String(search.value||'').trim().toLowerCase();const list=[...source.options].filter(o=>o.value!==''&&(!q||o.textContent.toLowerCase().includes(q)));if(!list.length){options.innerHTML='<div class="ge-searchable-empty">No matching data</div>';return}list.forEach(o=>{const row=document.createElement('label');row.className='ge-searchable-option';const input=document.createElement('input');input.type=multiple?'checkbox':'radio';input.name=multiple?`${sourceId}-multi`:`${sourceId}-single`;input.checked=o.selected;input.value=o.value;row.append(input,document.createTextNode(o.textContent));input.addEventListener('change',()=>{if(multiple)o.selected=input.checked;else{source.value=input.value;host.classList.remove('is-open')}source.dispatchEvent(new Event('change',{bubbles:true}));sync()});options.appendChild(row)})};
+    const sync=()=>{const selected=[...source.options].filter(o=>o.selected),has=multiple?selected.length>0:!!source.value;trigger.textContent=multiple?(selected.length?`${selected.length} station selected`:'Search or choose station'):(source.selectedOptions[0]?.textContent||'Search or choose service provider');trigger.classList.toggle('is-placeholder',!has);options.innerHTML='';const q=String(search.value||'').trim().toLowerCase();const list=[...source.options].filter(o=>o.value!==''&&(!q||o.textContent.toLowerCase().includes(q)));if(!list.length){options.innerHTML='<div class="ge-searchable-empty">No matching data</div>';return}list.forEach(o=>{const row=document.createElement('label');row.className='ge-searchable-option';const input=document.createElement('input');input.type=multiple?'checkbox':'radio';input.name=multiple?`${sourceId}-multi`:`${sourceId}-single`;input.checked=o.selected;input.value=o.value;row.append(input,document.createTextNode(o.textContent));input.addEventListener('change',()=>{if(multiple)o.selected=input.checked;else{source.value=input.value;host.classList.remove('is-open')}source.dispatchEvent(new Event('change',{bubbles:true}));sync()});options.appendChild(row)})};
     trigger.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.ge-searchable.is-open').forEach(x=>{if(x!==host)x.classList.remove('is-open')});host.classList.toggle('is-open');if(host.classList.contains('is-open')){search.focus();sync()}});search.addEventListener('input',sync);document.addEventListener('click',e=>{if(!host.contains(e.target))host.classList.remove('is-open')});sync();
   }
   function geInitLoungeSearchablesR4(){geLoungeSearchableR4('loungeStationSearchR4');geLoungeSearchableR4('loungeProviderSearchR4')}
   function populateFilterOptions(){
     const provider=document.getElementById('loungeNameFilter'),status=document.getElementById('loungeStatusFilter'),station=document.getElementById('loungeAirportFilter'),region=document.getElementById('loungeRegionFilter');
     const put=(el,values,label)=>{if(!el)return;const cur=el.value,items=[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));el.innerHTML=`<option value="">${label}</option>`+items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(!el.multiple)el.value=items.includes(cur)?cur:''};
-    put(provider,(data.lounges||[]).map(x=>x.name),'All Providers');
-    put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Documents');
+    put(provider,(data.lounges||[]).map(x=>x.name),'All Service Providers');
+    put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Status');
     put(region,(data.lounges||[]).map(x=>x.region||x.wilayah),'All Regions');
     if(station){const selected=new Set([...station.options].filter(o=>o.selected).map(o=>o.value));const airports=typeof geVisibleAirports==='function'?geVisibleAirports():[...(data.airports||[])].map(x=>x.code||x.iata||x.airportCode).filter(Boolean);station.innerHTML=airports.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');[...station.options].forEach(o=>o.selected=selected.has(o.value));}
   }
@@ -9277,7 +9278,6 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       const review=rt.status==='REVIEW'?`<div class="ge-p29-review-note">Requires Review: ${esc(rt.reason)}</div>`:'';
       const update=canEdit()?`<button class="ge-btn secondary compact-btn" type="button" onclick="openLoungeEdit(${Number(x.id)})">Edit</button>`:'';
       const del=typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn danger compact-btn" type="button" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button>`:'';
-      const detail='';
       return `<article class="lounge-master-card-v237 ge-p29-lounge-card">
         <div class="lounge-master-code-v237">${esc(x.airport||'-')}</div>
         <div class="lounge-master-card-body-v237">
@@ -9291,7 +9291,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
             ${priceMeta?`<div><dt>Price Schedule</dt><dd>${esc(priceMeta)}</dd></div>`:''}
             <div><dt>Agreement</dt><dd>${esc(x.documentNumber||'Not Available')}</dd></div>
           </div>${review}
-          <div class="lounge-card-actions-v237">${detail}${update}${del}</div>
+          <div class="lounge-card-actions-v237">${update}${del}</div>
         </div>
       </article>`;
     }).join('')||'<div class="lounge-master-empty-v237">Belum ada data Lounge/Tenant pada filter ini.</div>';
@@ -9846,7 +9846,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 /* Final canonical Initiative Grid/List view. This wrapper is intentionally last so legacy exports cannot overwrite it. */
 const initRender=window.renderInitiatives;
-if(initRender)window.renderInitiatives=function(){const out=initRender.apply(this,arguments),view=window.GE_INITIATIVE_VIEW_R4||document.getElementById('geInitiativeViewSelectR6')?.value||'grid';if(view!=='list')return out;window.GE_INITIATIVE_LIST_ACTION_MODE=true;let rows=[];try{rows=typeof currentInitiativeRows==='function'?currentInitiativeRows().filter(typeof geInitiativeScopedV224==='function'?geInitiativeScopedV224:()=>true):(store().initiatives||[])}catch(e){rows=store().initiatives||[]}const host=document.getElementById('initRows');if(host){host.innerHTML=`<div class="ge-initiative-list-r4"><table data-initiative-list-r26><thead><tr><th data-sort="0">Initiative ↕</th><th data-sort="1">Journey ↕</th><th data-sort="2">Touch Point ↕</th><th data-sort="3">Station ↕</th><th data-sort="4">PIC ↕</th><th data-sort="5">Due ↕</th><th data-sort="6">Progress ↕</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc((x.journeyScopes||[x.journey]).filter(Boolean).join(', '))}</td><td>${esc((x.touchpoints||[x.tp||x.touchpoint]).filter(Boolean).join(', '))}</td><td>${esc((x.stations||[x.airport]).filter(Boolean).join(', '))}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):''}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;window.GE_INITIATIVE_LIST_ACTION_MODE=false;window.geEnhanceAllTables?.();const t=host.querySelector('table[data-initiative-list-r26]');t?.querySelectorAll('th[data-sort]').forEach(th=>{th.style.cursor='pointer';th.onclick=()=>{const i=Number(th.dataset.sort),body=t.tBodies[0],dir=th.dataset.dir==='asc'?-1:1;[...body.rows].sort((a,b)=>a.cells[i].innerText.localeCompare(b.cells[i].innerText,'id',{numeric:true})*dir).forEach(r=>body.appendChild(r));th.dataset.dir=dir===1?'asc':'desc'}})}return out};
+if(initRender)window.renderInitiatives=function(){const out=initRender.apply(this,arguments),view=window.GE_INITIATIVE_VIEW_R4||document.getElementById('geInitiativeViewSelectR6')?.value||'grid';if(view!=='list')return out;let rows=[];try{rows=typeof currentInitiativeRows==='function'?currentInitiativeRows().filter(typeof geInitiativeScopedV224==='function'?geInitiativeScopedV224:()=>true):(store().initiatives||[])}catch(e){rows=store().initiatives||[]}const host=document.getElementById('initRows');if(host){host.innerHTML=`<div class="ge-initiative-list-r4"><table data-initiative-list-r26><thead><tr><th data-sort="0">Initiative ↕</th><th data-sort="1">Journey ↕</th><th data-sort="2">Touch Point ↕</th><th data-sort="3">Station ↕</th><th data-sort="4">PIC ↕</th><th data-sort="5">Due ↕</th><th data-sort="6">Progress ↕</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc((x.journeyScopes||[x.journey]).filter(Boolean).join(', '))}</td><td>${esc((x.touchpoints||[x.tp||x.touchpoint]).filter(Boolean).join(', '))}</td><td>${esc((x.stations||[x.airport]).filter(Boolean).join(', '))}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):''}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;window.geEnhanceAllTables?.();const t=host.querySelector('table[data-initiative-list-r26]');t?.querySelectorAll('th[data-sort]').forEach(th=>{th.style.cursor='pointer';th.onclick=()=>{const i=Number(th.dataset.sort),body=t.tBodies[0],dir=th.dataset.dir==='asc'?-1:1;[...body.rows].sort((a,b)=>a.cells[i].innerText.localeCompare(b.cells[i].innerText,'id',{numeric:true})*dir).forEach(r=>body.appendChild(r));th.dataset.dir=dir===1?'asc':'desc'}})}return out};
 window.geSetInitiativeViewR20=function(v){window.GE_INITIATIVE_VIEW_R4=v;document.querySelectorAll('#geInitiativeViewToggleR4 [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));window.renderInitiatives?.()};
 setTimeout(()=>{document.querySelectorAll('#geInitiativeViewToggleR4 [data-view]').forEach(b=>b.onclick=()=>window.geSetInitiativeViewR20(b.dataset.view));const s=document.getElementById('geInitiativeViewSelectR6');if(s)s.onchange=()=>window.geSetInitiativeViewR20(s.value)},0);
 
