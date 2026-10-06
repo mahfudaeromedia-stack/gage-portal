@@ -5634,3 +5634,27 @@ body.lounge-reference-v237 .lounge-expiry-warning b{color:#855c17}
 #r43Monitoring .ge-assess-card table button:not(.ge-btn):hover,
 #r43Monitoring .ge-assess-item>button:not(.ge-btn):hover,
 #r43Monitoring .ge-form-ref-list button:not(.ge-btn):hover{background:#0b376d;color:#fff}
+
+/* CBNR shared modal/filter boundary: overlays and dropdown layers must clear the shell. */
+.ge-id-backdrop{z-index:2147482000}
+.ge-ref-backdrop{z-index:2147482100}
+.modal-backdrop,.tp-modal-backdrop{z-index:2147482200}
+.ge-searchable{position:relative;z-index:2}
+.ge-searchable.is-open{z-index:2147481000}
+.ge-searchable.is-open .ge-searchable-menu{z-index:2147481100}
+.ge-filter-field{display:grid;gap:6px;min-width:0;font-size:11px;font-weight:700;color:#425a76}
+.ge-filter-field>span{line-height:1.2}
+.ge-filter-field select,.ge-filter-field .ge-searchable-trigger{width:100%;height:42px;min-height:42px;box-sizing:border-box;font:inherit;font-weight:400;color:#173b5c}
+.lounge-canonical-page-head{margin-bottom:14px}
+.lounge-canonical-page-head .ge-page-actions{align-items:center;flex-wrap:wrap}
+.lounge-canonical-page-head .bulk-action-group{display:flex;gap:8px;flex-wrap:wrap}
+.lounge-canonical-page-head .ge-btn{white-space:nowrap}
+
+/* CBNR: Planning Workspace dialogs use the same geometry as Lounge/Tenant dialogs. */
+.planning-dialog-body-level .planning-modal{width:min(820px,95vw);padding:20px 22px;border-radius:14px}
+.planning-dialog-body-level .planning-modal label{font-size:11px;font-weight:800;color:#536b7b}
+.planning-dialog-body-level .planning-modal input,
+.planning-dialog-body-level .planning-modal select,
+.planning-dialog-body-level .planning-modal textarea{width:100%;box-sizing:border-box;min-height:40px;margin-top:6px;border:1px solid #cbd8e2;border-radius:8px;padding:8px 10px;font:inherit;color:#173b5c;background:#fff}
+.planning-dialog-body-level .planning-modal .planning-domain-form{gap:13px 15px}
+.planning-dialog-body-level .planning-modal .ge-id-actions{margin-top:18px;padding-top:14px;border-top:1px solid #e4ebef}
