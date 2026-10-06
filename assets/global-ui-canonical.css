@@ -456,14 +456,25 @@ body.e1-page>.top .ge-session .filter select:focus{outline:none;box-shadow:none}
 .ge-view-select-r6.active,.ge-view-select-r6[aria-pressed="true"]{background:#0b376d;color:#fff;border-color:#0b376d}
 .planning-domain-page .planning-toolbar .ge-btn,.planning-domain-page .planning-row-actions .ge-btn{height:40px;min-height:40px;font-size:14px;font-weight:600}
 
-/* CBNR UI repair: shared modal/dropdown layers escape page cards and remain above shell chrome. */
-html body .modal-backdrop,html body .ge-id-backdrop,html body [data-modal-root]{z-index:2147483000;}
-html body .lounge-page-head-canonical{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin:4px 0 26px;}
-html body .lounge-page-head-canonical .ge-page-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
-html body .lounge-filter-grid-ref{overflow:visible;}
-html body .lounge-filter-grid-ref .ge-searchable-menu{z-index:2147482000;}
-html body .ge-searchable-menu{max-height:min(360px,60vh);overflow:auto;}
-html body .initiative-actions-v224{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:max-content;}
-html body .initiative-actions-v224 .ge-btn{display:inline-flex;align-items:center;justify-content:center;}
-html body .row-actions{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;white-space:nowrap;}
-@media(max-width:760px){html body .lounge-page-head-canonical{align-items:flex-start;flex-direction:column;}html body .lounge-page-head-canonical .ge-page-actions{width:100%;justify-content:flex-start;}html body .lounge-page-head-canonical .ge-page-actions .ge-btn{flex:1 1 150px;}}
+/* CBNR Lounge/Tenant reference controls: same 48px field geometry everywhere. */
+.lounge-filter-grid-ref{position:relative;z-index:20;overflow:visible}
+.lounge-filter-grid-ref>div,.lounge-filter-grid-ref>.ge-searchable{position:relative;z-index:1;min-width:0}
+.lounge-filter-grid-ref>.ge-searchable.is-open{z-index:120001}
+.lounge-filter-grid-ref select,.lounge-filter-grid-ref .ge-searchable-trigger{height:48px;min-height:48px;box-sizing:border-box;font-size:14px;font-weight:500}
+.lounge-filter-grid-ref .ge-searchable-menu{z-index:2147482000;max-height:320px}
+.lounge-filter-grid-ref .ge-searchable-options{max-height:240px}
+
+/* CBNR Service & Provider: same visual family as the approved Lounge/Tenant workspace. */
+#planningDomainContent[data-domain="service-provider"] .ge-page-head{margin:4px 0 34px;padding:0;background:transparent;border:0}
+#planningDomainContent[data-domain="service-provider"] .ge-page-head h1{font-size:38px;line-height:1.12;font-weight:500;letter-spacing:-.025em;color:#073f59;margin:0 0 18px}
+#planningDomainContent[data-domain="service-provider"] .ge-page-head p{font-size:16px;color:#728a94;margin:0;max-width:900px;line-height:1.55}
+#planningDomainContent[data-domain="service-provider"] .planning-domain-card{border:1px solid #d2e0e4;border-radius:20px;background:#fff;box-shadow:0 10px 30px rgba(8,65,83,.035);padding:24px}
+#planningDomainContent[data-domain="service-provider"] .planning-domain-card-head{color:#2e6fb8}
+#planningDomainContent[data-domain="service-provider"] .planning-domain-card h3{font-size:17px;font-weight:500;color:#06425d}
+#planningDomainContent[data-domain="service-provider"] .planning-toolbar,#planningDomainContent[data-domain="service-provider"] .planning-list-head{align-items:center}
+#planningDomainContent[data-domain="service-provider"] .planning-filters{position:relative;z-index:20}
+#planningDomainContent[data-domain="service-provider"] .planning-modal{width:min(820px,94vw);max-height:calc(100vh - 40px);overflow:auto;border-radius:20px;padding:28px;background:#fff;box-shadow:0 28px 80px rgba(0,0,0,.3)}
+#planningDomainContent[data-domain="service-provider"] .planning-modal h2{font-size:24px;font-weight:500;color:#073f59;margin:0 0 8px}
+#planningDomainContent[data-domain="service-provider"] .planning-modal label{font-size:13px;font-weight:600;color:#476878}
+#planningDomainContent[data-domain="service-provider"] .planning-modal input,#planningDomainContent[data-domain="service-provider"] .planning-modal select,#planningDomainContent[data-domain="service-provider"] .planning-modal textarea{min-height:48px;box-sizing:border-box;border:1px solid #c7d7e3;border-radius:10px;background:#fff;color:#17324d;font-size:14px}
+#planningDomainContent[data-domain="service-provider"] .planning-modal .ge-id-actions{position:sticky;bottom:0;display:flex;justify-content:flex-end;gap:10px;margin-top:18px;padding:14px 0 0;background:#fff}

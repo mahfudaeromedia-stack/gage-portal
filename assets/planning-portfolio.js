@@ -5,14 +5,14 @@
   if(p!=='planning-workspace')return;
   const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const groups=[
-    ['service','Service & Provider','lounge-list.html'],['space','Space & Building','branch-office-planning.html?panel=space'],
+    ['service','Service & Provider','app.html?page=service-provider'],['space','Space & Building','branch-office-planning.html?panel=space'],
     ['material','Station Material, Tools & Equipment','service-planning.html?panel=material'],
     ['system','Airport Systems','branch-office-planning.html?panel=systems'],
     ['document','Planning Documents','planning-documents.html'],['gaso','GASO','gaso-planning.html']
   ];
   const links=Object.fromEntries(groups.map(([id,,href])=>[id,href]));
   const hierarchy=[
-    {id:'service',name:'Service & Provider',children:[['Lounge / Tenant / Snack Box','lounge-list.html'],['Ground Handling Agent'],['Airport Operator'],['Other Services']]},
+    {id:'service',name:'Service & Provider',children:[['Lounge / Tenant / Snack Box','app.html?page=lounge-list'],['Ground Handling Agent'],['Airport Operator'],['Other Services']]},
     {id:'space',name:'Space & Building',children:[['Perkantoran'],['Layanan'],['Other Space / Building']]},
     {id:'material',name:'Station Material, Tools & Equipment',children:[['Dokumen'],['Label'],['Tools'],['Equipment'],['Other']]},
     {id:'system',name:'Airport Systems',children:[['Hardware'],['Software'],['Other']]},

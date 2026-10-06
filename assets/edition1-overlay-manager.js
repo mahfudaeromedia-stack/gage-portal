@@ -10,7 +10,7 @@ window.__GE_EDITION1_OVERLAY_MANAGER__=true;
 const selectors=[
   '.initiative-dialog', '.modal-backdrop', '.tp-modal-backdrop',
   '.map-move-modal-backdrop', '#r8InitiativeBackdrop', '#r9InitiativeBackdrop',
-  '.r9-portal-dialog', '.ge-viewport-overlay', '.modal.open', 'dialog[open]', '.ge-ref-backdrop', '#geGlobalRefModal', '#geV251EventModal',
+  '.r9-portal-dialog', '.ge-viewport-overlay', '.modal.open', '.overlay-backdrop.show', '[data-overlay-backdrop].show', 'dialog[open]', '.ge-ref-backdrop', '.ge-id-backdrop', '.planning-dialog', '.ge-modal-backdrop', '#geGlobalRefModal', '#geV251EventModal',
   '#geV2542DraftModal', '#geCalListModalV2533', '#geV2532ListModal'
 ];
 const matches=()=>document.querySelectorAll(selectors.join(','));
