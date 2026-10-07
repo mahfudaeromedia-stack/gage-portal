@@ -32,6 +32,20 @@ async function actor(event) {
   return { db, profile };
 }
 
+async function authenticatedSubmitter(event) {
+  const t = bearer(event);
+  if (!t) return null;
+  const { auth, db } = firebase();
+  let decoded;
+  try { decoded = await auth.verifyIdToken(t, true); }
+  catch { throw Object.assign(new Error('Invalid or expired authentication token.'), { statusCode: 401, code: 'AUTH_INVALID' }); }
+  const snap = await db.collection('users').doc(decoded.uid).get();
+  if (!snap.exists) throw Object.assign(new Error('User profile not found.'), { statusCode: 403, code: 'PROFILE_NOT_FOUND' });
+  const profile = { ...snap.data(), uid: decoded.uid };
+  if (!active(profile)) throw Object.assign(new Error('Account inactive.'), { statusCode: 403, code: 'ACCOUNT_INACTIVE' });
+  return { db, profile };
+}
+
 function visible(field, answers) {
   return !field?.showIf?.fieldId || String(answers?.[field.showIf.fieldId] ?? '') === String(field.showIf.equals ?? '');
 }
@@ -74,41 +88,37 @@ async function publicShare(db, rawToken) {
   return { share, work: { id: workSnap.id, title: work.title || '', stationCode: work.stationCode || '', dueDate: work.dueDate || '', templateId: work.templateId || '', templateVersion: work.templateVersion || 0 }, template, touchpoints };
 }
 
-async function handleGuestSubmit(db, payload) {
+async function handleSubmit(db, event, payload) {
   const { share, work, template } = await publicShare(db, payload.token);
-  if (share.accessType !== 'GUEST') throw Object.assign(new Error('This link requires an authenticated website user.'), { statusCode: 401, code: 'LOGIN_REQUIRED' });
+  const accessType = String(share.accessType || 'GUEST').toUpperCase();
+  const authSubmitter = await authenticatedSubmitter(event);
+  const isUser = !!authSubmitter;
+  if (accessType === 'USER' && !isUser) throw Object.assign(new Error('Login required for this checklist.'), { statusCode: 401, code: 'LOGIN_REQUIRED' });
+  if (!['USER','USER_GUEST','GUEST'].includes(accessType)) throw Object.assign(new Error('Invalid share access type.'), { statusCode: 400, code: 'INVALID_ACCESS_TYPE' });
+  if (!isUser && accessType !== 'GUEST' && accessType !== 'USER_GUEST') throw Object.assign(new Error('Login required for this checklist.'), { statusCode: 401, code: 'LOGIN_REQUIRED' });
   const answers = payload.answers && typeof payload.answers === 'object' ? payload.answers : {};
   for (const field of (template.sections || []).flatMap(s => s.fields || [])) {
     if (!visible(field, answers)) continue;
     const value = answers[field.id];
-    if (field.required && (value === '' || value == null || (Array.isArray(value) && !value.length))) {
-      throw Object.assign(new Error(`Complete: ${field.label}`), { statusCode: 400, code: 'REQUIRED_FIELD' });
-    }
+    if (field.required && (value === '' || value == null || (Array.isArray(value) && !value.length))) throw Object.assign(new Error(`Complete: ${field.label}`), { statusCode: 400, code: 'REQUIRED_FIELD' });
   }
   const result = evaluate(template, answers);
   const guest = payload.guest && typeof payload.guest === 'object' ? payload.guest : {};
+  if (!isUser && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(guest.email || '').trim())) throw Object.assign(new Error('Guest email is required and must be valid.'), { statusCode: 400, code: 'GUEST_EMAIL_INVALID' });
   const submissionId = id();
-  const storage = getStorage().bucket();
   const normalizedAnswers = { ...answers };
   for (const field of (template.sections || []).flatMap(s => s.fields || [])) {
     const value = normalizedAnswers[field.id];
     if (!value || typeof value !== 'object' || !value.__fileBase64) continue;
-    const b64 = String(value.__fileBase64);
-    const buf = Buffer.from(b64, 'base64');
+    const b64 = String(value.__fileBase64); const buf = Buffer.from(b64, 'base64');
     if (buf.length > MAX_FILE_BYTES) throw Object.assign(new Error('Maximum evidence file size is 5 MB.'), { statusCode: 413, code: 'FILE_TOO_LARGE' });
     const safeName = clean(value.name || 'evidence', 160).replace(/[^a-zA-Z0-9._-]/g, '_');
-    const key = `monitoring/${work.stationCode || 'shared'}/guest/${submissionId}-${safeName}`;
-    await storage.file(key).save(buf, { metadata: { contentType: clean(value.type || 'application/octet-stream', 120), metadata: { originalName: safeName, accessType: 'GUEST', shareId: share.id || '' } } });
+    const key = `monitoring/${work.stationCode || 'shared'}/${isUser?'user':'guest'}/${submissionId}-${safeName}`;
+    const storage = getStorage().bucket();
+    await storage.file(key).save(buf, { metadata: { contentType: clean(value.type || 'application/octet-stream', 120), metadata: { originalName: safeName, accessType: isUser ? 'USER' : 'GUEST', shareId: share.id || '' } } });
     normalizedAnswers[field.id] = { key, name: safeName, type: value.type || 'application/octet-stream', size: buf.length };
   }
-  const submission = {
-    id: submissionId, workId: work.id, workTitle: work.title, stationCode: work.stationCode,
-    templateId: work.templateId, templateVersion: work.templateVersion, formSnapshot: template,
-    category: template.category, answers: normalizedAnswers, ...result,
-    submittedAt: new Date().toISOString(), accessType: 'GUEST', submittedBy: '',
-    submittedByUid: '', submittedByName: clean(guest.name, 160) || 'Guest', submittedByEmail: clean(guest.email, 240),
-    shareId: share.id || '', shareTokenVersion: 1
-  };
+  const submission = { id: submissionId, workId: work.id, workTitle: work.title, stationCode: work.stationCode, templateId: work.templateId, templateVersion: work.templateVersion, formSnapshot: template, category: template.category, answers: normalizedAnswers, ...result, submittedAt: new Date().toISOString(), accessType: isUser ? 'USER' : 'GUEST', shareAccessType: accessType, submittedBy: isUser ? authSubmitter.profile.uid : '', submittedByUid: isUser ? authSubmitter.profile.uid : '', submittedByName: isUser ? clean(authSubmitter.profile.name || authSubmitter.profile.displayName || authSubmitter.profile.email, 160) : (clean(guest.name,160) || 'Guest'), submittedByEmail: isUser ? clean(authSubmitter.profile.email,240) : clean(guest.email,240), shareId: share.id || '', shareTokenVersion: 1 };
   await ref(db, SUBMISSIONS, submissionId).set(submission);
   return { submissionId, result: submission.result, findings: submission.findings.length, submittedByName: submission.submittedByName };
 }
@@ -127,9 +137,9 @@ exports.handler = async event => {
       return ok({ ok: true, accessType: payload.share.accessType || 'GUEST', shareId: payload.share.id || '', work: payload.work, template: payload.template, touchpoints: payload.touchpoints || [] });
     }
 
-    if (method === 'POST' && body.action === 'SUBMIT_GUEST') {
+    if (method === 'POST' && (body.action === 'SUBMIT' || body.action === 'SUBMIT_GUEST')) {
       if (!queryToken) return bad(400, 'TOKEN_REQUIRED', 'Share token is required.');
-      return ok({ ok: true, ...(await handleGuestSubmit(db, body)) });
+      return ok({ ok: true, ...(await handleSubmit(db, event, body)) });
     }
 
     if (method === 'POST' && body.action === 'CREATE') {
@@ -138,7 +148,7 @@ exports.handler = async event => {
       const workSnap = await ref(db, WORKS, workId).get();
       if (!workSnap.exists) return bad(404, 'WORK_NOT_FOUND', 'Monitoring Work not found.');
       const work = workSnap.data();
-      const accessType = String(body.accessType || 'GUEST').toUpperCase() === 'USER' ? 'USER' : 'GUEST';
+      const accessType = String(body.accessType || 'GUEST').toUpperCase(); if (!['USER','USER_GUEST','GUEST'].includes(accessType)) return bad(400, 'INVALID_ACCESS_TYPE', 'Share access type is invalid.');
       const raw = token(), shareId = id();
       const expiresAt = body.expiresAt ? new Date(body.expiresAt).toISOString() : '';
       await ref(db, SHARES, shareId).set({ id: shareId, workId, accessType, tokenHash: hashToken(raw), createdAt: new Date().toISOString(), createdBy: profile.uid, createdByName: profile.name || profile.displayName || profile.email || '', expiresAt, revokedAt: '' });

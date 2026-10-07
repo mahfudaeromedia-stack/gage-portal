@@ -3424,3 +3424,13 @@ Do not revert unrelated files.
 
 Open login.html
 
+
+
+## 2026-10-04 — CBNR Checklist Share + Planning Domain Identity Clarification
+- Planning Workspace page/domain IDs (`PD-*`) are page-definition identifiers, not Master Data IDs.
+- Planning page definitions are persisted separately as `planningDomains`; they must not be flagged/stored as Master Data `referenceCatalog` entities.
+- Monitoring Works actions are canonical `Complete`, `Share`, and `Delete`.
+- `Share` supports `User GE`, `User GE + Guest`, and `Hanya Guest`, then `Generate Link`.
+- Generated links target the dedicated `monitoring-checklist` route.
+- Guest submissions require a syntactically valid email.
+- GE users submit using their authenticated account; `User GE` requires login; `User GE + Guest` allows either authenticated GE user or guest.

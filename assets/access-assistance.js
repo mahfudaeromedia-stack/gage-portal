@@ -100,7 +100,7 @@
         ${x.resolutionNote?`<div class="span2"><small>Catatan Penyelesaian</small><div>${esc(x.resolutionNote)}</div></div>`:''}
       </div>
       <div id="p32DetailMessage" class="p32-action-message" aria-live="polite"></div>
-      <div class="modal-actions p32-detail-actions">${x.status==='OPEN'?'<button class="btn" type="button" data-p32-action="process">Proses</button><button class="btn secondary" type="button" data-p32-action="resolve">Selesaikan</button>':x.status==='IN_PROGRESS'?'<button class="btn" type="button" data-p32-action="resolve">Selesaikan</button>':''}</div>`;
+      <div class="modal-actions p32-detail-actions">${x.status==='OPEN'?'<button class="ge-btn" type="button" data-p32-action="process">Proses</button><button class="ge-btn secondary" type="button" data-p32-action="resolve">Selesaikan</button>':x.status==='IN_PROGRESS'?'<button class="ge-btn" type="button" data-p32-action="resolve">Selesaikan</button>':''}</div>`;
     modal.classList.add('show');
     modal.querySelectorAll('[data-p32-action]').forEach(btn=>btn.addEventListener('click',()=>performAction(id,btn.dataset.p32Action,modal)));
   }
@@ -128,7 +128,7 @@
   function renderAdminPanel(error=''){
     const panel=document.getElementById('p32AccessAssistancePanel');if(!panel)return;
     if(error){panel.querySelector('[data-p32-body]').innerHTML=`<div class="p32-empty">${esc(error)}</div>`;return}
-    panel.querySelector('[data-p32-body]').innerHTML=requests.length?`<div class="table-scroll"><table class="admin-inbox-table p32-assistance-table"><thead><tr><th>No</th><th>Requested At</th><th>Username / Email</th><th>Keterangan</th><th>Status</th><th>Handling Admin</th><th>Kelola</th></tr></thead><tbody>${requests.map((x,i)=>`<tr class="${x.notificationStatus==='UNREAD'?'p32-unread-row':''}"><td>${i+1}</td><td>${esc(dateTime(x.createdAt))}</td><td><b>${esc(x.identifier||'—')}</b></td><td>${esc(x.reason||'—')}</td><td>${statusPill(x.status)}</td><td>${esc(x.handledBy?adminName(x.handledBy):'—')}</td><td><button class="btn secondary compact-btn" type="button" data-p32-open="${esc(x.id)}">Buka</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="p32-empty">Belum ada permintaan bantuan akses.</div>';
+    panel.querySelector('[data-p32-body]').innerHTML=requests.length?`<div class="table-scroll"><table class="admin-inbox-table p32-assistance-table"><thead><tr><th>No</th><th>Requested At</th><th>Username / Email</th><th>Keterangan</th><th>Status</th><th>Handling Admin</th><th>Kelola</th></tr></thead><tbody>${requests.map((x,i)=>`<tr class="${x.notificationStatus==='UNREAD'?'p32-unread-row':''}"><td>${i+1}</td><td>${esc(dateTime(x.createdAt))}</td><td><b>${esc(x.identifier||'—')}</b></td><td>${esc(x.reason||'—')}</td><td>${statusPill(x.status)}</td><td>${esc(x.handledBy?adminName(x.handledBy):'—')}</td><td><button class="ge-btn secondary compact-btn" type="button" data-p32-open="${esc(x.id)}">Buka</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="p32-empty">Belum ada permintaan bantuan akses.</div>';
     panel.querySelectorAll('[data-p32-open]').forEach(btn=>btn.addEventListener('click',()=>openDetail(btn.getAttribute('data-p32-open'))));
   }
 
