@@ -3434,3 +3434,36 @@ Open login.html
 - Generated links target the dedicated `monitoring-checklist` route.
 - Guest submissions require a syntactically valid email.
 - GE users submit using their authenticated account; `User GE` requires login; `User GE + Guest` allows either authenticated GE user or guest.
+
+
+### 2026-10-11 — Monitoring multi-select confirmation
+- Form Builder metadata selectors (stations, journeys, touch points) now stage checkbox selections and commit on OK; Cancel/Escape/outside restores committed state.
+- Existing checklist-answer multi-select confirmation remains in place.
+- No dynamic Planning Workspace schema migration or portal-wide visual acceptance is claimed in this change.
+
+### 2026-10-11 — GHA station checkbox normalization
+- Standardized native checkbox presentation in Planning Station picker and added OK/Cancel confirmation before save. No claim of complete portal-wide visual validation.
+
+### 2026-10-11 — Planning modal continuation
+- Normalized Planning directory toolbar and modal action labels to English, scoped modal field/button dimensions, and native station checkbox sizing. This is a focused continuation, not a claim of complete portal-wide browser validation.
+
+### 2026-10-11 — Master Data reference / GHA behavior correction
+Corrected wrong reference kind in ID duplicate validation; restored explicit OK/Cancel semantics to Master Data multi-select; fixed unreachable multi-station GHA creation branch; aligned the selector controls and several English action labels. Validation status is tracked in WORK-IN-PROGRESS-VALIDATION.md; this is not a production release.
+
+### 2026-10-11 — Assessment workspace control normalization
+- Replaced legacy Indonesian text in the Assessment workspace with English labels and feedback.
+- Added canonical ge-btn class to previously unstyled table actions and Retry control.
+- Aligned canonical button font and control height to 14px / 42px; fixed invalid Planning station button font declaration.
+- Browser and Firebase verification are still outstanding; this is not a production release.
+
+## 2026-10-11 — Audit dan normalisasi nama versi historis
+Aturan baru: penanda patch Pxx/Rxx bukan nama canonical fungsi. Perubahan awal: `PLANNING_PAGES_P22` menjadi `PLANNING_ACCESS_PAGES`, `P83_MASTER_REFERENCE_KINDS` menjadi `MASTER_CURRENCY_POSITION_REFERENCES`, serta komentar P83 pada planning domains dibersihkan. Kontrak UI/storage/route versi lama belum diubah sembarangan karena memiliki referensi silang. Lihat `VERSION-NAMING-AUDIT.md`. Pemeriksaan sintaks dan 58 regression checks lulus.
+
+### Identifier cleanup lanjutan (11 Oktober 2026)
+Tiga global runtime export dengan nama versi historis diganti menjadi nama berbasis domain (presentation, password, access assistance). Tidak mengubah persisted data ID atau routing. Detail dan batasan di `VERSION-NAMING-AUDIT.md`.
+
+### Cleanup identifier lokal (11 Oktober 2026)
+Tiga identifier internal bisnis diubah menjadi nama berbasis domain; satu kandidat lintas-file ditunda. Detail: VERSION-NAMING-AUDIT.md.
+
+### 2026-10-11 — Shared compact button and checkbox contract
+Consolidated duplicate compact/table button geometry in `assets/global-ui-canonical.css`; established a scoped 16px checkbox rule for Planning, Monitoring, Assessment and Master Reference surfaces. Added `tests/canonical-controls-contract.js` to verify these properties. Existing domain business logic and stored reference IDs were not changed. Browser/Firebase verification remains pending.

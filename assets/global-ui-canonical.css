@@ -8,9 +8,9 @@
   --ui-text:#18364f;
   --ui-border:#b8c9da;
   --ui-danger:#b42318;
-  --ui-control-h:44px;
+  --ui-control-h:42px;
   --ui-control-radius:9px;
-  --ui-button-font:15px;
+  --ui-button-font:14px;
   --ui-button-weight:600;
 }
 
@@ -113,19 +113,6 @@ html body .ge-btn:focus-visible{
   outline-offset:2px;
 }
 
-/* Compact/table actions use the same typography, only smaller geometry. */
-html body .btn.compact,
-html body .ge-btn.compact,
-html body .row-actions .btn,
-html body td .btn{
-  min-height:36px;
-  height:36px;
-  padding:0 12px;
-  font-size:12px;
-  font-weight:600;
-  border-radius:8px;
-}
-
 /* Canonical shell/header layering. */
 html body.e1-page>.top,
 html body.e1-page>header.top,
@@ -210,12 +197,43 @@ html body.e1-page #cleanPageOutlet .hero-title-actions{
   html body.e1-page #cleanPageOutlet .hero-title-actions{width:100%;margin-left:0;justify-content:flex-start}
 }
 
-/* Canonical button typography is defined once in :root. */
+/* Table actions share the standard button font and height. */
 html body .btn.compact,
 html body .ge-btn.compact,
 html body .row-actions .btn,
 html body td .btn{
-  min-height:38px;height:38px;padding:0 13px;font-size:13px;font-weight:600;border-radius:8px;
+  min-height:var(--ui-control-h);
+  height:var(--ui-control-h);
+  padding:0 12px;
+  font-size:var(--ui-button-font);
+  font-weight:var(--ui-button-weight);
+  border-radius:var(--ui-control-radius);
+}
+
+/* Checkbox contract: no page may stretch checkboxes to text-field height. */
+#cleanPageOutlet input[type="checkbox"],
+#geGlobalRefModal input[type="checkbox"],
+.planning-dialog-body-level .planning-modal input[type="checkbox"]{
+  box-sizing:border-box;
+  appearance:auto;
+  width:16px;
+  min-width:16px;
+  max-width:16px;
+  height:16px;
+  min-height:16px;
+  max-height:16px;
+  padding:0;
+  margin:0;
+  flex:0 0 16px;
+  accent-color:var(--ui-navy);
+  vertical-align:middle;
+  cursor:pointer;
+}
+#cleanPageOutlet :is(.ge-checkbox-group,.ge-confirm-multi-options,.ge-form-multi-options,.planning-station-options) label,
+#geGlobalRefModal .ge-ref-multi-pop label{
+  font-family:inherit;
+  font-size:var(--ui-button-font);
+  line-height:1.4;
 }
 
 /* Canonical Lounge/Tenant searchable filters: one field and dropdown geometry. */
@@ -267,3 +285,68 @@ html body.e1-page #cleanPageOutlet .lounge-open-head-actions-v240 .ge-btn{min-wi
 #cleanPageOutlet .ge-submission-toolbar input::placeholder{color:var(--ui-filter-placeholder,#8493a5);opacity:1}
 
 .ge-checklist-share-dialog-backdrop{position:fixed;inset:0;z-index:20002;background:rgba(10,25,49,.48);display:grid;place-items:center;padding:24px}.ge-checklist-share-dialog{width:min(460px,100%);background:#fff;border-radius:12px;padding:24px;box-shadow:0 16px 50px rgba(0,0,0,.2)}.ge-checklist-share-dialog label{display:grid;gap:8px;margin:16px 0}.ge-checklist-share-dialog-actions{display:flex;justify-content:flex-end;gap:8px}.ge-checklist-share-dialog input{width:100%;margin-top:10px}
+
+/* Shared control contract for Planning, Monitoring and Assessment. */
+#cleanPageOutlet :is(.ge-assess-card,.ge-assess-form,.ge-form-builder,.planning-domain-detail-view,.planning-domain-grid-view) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select,button,textarea){font-family:inherit;font-size:14px;box-sizing:border-box}
+#cleanPageOutlet :is(.ge-assess-card,.ge-assess-form,.ge-form-builder,.planning-domain-detail-view) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select){height:var(--ui-control-h);min-height:var(--ui-control-h);border-radius:var(--ui-control-radius)}
+#cleanPageOutlet :is(.ge-assess-card,.ge-assess-form,.ge-form-builder,.planning-domain-detail-view) textarea{min-height:104px;border-radius:var(--ui-control-radius)}
+#cleanPageOutlet :is(.ge-assess-card,.ge-assess-form,.ge-form-builder,.planning-domain-detail-view) button:not(.planning-sort):not(.ge-confirm-multi-trigger){min-height:var(--ui-control-h);font-weight:var(--ui-button-weight)}
+#cleanPageOutlet .ge-confirm-multi{position:relative;min-width:190px}
+#cleanPageOutlet .ge-confirm-multi-trigger{width:100%;justify-content:space-between;overflow:hidden;text-overflow:ellipsis}
+#cleanPageOutlet .ge-confirm-multi-panel{position:absolute;top:calc(100% + 6px);left:0;min-width:100%;width:max-content;max-width:min(420px,90vw);background:#fff;border:1px solid var(--ui-border);border-radius:var(--ui-control-radius);padding:12px;box-shadow:0 16px 35px rgba(8,43,89,.18);z-index:120000}
+#cleanPageOutlet .ge-confirm-multi-panel[hidden]{display:none}
+#cleanPageOutlet .ge-confirm-multi-options{max-height:220px;overflow:auto;display:grid;gap:8px}
+#cleanPageOutlet .ge-confirm-multi-options label{display:flex;align-items:center;gap:8px;white-space:nowrap}
+#cleanPageOutlet .ge-confirm-multi-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+/* Confirmed selections in Form Builder metadata, aligned to shared controls. */
+#cleanPageOutlet .ge-form-multi-actions{display:flex;justify-content:flex-end;gap:8px;padding:10px 0 0;margin-top:10px;border-top:1px solid #e2e8f0}
+#cleanPageOutlet .ge-form-multi-actions .ge-btn{min-height:var(--ui-control-h);font-size:14px;font-weight:600}
+#cleanPageOutlet .ge-form-multi summary{min-height:var(--ui-control-h);box-sizing:border-box;display:flex;align-items:center;font-size:14px;cursor:pointer}
+
+/* Planning station selection: native, accessible checkbox sizing and explicit confirmation. */
+#cleanPageOutlet .planning-stations{min-width:0;border:1px solid #d5dce6;border-radius:10px;padding:12px 14px}
+#cleanPageOutlet .planning-stations legend{font-size:14px;font-weight:600;padding:0 6px}
+#cleanPageOutlet .planning-station-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;max-height:210px;overflow:auto;margin-top:10px}
+#cleanPageOutlet .planning-station-options label{display:flex;align-items:center;gap:9px;min-height:38px;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
+#cleanPageOutlet .planning-station-options label[hidden]{display:none}
+#cleanPageOutlet .planning-station-options input[type=checkbox]{appearance:auto;flex:0 0 16px;width:16px;height:16px;min-height:16px;margin:0;accent-color:#142f56;cursor:pointer}
+#cleanPageOutlet .planning-station-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0}
+#cleanPageOutlet .planning-station-actions .ge-btn{min-height:var(--ui-control-h);font-family:inherit;font-size:14px;font-weight:600;line-height:1.3}
+#cleanPageOutlet .planning-station-confirmed{margin:8px 0 0;font-size:12px;color:#52637b}
+
+/* Canonical Planning modal controls — scoped to modal only, no global overrides. */
+.planning-dialog-body-level .planning-modal :is(input:not([type=checkbox]):not([type=radio]),select,textarea){box-sizing:border-box;width:100%;font-family:inherit;font-size:14px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#142c4c}
+.planning-dialog-body-level .planning-modal :is(input:not([type=checkbox]):not([type=radio]),select){height:42px;min-height:42px;padding:0 12px}
+.planning-dialog-body-level .planning-modal textarea{min-height:104px;padding:10px 12px;resize:vertical}
+.planning-dialog-body-level .planning-modal :is(.ge-btn,button){box-sizing:border-box;min-height:42px;font-family:inherit;font-size:14px;font-weight:600;line-height:1.25}
+.planning-dialog-body-level .planning-modal .planning-station-options input[type=checkbox]{width:16px;height:16px;min-height:16px;padding:0;accent-color:#142f56}
+.planning-dialog-body-level .planning-modal .planning-station-options label{font-size:14px;line-height:1.4}
+.planning-dialog-body-level .planning-modal .ge-id-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+
+/* Master Data and GHA confirmed multi-select: match canonical control geometry. */
+#geGlobalRefModal .ge-ref-multi-actions{display:flex;justify-content:flex-end;gap:8px;padding:10px 0 0;border-top:1px solid #e2e8f0;margin-top:10px}
+#geGlobalRefModal .ge-ref-multi-actions .ge-btn{min-height:var(--ui-control-h);height:var(--ui-control-h);min-width:76px;font-family:inherit;font-size:14px;font-weight:600;border-radius:8px}
+#geGlobalRefModal .ge-ref-multi-pop label{display:flex;align-items:center;gap:9px;min-height:36px;font-size:14px;line-height:1.4}
+#geGlobalRefModal .ge-ref-multi-pop input[type=checkbox]{appearance:auto;width:16px;height:16px;min-width:16px;min-height:16px;margin:0;accent-color:#142f56}
+
+/* Canonical Master Reference/GHA controls: one component size and valid field structure. */
+#geGlobalRefModal .ge-ref-field-label{font-family:inherit;font-size:14px;font-weight:600;line-height:1.4;color:#34495e;margin-bottom:6px}
+#geGlobalRefModal .ge-ref-form input:not([type=checkbox]),
+#geGlobalRefModal .ge-ref-form select,
+#geGlobalRefModal .ge-ref-multi-trigger,
+#geGlobalRefModal .ge-ref-combo-toggle{box-sizing:border-box;min-height:42px;height:42px;font-family:inherit;font-size:14px;border-radius:8px}
+#geGlobalRefModal .ge-ref-form label{font-size:14px;line-height:1.4}
+#geGlobalRefModal .ge-ref-multi-pop label{font-size:14px;min-height:38px;cursor:pointer}
+#geGlobalRefModal .ge-ref-multi-pop input[type=checkbox]{width:16px;height:16px;min-width:16px;min-height:16px;flex:0 0 16px;accent-color:#142f56;cursor:pointer}
+#geGlobalRefModal .ge-modal-actions .ge-btn,
+#geGlobalRefModal .ge-ref-multi-actions .ge-btn,
+#geGlobalRefModal .ge-ahan-add{box-sizing:border-box;min-height:42px;height:42px;font-family:inherit;font-size:14px;font-weight:600;line-height:1.2;border-radius:8px}
+#geGlobalRefModal .ge-ahan-row input{height:42px}
+#geGlobalRefModal .ge-ahan-row button{height:42px;min-height:42px}
+#geGlobalRefModal .ge-ref-multi-pop{max-width:100%;box-sizing:border-box}
+
+/* Confirmed Lounge station multi-select: shared button/checkbox geometry. */
+html body .ge-searchable-confirm-actions{display:flex;justify-content:flex-end;gap:8px;padding:10px 4px 2px;border-top:1px solid #e2e8f0}
+html body .ge-searchable-confirm-actions button{min-height:42px;height:42px;min-width:80px;font-family:inherit;font-size:14px;font-weight:600}
+html body .ge-searchable-option input[type=checkbox]{appearance:auto;width:16px;height:16px;min-height:16px;flex:0 0 16px;margin:0;accent-color:#142f56}

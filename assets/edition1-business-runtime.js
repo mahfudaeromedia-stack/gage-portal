@@ -8667,10 +8667,10 @@ window.addEventListener('DOMContentLoaded',()=>{
 /* P22/P23/P24 — Planning action visibility follows Access Level + Permission, not Role alone. */
 (function(){
 'use strict';
-const PLANNING_PAGES_P22=new Set(['service-planning.html','planning-workspace.html','lounge-list.html','branch-office-planning.html','gaso-planning.html','planning-documents.html','station-material.html','bo-space.html','airport-systems.html','lounge-procurement.html']);
+const PLANNING_ACCESS_PAGES=new Set(['service-planning.html','planning-workspace.html','lounge-list.html','branch-office-planning.html','gaso-planning.html','planning-documents.html','station-material.html','bo-space.html','airport-systems.html','lounge-procurement.html']);
 function applyPlanningActions(){
  const page=(location.pathname.split('/').pop()||'index.html').toLowerCase();
- if(!PLANNING_PAGES_P22.has(page))return;
+ if(!PLANNING_ACCESS_PAGES.has(page))return;
  document.querySelectorAll('[data-admin-only]').forEach(el=>{el.style.display=gePlanningCanAction('Edit')?'':'none'});
 }
 window.addEventListener('DOMContentLoaded',()=>setTimeout(applyPlanningActions,120));
@@ -9227,10 +9227,69 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
 
   /* R4 canonical searchable filter: placeholder stays muted until a selection is made. */
   function geLoungeSearchableR4(hostId){
-    const host=document.getElementById(hostId);if(!host)return;const sourceId=host.dataset.sourceSelect,source=document.getElementById(sourceId),trigger=host.querySelector('[data-searchable-trigger]'),menu=host.querySelector('[data-searchable-menu]'),search=menu?.querySelector('input'),options=menu?.querySelector('.ge-searchable-options');
-    if(!source||!trigger||!menu||!search||!options||host.dataset.ready==='1')return;host.dataset.ready='1';const multiple=source.multiple;
-    const sync=()=>{const selected=[...source.options].filter(o=>o.selected),has=multiple?selected.length>0:!!source.value;trigger.textContent=multiple?(selected.length?`${selected.length} station selected`:'Search or choose station'):(source.selectedOptions[0]?.textContent||'Search or choose service provider');trigger.classList.toggle('is-placeholder',!has);options.innerHTML='';const q=String(search.value||'').trim().toLowerCase();const list=[...source.options].filter(o=>o.value!==''&&(!q||o.textContent.toLowerCase().includes(q)));if(!list.length){options.innerHTML='<div class="ge-searchable-empty">No matching data</div>';return}list.forEach(o=>{const row=document.createElement('label');row.className='ge-searchable-option';const input=document.createElement('input');input.type=multiple?'checkbox':'radio';input.name=multiple?`${sourceId}-multi`:`${sourceId}-single`;input.checked=o.selected;input.value=o.value;row.append(input,document.createTextNode(o.textContent));input.addEventListener('change',()=>{if(multiple)o.selected=input.checked;else{source.value=input.value;host.classList.remove('is-open')}source.dispatchEvent(new Event('change',{bubbles:true}));sync()});options.appendChild(row)})};
-    trigger.addEventListener('click',e=>{e.preventDefault();document.querySelectorAll('.ge-searchable.is-open').forEach(x=>{if(x!==host)x.classList.remove('is-open')});host.classList.toggle('is-open');if(host.classList.contains('is-open')){search.focus();sync()}});search.addEventListener('input',sync);document.addEventListener('click',e=>{if(!host.contains(e.target))host.classList.remove('is-open')});sync();
+    const host=document.getElementById(hostId);if(!host)return;
+    const source=document.getElementById(host.dataset.sourceSelect);
+    const trigger=host.querySelector('[data-searchable-trigger]');
+    const menu=host.querySelector('[data-searchable-menu]');
+    const search=menu?.querySelector('input');
+    const options=menu?.querySelector('.ge-searchable-options');
+    if(!source||!trigger||!menu||!search||!options||host.dataset.ready==='1')return;
+    host.dataset.ready='1';
+    const multiple=source.multiple;
+    let draft=new Set();
+    const committed=()=>new Set([...source.options].filter(o=>o.selected).map(o=>String(o.value)));
+    const summary=()=>{
+      const selected=[...source.options].filter(o=>o.selected);
+      const has=multiple?selected.length>0:!!source.value;
+      trigger.textContent=multiple?(selected.length?`${selected.length} station selected`:'Search or choose station'):(source.selectedOptions[0]?.textContent||'Search or choose service provider');
+      trigger.classList.toggle('is-placeholder',!has);
+      trigger.setAttribute('aria-expanded',String(host.classList.contains('is-open')));
+    };
+    if(multiple){
+      const footer=document.createElement('div');footer.className='ge-searchable-confirm-actions';
+      footer.innerHTML='<button type="button" class="ge-btn secondary" data-picker-cancel>Cancel</button><button type="button" class="ge-btn primary" data-picker-ok>OK</button>';
+      menu.appendChild(footer);
+      footer.querySelector('[data-picker-cancel]').addEventListener('click',()=>close(false));
+      footer.querySelector('[data-picker-ok]').addEventListener('click',()=>close(true));
+    }
+    function render(){
+      const q=String(search.value||'').trim().toLowerCase();options.replaceChildren();
+      const list=[...source.options].filter(o=>o.value!==''&&(!q||o.textContent.toLowerCase().includes(q)));
+      if(!list.length){const empty=document.createElement('div');empty.className='ge-searchable-empty';empty.textContent='No matching data';options.appendChild(empty);return;}
+      list.forEach(o=>{
+        const row=document.createElement('label');row.className='ge-searchable-option';
+        const input=document.createElement('input');input.type=multiple?'checkbox':'radio';
+        input.name=multiple?`${hostId}-multi`:`${hostId}-single`;
+        input.checked=multiple?draft.has(String(o.value)):o.selected;
+        input.value=o.value;row.append(input,document.createTextNode(o.textContent));
+        input.addEventListener('change',()=>{
+          if(multiple){input.checked?draft.add(String(o.value)):draft.delete(String(o.value));}
+          else{source.value=input.value;source.dispatchEvent(new Event('change',{bubbles:true}));close(false);}
+        });options.appendChild(row);
+      });
+    }
+    function close(apply){
+      if(!host.classList.contains('is-open'))return;
+      if(multiple&&apply){
+        [...source.options].forEach(o=>{o.selected=draft.has(String(o.value))});
+        source.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+      host.classList.remove('is-open');search.value='';summary();
+    }
+    function open(){
+      document.querySelectorAll('.ge-searchable.is-open').forEach(other=>{
+        if(other!==host)other.dispatchEvent(new CustomEvent('ge-picker-dismiss'));
+      });
+      draft=committed();host.classList.add('is-open');summary();render();search.focus();
+    }
+    host.addEventListener('ge-picker-dismiss',()=>close(false));
+    trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
+    trigger.addEventListener('click',e=>{e.preventDefault();host.classList.contains('is-open')?close(false):open()});
+    search.addEventListener('input',render);
+    host.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();close(false);trigger.focus()}});
+    document.addEventListener('pointerdown',e=>{if(!host.contains(e.target))close(false)},true);
+    source.addEventListener('change',()=>{summary();if(host.classList.contains('is-open')&&!multiple)render()});
+    summary();
   }
   function geInitLoungeSearchablesR4(){geLoungeSearchableR4('loungeStationSearchR4');geLoungeSearchableR4('loungeProviderSearchR4')}
   function populateFilterOptions(){
@@ -9309,7 +9368,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
     }).join('');
   }
-  const geP29RenderTableBaseR4=renderTable;renderTable=function(){geP29RenderTableBaseR4();setTimeout(()=>window.geEnhanceAllTables?.(),0)};
+  const renderLoungeTableBase=renderTable;renderTable=function(){renderLoungeTableBase();setTimeout(()=>window.geEnhanceAllTables?.(),0)};
   window.renderLounges=function(){try{populateFilterOptions();renderTable();renderCards();renderPriceSummary();}catch(e){console.error('P29 Lounge render guard',e);const g=document.getElementById('loungeCardGridV237');if(g)g.innerHTML='<div class="lounge-master-empty-v237">Data Lounge/Tenant tidak dapat ditampilkan. Periksa data yang memerlukan review.</div>';}};
 
   function renderPriceSummary(){

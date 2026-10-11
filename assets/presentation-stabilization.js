@@ -223,7 +223,7 @@
 
   window.GX_PAGE_IDENTITY_V35=PAGE_IDENTITY;
   window.GX_SEMANTIC_STATUS_V34=semanticStatus;
-  window.GX_P33_P37_INIT=init;
+  window.GX_PRESENTATION_INIT=init;
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(init,40));
   else setTimeout(init,40);
 })();

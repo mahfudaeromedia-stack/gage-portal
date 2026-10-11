@@ -7,7 +7,7 @@
   const TYPE_SET=new Set(TYPES);
   const STATUS_VALUES=['Valid','Pending','Invalid'];
   const FIELD_HEADERS={
-    region:'Region', station:'Station', name:'Nama Layanan / Provider', serviceType:'Jenis Layanan', pic:'PIC',
+    region:'Region', station:'Station', name:'Nama Layanan / Provider', serviceType:'Service Type', pic:'PIC',
     currency:'Mata Uang', pricePerPax:'Harga Per Pax', startDate:'Tanggal Mulai', endDate:'Tanggal Berakhir',
     documentNumber:'Nomor Dokumen', documentType:'Jenis Dokumen', documentStatus:'Status Dokumen', remarks:'Remarks',
     priceEffectiveFrom:'Price Period Effective From', priceEffectiveTo:'Price Period Effective To',
@@ -178,7 +178,7 @@
       if(parts.some(code=>!known.has(code)))errors.push('Station/Airport tidak ditemukan pada master: '+parts.filter(code=>!known.has(code)).join(', '));
     }
     if(!name)errors.push('Nama Layanan / Provider wajib diisi');
-    if(!serviceType)errors.push('Jenis Layanan harus Lounge, Tenant, atau Snack Box');
+    if(!serviceType)errors.push('Service Type harus Lounge, Tenant, atau Snack Box');
     if(raw.startDate&&!start)errors.push('Tanggal Mulai tidak valid; gunakan YYYY-MM-DD');
     if(raw.endDate&&!end)errors.push('Tanggal Berakhir tidak valid; gunakan YYYY-MM-DD');
     if(start&&end&&end<start)errors.push('Tanggal Berakhir tidak boleh sebelum Tanggal Mulai');
@@ -227,7 +227,7 @@
       <div><label>Effective From<input data-price-field="effectiveFrom" type="date" value="${esc(s.effectiveFrom||'')}"></label></div>
       <div><label>Effective To<input data-price-field="effectiveTo" type="date" value="${esc(s.effectiveTo||'')}"></label></div>
       <div><label>Price<input data-price-field="price" type="number" min="0" step="0.01" value="${esc(s.price??'')}"></label></div>
-      <div><label>Currency<select data-price-field="currency"><option value="">Pilih Mata Uang</option>${currencyMasterOptions(s.currency)}</select></label></div>
+      <div><label>Currency<select data-price-field="currency"><option value="">Select Currency</option>${currencyMasterOptions(s.currency)}</select></label></div>
       <div><label>Price Basis<input data-price-field="priceBasis" value="${esc(s.priceBasis||'pax')}" placeholder="pax"></label></div>
       <div><label>Note<input data-price-field="priceNote" value="${esc(s.priceNote||'')}"></label></div>
       <button type="button" class="ge-btn danger compact-btn ge-p29-remove-price" ${rows.length===1?'disabled':''}>Delete</button>
@@ -244,14 +244,14 @@
   function commonFormMarkup(prefix,model){
     const m=model||{};
     return `<div class="formgrid ge-p29-form-grid">
-      <label>Region<select id="${prefix}Region"><option value="">Pilih Region</option><option ${m.region==='WEST'?'selected':''}>WEST</option><option ${m.region==='EAST'?'selected':''}>EAST</option><option ${m.region==='INT'?'selected':''}>INT</option></select></label>
-      <label>Station<select id="${prefix}Airport" required><option value="">Pilih Station</option>${airportMasterOptions(m.airport)}</select></label>
+      <label>Region<select id="${prefix}Region"><option value="">Select Region</option><option ${m.region==='WEST'?'selected':''}>WEST</option><option ${m.region==='EAST'?'selected':''}>EAST</option><option ${m.region==='INT'?'selected':''}>INT</option></select></label>
+      <label>Station<select id="${prefix}Airport" required><option value="">Select Station</option>${airportMasterOptions(m.airport)}</select></label>
       <label>Nama Layanan / Provider<input id="${prefix}Name" required value="${esc(m.name||'')}" placeholder="Nama provider / layanan"></label>
-      <label>Jenis Layanan<select id="${prefix}ServiceType" required><option value="">Pilih Jenis Layanan</option>${TYPES.map(t=>`<option value="${t}" ${m.serviceType===t?'selected':''}>${t}</option>`).join('')}</select></label>
+      <label>Service Type<select id="${prefix}ServiceType" required><option value="">Pilih Service Type</option>${TYPES.map(t=>`<option value="${t}" ${m.serviceType===t?'selected':''}>${t}</option>`).join('')}</select></label>
       <label>PIC<input id="${prefix}Pic" value="${esc(m.pic||'')}" placeholder="Nama PIC / contact"></label>
       <label>Agreement Start Date<input id="${prefix}Start" type="date" value="${esc(m.startDate||'')}"></label>
       <label>Agreement End Date<input id="${prefix}End" type="date" value="${esc(m.endDate||'')}"></label>
-      <label>Mata Uang (single price)<select id="${prefix}Currency"><option value="">Pilih Mata Uang</option>${currencyMasterOptions(m.currency)}</select></label>
+      <label>Currency (single price)<select id="${prefix}Currency"><option value="">Select Currency</option>${currencyMasterOptions(m.currency)}</select></label>
       <label>Harga Per Pax (single price)<input id="${prefix}Price" type="number" min="0" step="0.01" value="${m.pricePerPax?esc(m.pricePerPax):''}"></label>
       <label>Nomor Dokumen / Agreement Identity<input id="${prefix}DocumentNumber" value="${esc(m.documentNumber||'')}" placeholder="Nomor agreement / dokumen"></label>
       <label>Jenis Dokumen<input id="${prefix}DocumentType" value="${esc(m.documentType||'')}" placeholder="Jenis dokumen"></label>
@@ -294,7 +294,7 @@
 
   window.openLoungeAddModalV230=function(){
     if(!canCreate())return;
-    state.editId=null;replaceModalContent('loungeAddModalV221','Tambah Layanan Lounge/Tenant','geP29Add',{});
+    state.editId=null;replaceModalContent('loungeAddModalV221','Add Lounge/Tenant Service','geP29Add',{});
   };
   window.closeLoungeAddModalV221=function(){document.getElementById('loungeAddModalV221')?.classList.remove('show')};
   window.openLoungeEdit=function(id){
@@ -420,7 +420,7 @@
     tbody.innerHTML=rows.map((x,i)=>{
       const rt=resolveType(x),p=applicablePrice(x,new Date()),price=p.status==='CURRENT'||p.status==='LEGACY'?safePriceDisplay(p.currency,p.price):'Not Available';
       const action=canEdit()?`<td><div class="row-actions"><button class="ge-btn secondary" onclick="openLoungeEdit(${Number(x.id)})">Update</button><button class="ge-btn ge-btn danger" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button></div></td>`:'';
-      return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Unduh</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
+      return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
     }).join('');
   }
   window.renderLounges=function(){try{populateFilterOptions();renderTable();renderCards();renderPriceSummary();window.geSetLoungeViewP87?.(document.getElementById('geLoungeViewSelectR6')?.value||'grid');}catch(e){console.error('P29 Lounge render guard',e);const g=document.getElementById('loungeCardGridV237');if(g)g.innerHTML='<div class="lounge-master-empty-v237">Data Lounge/Tenant tidak dapat ditampilkan. Periksa data yang memerlukan review.</div>';}};
@@ -438,8 +438,8 @@
     if(!canUpload())return;
     const lines=[
       '# Template CSV Layanan Lounge / Tenant',
-      '# Required: Station, Nama Layanan / Provider, Jenis Layanan',
-      '# Jenis Layanan: Lounge / Tenant / Snack Box. Date: YYYY-MM-DD. Currency: ISO 4217.',
+      '# Required: Station, Nama Layanan / Provider, Service Type',
+      '# Service Type: Lounge / Tenant / Snack Box. Date: YYYY-MM-DD. Currency: ISO 4217.',
       '# Single price: isi Harga Per Pax + Mata Uang. Multi price: ulangi Agreement Number yang sama pada beberapa baris dan isi Price Period fields.',
       '# Multi price rows dengan Agreement Number yang sama membentuk SATU Agreement + beberapa Price Period. Import bersifat CREATE-only; duplikat diblokir sebelum commit.',
       Object.values(FIELD_HEADERS).map(csvCell).join(','),
@@ -619,29 +619,47 @@
     if(existing){renderStationMultiOptionsR12(existing,select);return;}
     select.classList.add('ge-station-source-r12');
     const wrap=document.createElement('div');wrap.className='ge-station-multi-r12';
-    wrap.innerHTML='<button type="button" class="ge-station-trigger-r12" aria-haspopup="listbox" aria-expanded="false"><span>Semua Station</span><i>▾</i></button><div class="ge-station-menu-r12" role="listbox"><input class="ge-station-search-r12" type="search" placeholder="Cari Station..." autocomplete="off"><div class="ge-station-options-r12"></div><div class="ge-station-menu-actions-r12"><button type="button" data-action="clear">Clear</button><button type="button" data-action="done">Selesai</button></div></div>';
+    wrap.innerHTML='<button type="button" class="ge-station-trigger-r12" aria-haspopup="listbox" aria-expanded="false"><span>All Stations</span><i>▾</i></button><div class="ge-station-menu-r12" role="listbox"><input class="ge-station-search-r12" type="search" placeholder="Search stations..." autocomplete="off"><div class="ge-station-options-r12"></div><div class="ge-station-menu-actions-r12"><button type="button" data-action="cancel">Cancel</button><button type="button" data-action="done">OK</button></div></div>';
     select.parentNode.insertBefore(wrap,select);
     const trigger=wrap.querySelector('.ge-station-trigger-r12'),menu=wrap.querySelector('.ge-station-menu-r12'),search=wrap.querySelector('.ge-station-search-r12');
-    trigger.onclick=()=>{const open=menu.classList.toggle('show');trigger.setAttribute('aria-expanded',String(open));if(open){search.value='';renderStationMultiOptionsR12(wrap,select);search.focus()}};
+    let originalSelection=[];
+    const restoreSelection=()=>{
+      const saved=new Set(originalSelection);
+      [...select.options].forEach(o=>{o.selected=saved.has(o.value)});
+      updateStationTriggerR12(wrap,select);
+      renderStationMultiOptionsR12(wrap,select);
+    };
+    const dismiss=(commit)=>{
+      if(!commit)restoreSelection();
+      menu.classList.remove('show');trigger.setAttribute('aria-expanded','false');
+      if(commit){select.dispatchEvent(new Event('change',{bubbles:true}));}
+    };
+    trigger.onclick=()=>{
+      if(menu.classList.contains('show')){dismiss(false);return;}
+      originalSelection=[...select.selectedOptions].map(o=>o.value);
+      menu.classList.add('show');trigger.setAttribute('aria-expanded','true');
+      search.value='';renderStationMultiOptionsR12(wrap,select);search.focus();
+    };
     search.oninput=()=>renderStationMultiOptionsR12(wrap,select);
-    wrap.querySelector('[data-action="clear"]').onclick=()=>{[...select.options].forEach(o=>o.selected=false);renderStationMultiOptionsR12(wrap,select);loungeCardPage=1;renderLounges()};
-    wrap.querySelector('[data-action="done"]').onclick=()=>{menu.classList.remove('show');trigger.setAttribute('aria-expanded','false');loungeCardPage=1;renderLounges()};
+    wrap.querySelector('[data-action="cancel"]').onclick=()=>dismiss(false);
+    wrap.querySelector('[data-action="done"]').onclick=()=>dismiss(true);
+    search.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();dismiss(false)}});
     select.addEventListener('change',()=>{updateStationTriggerR12(wrap,select);loungeCardPage=1;renderLounges()});
-    document.addEventListener('pointerdown',e=>{if(!wrap.contains(e.target)){menu.classList.remove('show');trigger.setAttribute('aria-expanded','false')}});
+    document.addEventListener('pointerdown',e=>{if(!wrap.contains(e.target)&&menu.classList.contains('show'))dismiss(false)});
     renderStationMultiOptionsR12(wrap,select);
   }
 
   function updateStationTriggerR12(wrap,select){
     const selected=[...(select.selectedOptions||[])].filter(o=>o.value);
     const span=wrap.querySelector('.ge-station-trigger-r12 span');
-    if(span)span.textContent=!selected.length?'Semua Station':selected.length===1?selected[0].textContent:`${selected.length} Station dipilih`;
+    if(span)span.textContent=!selected.length?'All Stations':selected.length===1?selected[0].textContent:`${selected.length} Stations selected`;
   }
   function renderStationMultiOptionsR12(wrap,select){
     const q=String(wrap.querySelector('.ge-station-search-r12')?.value||'').trim().toLowerCase();
     const box=wrap.querySelector('.ge-station-options-r12');
     const opts=[...select.options].filter(o=>o.value&&(!q||o.textContent.toLowerCase().includes(q)));
-    box.innerHTML=opts.length?opts.map(o=>`<label><input type="checkbox" value="${esc(o.value)}" ${o.selected?'checked':''}><span>${esc(o.textContent)}</span></label>`).join(''):'<div class="ge-station-empty-r12">Station tidak ditemukan.</div>';
-    box.querySelectorAll('input').forEach(cb=>cb.onchange=()=>{const o=[...select.options].find(x=>x.value===cb.value);if(o)o.selected=cb.checked;updateStationTriggerR12(wrap,select);loungeCardPage=1;renderLounges()});
+    box.innerHTML=opts.length?opts.map(o=>`<label><input type="checkbox" value="${esc(o.value)}" ${o.selected?'checked':''}><span>${esc(o.textContent)}</span></label>`).join(''):'<div class="ge-station-empty-r12">No matching stations.</div>';
+    box.querySelectorAll('input').forEach(cb=>cb.onchange=()=>{const o=[...select.options].find(x=>x.value===cb.value);if(o)o.selected=cb.checked;updateStationTriggerR12(wrap,select)});
     updateStationTriggerR12(wrap,select);
   }
 
@@ -656,7 +674,7 @@
     populateStationFilterOptions();
     setupStationMultiSelectR12();
     setupTypeFilter();
-    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template P29';}
+    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template';}
     ['loungeRegionFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{loungeCardPage=1;renderLounges()})});
     try{if(typeof fillAirportSelects==='function')fillAirportSelects()}catch(e){}
     populateStationFilterOptions();
@@ -670,7 +688,7 @@
     if(!schedules.length)return;
     let modal=document.getElementById('geP29PriceScheduleModal');if(!modal){modal=document.createElement('div');modal.id='geP29PriceScheduleModal';modal.className='modal-backdrop';modal.innerHTML='<div class="modal-card ge-p29-schedule-modal"></div>';document.body.appendChild(modal)}
     const checked=validateSchedules(schedules,validDate(x.startDate),validDate(x.endDate));
-    modal.querySelector('.modal-card').innerHTML=`<button class="modal-x" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">×</button><h2>Price Schedule</h2><p class="section-subtitle">${esc(x.name||'Lounge/Tenant')} • ${esc(x.documentNumber||'Agreement identity tidak tersedia')}</p>${checked.valid?`<div class="ge-p29-schedule-list">${checked.schedules.map((s,i)=>`<div class="ge-p29-schedule-item"><div><span>Period ${i+1}</span><b>${esc(dateLabel(s.effectiveFrom))} — ${esc(dateLabel(s.effectiveTo))}</b></div><div><span>Price</span><b>${esc(safePriceDisplay(s.currency,s.price))}</b></div><div><span>Basis</span><b>${esc(s.priceBasis||'pax')}</b></div>${s.priceNote?`<small>${esc(s.priceNote)}</small>`:''}</div>`).join('')}</div>`:`<div class="ge-p29-form-errors"><b>Requires Review</b><p>${esc(checked.errors.join('; '))}</p></div>`}<div class="modal-actions"><button class="ge-btn secondary" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">Tutup</button></div>`;
+    modal.querySelector('.modal-card').innerHTML=`<button class="modal-x" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">×</button><h2>Price Schedule</h2><p class="section-subtitle">${esc(x.name||'Lounge/Tenant')} • ${esc(x.documentNumber||'Agreement reference unavailable')}</p>${checked.valid?`<div class="ge-p29-schedule-list">${checked.schedules.map((s,i)=>`<div class="ge-p29-schedule-item"><div><span>Period ${i+1}</span><b>${esc(dateLabel(s.effectiveFrom))} — ${esc(dateLabel(s.effectiveTo))}</b></div><div><span>Price</span><b>${esc(safePriceDisplay(s.currency,s.price))}</b></div><div><span>Basis</span><b>${esc(s.priceBasis||'pax')}</b></div>${s.priceNote?`<small>${esc(s.priceNote)}</small>`:''}</div>`).join('')}</div>`:`<div class="ge-p29-form-errors"><b>Requires Review</b><p>${esc(checked.errors.join('; '))}</p></div>`}<div class="modal-actions"><button class="ge-btn secondary" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">Close</button></div>`;
     modal.classList.add('show');
   };
 

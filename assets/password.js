@@ -62,6 +62,6 @@
     const state=el('p27TempState');if(state)state.innerHTML=s.mustChangePassword?'<span class="gx-status-badge gx-status-warning">Temporary password change required</span>':'<span class="gx-status-badge gx-status-positive">Password self-service available</span>';
     el('p27PasswordForm')?.addEventListener('submit',submit);toggle('p27ToggleCurrent','p27CurrentPassword');toggle('p27ToggleNew','p27NewPassword');toggle('p27ToggleConfirm','p27ConfirmPassword');
   }
-  window.GXP27Password={load,validate,messageFor,markLifecycleComplete};
+  window.GXPasswordService={load,validate,messageFor,markLifecycleComplete};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(load,100));else setTimeout(load,100);
 })();

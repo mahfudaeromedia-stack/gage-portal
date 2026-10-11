@@ -143,6 +143,6 @@
     await loadRequests();
   }
 
-  window.AccessAssistanceP32={load:loadRequests,open:openDetail,render:renderAdminPanel};
+  window.GXAccessAssistance={load:loadRequests,open:openDetail,render:renderAdminPanel};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,120));else setTimeout(init,120);
 })();
