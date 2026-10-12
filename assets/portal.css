@@ -5723,3 +5723,27 @@ body.lounge-reference-v237 .lounge-expiry-warning b{color:#855c17}
 #geLoungeViewToggle button:not(.active):hover{background:#082b59;color:#fff}
 @media(max-width:1100px){#loungeFilterGridR4{grid-template-columns:repeat(2,minmax(0,1fr))}.lounge-master-page-head .ge-page-actions>a[href*="service-provider"]{margin-left:0}}
 @media(max-width:600px){#loungeFilterGridR4{grid-template-columns:minmax(0,1fr)}.lounge-master-page-head .ge-page-actions,.lounge-master-page-head .bulk-action-group{width:100%}.lounge-master-page-head .ge-page-actions :is(.btn,.ge-btn){flex:1 1 auto}.lounge-master-toolbar-v237{flex-wrap:wrap;gap:12px}}
+
+/* Canonical Lounge/Tenant directory — compact controls and reference card proportions. */
+.lounge-master-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
+.lounge-master-page-head .lounge-navigation{margin-left:auto;flex-shrink:0}
+.lounge-master-page-head .lounge-navigation .ge-btn{height:36px;min-height:36px;padding:0 14px;font-size:12px;font-weight:600;border:1px solid #0b2e60;border-radius:9px;background:#fff;color:#0b2e60}
+.lounge-master-page-head .lounge-navigation .ge-btn:hover{background:#0b2e60;color:#fff}
+.lounge-directory-actions{display:flex;gap:9px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin:0 0 16px}
+.lounge-directory-actions .ge-btn{height:36px;min-height:36px;padding:0 14px;font:600 12px/1.2 inherit;border:1px solid #0b2e60;border-radius:9px;white-space:nowrap;background:#fff;color:#0b2e60}
+.lounge-directory-actions .ge-btn.primary{background:#0b2e60;color:#fff}
+.lounge-directory-actions .ge-btn:hover{background:#0b2e60;color:#fff}
+#loungeFilterGridR4{grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:10px}
+#loungeFilterGridR4>select,#loungeFilterGridR4>.ge-lounge-station-field>.ge-station-multi-r12>.ge-station-trigger-r12,#loungeFilterGridR4>.ge-btn{height:38px;min-height:38px;font-size:13px;padding:0 11px}
+#loungeFilterGridR4 .ge-station-menu-r12{z-index:500;width:300px;max-width:min(340px,calc(100vw - 40px))}
+.lounge-segmented-switch{display:inline-flex;align-items:center;padding:3px;border:1px solid #c6d4e5;border-radius:999px;background:#edf2f8;gap:2px}
+#geLoungeViewToggle.lounge-segmented-switch button{height:30px;min-height:30px;padding:0 16px;border:0;border-radius:999px;background:transparent;color:#26476c;font-size:12px;font-weight:600}
+#geLoungeViewToggle.lounge-segmented-switch button.active{background:#0b2e60;color:#fff;box-shadow:0 1px 3px #001a3640}
+.lounge-master-grid-v237 .lounge-master-card-v237{padding:20px;gap:16px;border-radius:18px}
+.lounge-master-grid-v237 .lounge-master-code-v237{width:77px;height:77px;min-width:77px;display:grid;place-items:center;border-radius:16px;font-size:21px}
+.lounge-master-grid-v237 .lounge-master-card-body-v237 h3{font-size:17px;line-height:1.35;margin:12px 0}
+.lounge-master-grid-v237 .lounge-card-actions-v237 button{height:36px;min-height:36px;padding:0 17px;font-size:12px;border-radius:9px}
+.lounge-master-grid-v237 .lounge-card-actions-v237 .danger{background:#fff;color:#cf2020;border:1px solid #cf2020}
+.lounge-master-grid-v237 .lounge-card-actions-v237 .danger:hover{background:#cf2020;color:#fff}
+@media(max-width:900px){#loungeFilterGridR4{grid-template-columns:repeat(2,minmax(0,1fr))}.lounge-master-page-head{flex-wrap:wrap}}
+@media(max-width:560px){#loungeFilterGridR4{grid-template-columns:1fr}.lounge-directory-actions{justify-content:flex-start}.lounge-master-page-head .lounge-navigation{margin-left:0}}

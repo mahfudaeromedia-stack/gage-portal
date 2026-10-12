@@ -3486,3 +3486,9 @@ Scope: Lounge/Tenant directory and Add/Update rendering. Standardized directory 
 - Removed redundant visible filter labels; all controls carry accessible names. Directory toolbar keeps Add, CSV template and Upload grouped, with Service & Provider navigation at the far right. Grid/Details continues to use the existing segmented control and preserves the selected view when records rerender.
 - Region and Station options combine Master Data and existing agreement references to preserve legacy records. Provider filter and form suggestions combine existing agreement providers with supported provider-master collections. Existing Add/Edit business rules, role guards, price schedules, attachments and save flow remain in place.
 - No Firestore rules, indexes, schema or environment changes. Browser-authenticated Firebase CRUD and visual screenshot comparison are not covered by source regression tests.
+
+
+### Lounge/Tenant focused correction — 2026-10-12
+- Lounge directory loads its dedicated planning controller after the shared runtime, restoring Add/Edit modal handlers and canonical filter initialization.
+- Action buttons are placed beneath the Service & Provider navigation. Region reference options combine airport master, reference catalog and legacy lounge data. Station selector remains visible with explicit OK/Cancel.
+- Grid/Details uses a compact segmented control; cards follow the approved compact visual reference with Update/Delete actions. Existing Firebase business logic, record identifiers and permission checks are retained.

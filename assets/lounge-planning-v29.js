@@ -65,7 +65,10 @@
     return rows.filter(x=>x.code&&!seen.has(x.code)&&(seen.add(x.code),true)).sort((a,b)=>a.code.localeCompare(b.code)).map(x=>`<option value="${esc(x.code)}" ${x.code===code?'selected':''}>${esc(x.code+(x.name?' — '+x.name:''))}</option>`).join('');
   }
   function regionMasterOptions(selected=''){
-    const values=[...(data.airports||[]).map(x=>x.region||x.wilayah),...(data.lounges||[]).map(x=>x.region||x.wilayah),selected];
+    let airports=[],references=[];
+    try{airports=typeof GECore?.list==='function'?(GECore.list('airports')||[]):[]}catch(_e){}
+    try{references=typeof GEStore?.get==='function'?(GEStore.get()?.referenceCatalog||[]):[]}catch(_e){}
+    const values=[...airports,...(data.airports||[])].map(x=>x.networkRegion||x.region||x.wilayah||x.area).concat((data.lounges||[]).map(x=>x.region||x.wilayah),references.filter(x=>/region/i.test(String(x.kind||x.type||''))&&x.status!=='Inactive').map(x=>x.name||x.label||x.code),selected);
     const unique=[...new Set(values.map(x=>String(x||'').trim()).filter(Boolean))].sort();
     return unique.map(v=>`<option value="${esc(v)}" ${v===selected?'selected':''}>${esc(v)}</option>`).join('');
   }
@@ -367,7 +370,10 @@
   function populateFilterOptions(){
     const region=document.getElementById('loungeRegionFilter'),provider=document.getElementById('loungeNameFilter'),status=document.getElementById('loungeStatusFilter');
     const put=(el,values,label)=>{if(!el)return;const cur=el.value,items=[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));el.innerHTML=`<option value="">${label}</option>`+items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');el.value=items.includes(cur)?cur:''};
-    put(region,[...(data.airports||[]).map(x=>x.region||x.wilayah),...(data.lounges||[]).map(x=>x.region||x.wilayah)],'All Regions');
+    let airportRefs=[],regionRefs=[];
+    try{airportRefs=typeof GECore?.list==='function'?(GECore.list('airports')||[]):[]}catch(_e){}
+    try{regionRefs=typeof GEStore?.get==='function'?(GEStore.get()?.referenceCatalog||[]):[]}catch(_e){}
+    put(region,[...airportRefs,...(data.airports||[])].map(x=>x.networkRegion||x.region||x.wilayah||x.area).concat((data.lounges||[]).map(x=>x.region||x.wilayah),regionRefs.filter(x=>/region/i.test(String(x.kind||x.type||''))&&x.status!=='Inactive').map(x=>x.name||x.label||x.code)),'All Regions');
     put(provider,[...(data.lounges||[]).map(x=>x.name),...providerMasterNames()],'All Providers');
     put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Documents');
   }
@@ -429,7 +435,7 @@
             ${priceMeta?`<div><dt>Price Schedule</dt><dd>${esc(priceMeta)}</dd></div>`:''}
             <div><dt>Agreement</dt><dd>${esc(x.documentNumber||'Not Available')}</dd></div>
           </div>${review}
-          <div class="lounge-card-actions-v237">${detail}${update}${del}</div>
+          <div class="lounge-card-actions-v237">${update}${del}</div>
         </div>
       </article>`;
     }).join('')||'<div class="lounge-master-empty-v237">No Lounge/Tenant records match these filters.</div>';
@@ -732,6 +738,6 @@
   window.geChangeLoungeCardPageP87=function(delta){loungeCardPage+=Number(delta||0);renderCards();document.querySelector('.lounge-open-heading-v237')?.scrollIntoView({behavior:'smooth',block:'start'});};
   window.geLoungeViewSelectR6=function(value){window.geSetLoungeViewP87?.(value);};
   function bindCanonicalLoungeView(){const view=document.getElementById('geLoungeViewSelectR6');if(view)view.onchange=function(){window.geLoungeViewSelectR6(this.value);};}
-  window.geSetLoungeViewP87=function(view){const detail=view==='detail',grid=document.getElementById('loungeCardGridV237'),table=document.querySelector('.lounge-table-fallback-v237'),pager=document.querySelector('.lounge-master-pager-v237');if(grid)grid.hidden=detail;if(table){table.hidden=!detail;table.classList.toggle('ge-p29-table-visible',detail)}if(pager)pager.hidden=detail;};
-  window.addEventListener('DOMContentLoaded',()=>setTimeout(setup,0));
+  window.geSetLoungeViewP87=function(view){window.GE_LOUNGE_VIEW_R19=view==='detail'?'detail':'grid';document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(b=>{const active=b.dataset.view===window.GE_LOUNGE_VIEW_R19;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});const detail=view==='detail',grid=document.getElementById('loungeCardGridV237'),table=document.querySelector('.lounge-table-fallback-v237'),pager=document.querySelector('.lounge-master-pager-v237');if(grid)grid.hidden=detail;if(table){table.hidden=!detail;table.classList.toggle('ge-p29-table-visible',detail)}if(pager)pager.hidden=detail;};
+  if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',()=>setTimeout(setup,0),{once:true});else setTimeout(setup,0);
 })();
