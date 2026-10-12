@@ -3467,3 +3467,16 @@ Tiga identifier internal bisnis diubah menjadi nama berbasis domain; satu kandid
 
 ### 2026-10-11 — Shared compact button and checkbox contract
 Consolidated duplicate compact/table button geometry in `assets/global-ui-canonical.css`; established a scoped 16px checkbox rule for Planning, Monitoring, Assessment and Master Reference surfaces. Added `tests/canonical-controls-contract.js` to verify these properties. Existing domain business logic and stored reference IDs were not changed. Browser/Firebase verification remains pending.
+
+
+## 2026-10-12 — Lounge/Tenant focused correction
+
+- Consolidated Lounge/Tenant button and field dimensions to 42px / 14px in the existing portal stylesheet, including table/card actions and Add/Update modals.
+- Corrected English labels, field placeholders, and form guidance in the Lounge/Tenant renderer.
+- Corrected Add/Edit station preselection to use `station` (with legacy `airport` fallback).
+- Added submit locking to avoid duplicate saves, awaited asynchronous `save()` failures, and rolled back in-memory record mutations on save rejection.
+- Retained historical data identifiers and price schedule behavior; Firebase/browser live validation is separate from source tests.
+
+## Lounge/Tenant focused revision — 2026-10-12
+
+Scope: Lounge/Tenant directory and Add/Update rendering. Standardized directory button and field geometry (42px, 14px), navy outline/hover/focus treatment and responsive wrapping; preserved shared modal geometry. Corrected English-facing validation and empty states, removed duplicate Region filter refresh, supported legacy `station` fields alongside `airport`, retained string record identifiers in action handlers, and prevented silent attachment success when storage is unavailable. Added targeted source contract checks. No Firestore Rules, Storage Rules, indexes, schema, or environment configuration was changed. Production Firebase/role tests and authenticated visual checks require a test environment; do not infer production readiness from static regression tests.

@@ -7,9 +7,9 @@
   const TYPE_SET=new Set(TYPES);
   const STATUS_VALUES=['Valid','Pending','Invalid'];
   const FIELD_HEADERS={
-    region:'Region', station:'Station', name:'Nama Layanan / Provider', serviceType:'Service Type', pic:'PIC',
-    currency:'Mata Uang', pricePerPax:'Harga Per Pax', startDate:'Tanggal Mulai', endDate:'Tanggal Berakhir',
-    documentNumber:'Nomor Dokumen', documentType:'Jenis Dokumen', documentStatus:'Status Dokumen', remarks:'Remarks',
+    region:'Region', station:'Station', name:'Service / Provider Name', serviceType:'Service Type', pic:'PIC',
+    currency:'Currency', pricePerPax:'Price per Pax', startDate:'Start Date', endDate:'End Date',
+    documentNumber:'Document Number', documentType:'Document Type', documentStatus:'Document Status', remarks:'Remarks',
     priceEffectiveFrom:'Price Period Effective From', priceEffectiveTo:'Price Period Effective To',
     price:'Price Period Price', priceCurrency:'Price Period Currency', priceBasis:'Price Basis', priceNote:'Price Period Note'
   };
@@ -91,13 +91,13 @@
   function normalizeSchedule(raw,agreementStart,agreementEnd,index){
     const from=validDate(raw?.effectiveFrom),to=validDate(raw?.effectiveTo),price=numeric(raw?.price),currency=currencyCode(raw?.currency);
     const errors=[];
-    if(!from)errors.push('effectiveFrom tidak valid');
-    if(!to)errors.push('effectiveTo tidak valid');
-    if(from&&to&&to<from)errors.push('effectiveTo sebelum effectiveFrom');
-    if(price===null||price<0)errors.push('price harus numerik dan >= 0');
-    if(!currency)errors.push('currency tidak valid');
-    if(agreementStart&&from&&from<agreementStart)errors.push('effectiveFrom di luar periode Agreement');
-    if(agreementEnd&&to&&to>agreementEnd)errors.push('effectiveTo di luar periode Agreement');
+    if(!from)errors.push('Effective From is invalid');
+    if(!to)errors.push('Effective To is invalid');
+    if(from&&to&&to<from)errors.push('Effective To precedes Effective From');
+    if(price===null||price<0)errors.push('Price must be a non-negative number');
+    if(!currency)errors.push('Currency is invalid');
+    if(agreementStart&&from&&from<agreementStart)errors.push('Effective From is outside the agreement period');
+    if(agreementEnd&&to&&to>agreementEnd)errors.push('Effective To is outside the agreement period');
     const basis=String(raw?.priceBasis??'').trim();
     return {ok:!errors.length,errors,effectiveFrom:from,effectiveTo:to,price,currency,priceBasis:basis,priceNote:String(raw?.priceNote??'').trim(),index};
   }
@@ -109,7 +109,7 @@
     for(let i=1;i<valid.length;i++){
       const prev=valid[i-1],cur=valid[i];
       if(cur.effectiveFrom<=prev.effectiveTo){
-        errors.push(`Price Period ${cur.index+1} overlap dengan Price Period ${prev.index+1}`);
+        errors.push(`Price Period ${cur.index+1} overlaps Price Period ${prev.index+1}`);
       }
     }
     return {schedules:out,valid:!errors.length&&out.length>0,errors};
@@ -171,30 +171,30 @@
     const pic=String(raw.pic??'').trim();
     const start=validDate(raw.startDate??raw.agreementStartDate);
     const end=validDate(raw.endDate??raw.agreementEndDate);
-    if(!airport)errors.push('Station wajib diisi');
+    if(!airport)errors.push('Station is required');
     if(airport && Array.isArray(data?.airports) && data.airports.length){
       const known=new Set(data.airports.map(a=>String(a.code||'').trim().toUpperCase()).filter(Boolean));
       const parts=airport.split('/').map(x=>x.trim()).filter(Boolean);
-      if(parts.some(code=>!known.has(code)))errors.push('Station/Airport tidak ditemukan pada master: '+parts.filter(code=>!known.has(code)).join(', '));
+      if(parts.some(code=>!known.has(code)))errors.push('Station/Airport not found in Master Data: '+parts.filter(code=>!known.has(code)).join(', '));
     }
-    if(!name)errors.push('Nama Layanan / Provider wajib diisi');
-    if(!serviceType)errors.push('Service Type harus Lounge, Tenant, atau Snack Box');
-    if(raw.startDate&&!start)errors.push('Tanggal Mulai tidak valid; gunakan YYYY-MM-DD');
-    if(raw.endDate&&!end)errors.push('Tanggal Berakhir tidak valid; gunakan YYYY-MM-DD');
-    if(start&&end&&end<start)errors.push('Tanggal Berakhir tidak boleh sebelum Tanggal Mulai');
+    if(!name)errors.push('Service / Provider Name is required');
+    if(!serviceType)errors.push('Service Type must be Lounge, Tenant, or Snack Box');
+    if(raw.startDate&&!start)errors.push('Start Date must use YYYY-MM-DD');
+    if(raw.endDate&&!end)errors.push('End Date must use YYYY-MM-DD');
+    if(start&&end&&end<start)errors.push('End Date cannot precede Start Date');
 
     const singlePriceRaw=String(raw.pricePerPax??'').trim();
     const singleCurrencyRaw=String(raw.currency??'').trim();
     const singlePrice=singlePriceRaw===''?null:numeric(singlePriceRaw);
     const singleCurrency=singleCurrencyRaw===''?'':currencyCode(singleCurrencyRaw);
-    if(singlePriceRaw!==''&&(singlePrice===null||singlePrice<0))errors.push('Harga Per Pax harus numerik dan >= 0');
-    if((singlePriceRaw!==''&&singleCurrencyRaw==='')||(singlePriceRaw===''&&singleCurrencyRaw!==''))errors.push('Harga Per Pax dan Mata Uang harus diisi berpasangan');
-    if(singleCurrencyRaw&&!singleCurrency)errors.push('Mata Uang tidak valid');
+    if(singlePriceRaw!==''&&(singlePrice===null||singlePrice<0))errors.push('Price per Pax must be a non-negative number');
+    if((singlePriceRaw!==''&&singleCurrencyRaw==='')||(singlePriceRaw===''&&singleCurrencyRaw!==''))errors.push('Price per Pax and Currency must be provided together');
+    if(singleCurrencyRaw&&!singleCurrency)errors.push('Currency is invalid');
 
     const schedules=Array.isArray(raw.priceSchedules)?raw.priceSchedules:[];
     const checked=schedules.length?validateSchedules(schedules,start,end):{schedules:[],valid:false,errors:[]};
     errors.push(...checked.errors);
-    if(schedules.length&&singlePriceRaw!=='')errors.push('Gunakan Price Schedule atau Harga Per Pax legacy, bukan keduanya sebagai sumber input');
+    if(schedules.length&&singlePriceRaw!=='')errors.push('Use either Price Schedule or single Price per Pax, not both');
 
     const status=String(raw.documentStatus??'Valid').trim()||'Valid';
     const normalized={
@@ -245,30 +245,30 @@
     const m=model||{};
     return `<div class="formgrid ge-p29-form-grid">
       <label>Region<select id="${prefix}Region"><option value="">Select Region</option><option ${m.region==='WEST'?'selected':''}>WEST</option><option ${m.region==='EAST'?'selected':''}>EAST</option><option ${m.region==='INT'?'selected':''}>INT</option></select></label>
-      <label>Station<select id="${prefix}Airport" required><option value="">Select Station</option>${airportMasterOptions(m.airport)}</select></label>
-      <label>Nama Layanan / Provider<input id="${prefix}Name" required value="${esc(m.name||'')}" placeholder="Nama provider / layanan"></label>
-      <label>Service Type<select id="${prefix}ServiceType" required><option value="">Pilih Service Type</option>${TYPES.map(t=>`<option value="${t}" ${m.serviceType===t?'selected':''}>${t}</option>`).join('')}</select></label>
-      <label>PIC<input id="${prefix}Pic" value="${esc(m.pic||'')}" placeholder="Nama PIC / contact"></label>
+      <label>Station<select id="${prefix}Airport" required><option value="">Select Station</option>${airportMasterOptions(m.station||m.airport)}</select></label>
+      <label>Service / Provider Name<input id="${prefix}Name" required value="${esc(m.name||'')}" placeholder="Enter service or provider name"></label>
+      <label>Service Type<select id="${prefix}ServiceType" required><option value="">Select Service Type</option>${TYPES.map(t=>`<option value="${t}" ${m.serviceType===t?'selected':''}>${t}</option>`).join('')}</select></label>
+      <label>PIC<input id="${prefix}Pic" value="${esc(m.pic||'')}" placeholder="PIC name or contact"></label>
       <label>Agreement Start Date<input id="${prefix}Start" type="date" value="${esc(m.startDate||'')}"></label>
       <label>Agreement End Date<input id="${prefix}End" type="date" value="${esc(m.endDate||'')}"></label>
       <label>Currency (single price)<select id="${prefix}Currency"><option value="">Select Currency</option>${currencyMasterOptions(m.currency)}</select></label>
-      <label>Harga Per Pax (single price)<input id="${prefix}Price" type="number" min="0" step="0.01" value="${m.pricePerPax?esc(m.pricePerPax):''}"></label>
-      <label>Nomor Dokumen / Agreement Identity<input id="${prefix}DocumentNumber" value="${esc(m.documentNumber||'')}" placeholder="Nomor agreement / dokumen"></label>
-      <label>Jenis Dokumen<input id="${prefix}DocumentType" value="${esc(m.documentType||'')}" placeholder="Jenis dokumen"></label>
-      <label>Status Dokumen<input id="${prefix}DocumentStatus" list="geP29StatusOptions" value="${esc(m.documentStatus||'Valid')}"><datalist id="geP29StatusOptions">${STATUS_VALUES.map(s=>`<option value="${s}">`).join('')}</datalist></label>
-      <label class="ge-p29-span2">Remarks<textarea id="${prefix}Remarks" rows="3" placeholder="Catatan tambahan">${esc(m.remarks||'')}</textarea></label>
+      <label>Price per Pax (single price)<input id="${prefix}Price" type="number" min="0" step="0.01" value="${m.pricePerPax?esc(m.pricePerPax):''}"></label>
+      <label>Document Number / Agreement Identity<input id="${prefix}DocumentNumber" value="${esc(m.documentNumber||'')}" placeholder="Agreement or document number"></label>
+      <label>Document Type<input id="${prefix}DocumentType" value="${esc(m.documentType||'')}" placeholder="Document type"></label>
+      <label>Document Status<input id="${prefix}DocumentStatus" list="geP29StatusOptions" value="${esc(m.documentStatus||'Valid')}"><datalist id="geP29StatusOptions">${STATUS_VALUES.map(s=>`<option value="${s}">`).join('')}</datalist></label>
+      <label class="ge-p29-span2">Remarks<textarea id="${prefix}Remarks" rows="3" placeholder="Additional remarks">${esc(m.remarks||'')}</textarea></label>
     </div>
     <section class="ge-p29-price-section">
-      <div class="ge-p29-section-head"><div><b>Price Schedule</b><small>Opsional. Gunakan ini bila satu Agreement memiliki lebih dari satu periode harga. Agreement Start/End tetap menjadi periode Agreement.</small></div><button type="button" class="ge-btn secondary compact-btn" onclick="geP29AddPriceRow('${prefix}Prices')">+ Add Price Period</button></div>
+      <div class="ge-p29-section-head"><div><b>Price Schedule</b><small>Optional. Add multiple pricing periods under the same agreement.</small></div><button type="button" class="ge-btn secondary compact-btn" onclick="geP29AddPriceRow('${prefix}Prices')">+ Add Price Period</button></div>
       <div id="${prefix}Prices" class="ge-p29-price-rows"></div>
-      <div class="ge-p29-input-note">Satu sumber input: jika Price Schedule digunakan, jangan isi Harga Per Pax single price. Currency harus berupa kode mata uang ISO 4217 yang dikenali browser.</div>
+      <div class="ge-p29-input-note">Use either Price Schedule or a single Price per Pax, not both. Currency must be a supported ISO 4217 code.</div>
     </section>
-    <label class="ge-p29-file-field">Lampiran Dokumen<input id="${prefix}Document" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"></label>`;
+    <label class="ge-p29-file-field">Document Attachment<input id="${prefix}Document" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"></label>`;
   }
 
   function setFormError(prefix,errors){
     const box=document.getElementById(prefix+'Errors');if(!box)return;
-    box.innerHTML=errors.length?`<div class="ge-p29-form-errors"><b>Periksa input:</b><ul>${errors.map(esc).map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
+    box.innerHTML=errors.length?`<div class="ge-p29-form-errors"><b>Please review the following fields:</b><ul>${errors.map(esc).map(x=>`<li>${x}</li>`).join('')}</ul></div>`:'';
   }
 
   function collectForm(prefix){
@@ -284,11 +284,17 @@
     const modal=moveModalToBody(document.getElementById(id));if(!modal)return;
     const card=modal.querySelector('.modal-card');if(!card)return;
     card.innerHTML=`<button class="modal-x" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">×</button>
-      <h2>${esc(title)}</h2><p class="section-subtitle">Satu struktur data untuk Add, Update, dan CSV. Lounge dan Tenant tetap merupakan Service Type yang berbeda.</p>
+      <h2>${esc(title)}</h2><p class="section-subtitle">Manage agreement, service details, and pricing periods.</p>
       <form id="${prefix}Form"><div id="${prefix}Errors"></div>${commonFormMarkup(prefix,model)}
       <div class="modal-actions sticky-actions"><button class="ge-btn primary" type="submit">Save</button><button class="ge-btn secondary" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">Cancel</button></div></form>`;
     renderPriceRows(prefix+'Prices',model?.priceSchedules||[]);
-    document.getElementById(prefix+'Form').addEventListener('submit',e=>{e.preventDefault();id==='loungeAddModalV221'?saveAdd(prefix):saveEdit(prefix)});
+    document.getElementById(prefix+'Form').addEventListener('submit',async e=>{
+      e.preventDefault();const button=e.currentTarget.querySelector('[type=submit]');
+      if(button?.disabled)return;
+      if(button)button.disabled=true;
+      try{await (id==='loungeAddModalV221'?saveAdd(prefix):saveEdit(prefix));}
+      finally{if(button?.isConnected)button.disabled=false;}
+    });
     modal.classList.add('show');
   }
 
@@ -304,20 +310,23 @@
     state.editId=x.id;
     const model={...x,serviceType:rt.value};
     if(Array.isArray(x.priceSchedules)&&x.priceSchedules.length){model.pricePerPax='';model.currency='';model.priceDisplay='';}
-    replaceModalContent('loungeEditModal','Update Layanan Lounge/Tenant','geP29Edit',model);
-    if(rt.status==='REVIEW')setFormError('geP29Edit',[rt.reason+'; koreksi melalui Update sebelum menyimpan.']);
+    replaceModalContent('loungeEditModal','Update Lounge/Tenant Service','geP29Edit',model);
+    if(rt.status==='REVIEW')setFormError('geP29Edit',[rt.reason+'; correct the service type before saving.']);
   };
   window.closeLoungeEdit=function(){document.getElementById('loungeEditModal')?.classList.remove('show')};
 
   async function saveNormalized(model,old,file,prefix){
     let documentName=old?.documentName||'',documentKey=old?.documentKey||'';
-    if(file){documentKey='lounge_doc_'+Date.now();try{if(window.GEFiles?.put)await GEFiles.put(documentKey,file);documentName=file.name}catch(e){setFormError(prefix,['Lampiran gagal disimpan: '+(e.message||'Unknown error')]);return false}}
-    const obj={...(old||{}),...model,documentName,documentKey,id:old?.id||Date.now(),no:old?.no??'',priceDisplay:model.priceDisplay||old?.priceDisplay||''};
+    if(file){documentKey='lounge_doc_'+Date.now();try{if(typeof window.GEFiles?.put!=='function')throw new Error('Document storage is unavailable');await window.GEFiles.put(documentKey,file);documentName=file.name}catch(e){setFormError(prefix,['Unable to save attachment: '+(e.message||'Unknown error')]);return false}}
+    const obj={...(old||{}),...model,documentName,documentKey,id:old?.id??Date.now(),no:old?.no??'',priceDisplay:model.priceDisplay||old?.priceDisplay||''};
     if(old&&Array.isArray(old.priceSchedules)&&!model.priceSchedules.length)delete obj.priceSchedules;
     data.lounges=data.lounges||[];
     if(old){const i=data.lounges.findIndex(x=>String(x.id)===String(old.id));if(i<0)return false;data.lounges[i]=obj}
     else data.lounges.push(obj);
-    try{save()}catch(e){notice('Data Tidak Tersimpan','Perubahan tidak dapat disimpan: '+(e.message||'Unknown error'),'warning');return false}
+    try{await Promise.resolve(save())}catch(e){
+      if(old){const i=data.lounges.findIndex(x=>String(x.id)===String(old.id));if(i>=0)data.lounges[i]=old;}
+      else data.lounges=data.lounges.filter(x=>x!==obj);
+      notice('Save Failed','Unable to save changes: '+(e.message||'Unknown error'),'warning');return false}
     return true;
   }
   async function saveAdd(prefix){
@@ -327,7 +336,7 @@
     const file=document.getElementById(prefix+'Document')?.files?.[0];
     if(!await saveNormalized(check.model,null,file,prefix))return;
     closeLoungeAddModalV221();fillAirportSelects?.();renderLounges?.();renderLoungeCardsV237?.();renderLoungePriceSummaryV243?.();
-    notice('Layanan Tersimpan',`${check.model.serviceType} — ${check.model.name} berhasil ditambahkan.`,'success');
+    notice('Service Saved',`${check.model.serviceType} — ${check.model.name} was added successfully.`,'success');
   }
   async function saveEdit(prefix){
     if(!canEdit())return;
@@ -337,7 +346,7 @@
     const file=document.getElementById(prefix+'Document')?.files?.[0];
     if(!await saveNormalized(check.model,old,file,prefix))return;
     closeLoungeEdit();fillAirportSelects?.();renderLounges?.();renderLoungeCardsV237?.();renderLoungePriceSummaryV243?.();
-    notice('Layanan Diperbarui',`${check.model.serviceType} — ${check.model.name} berhasil diperbarui.`,'success');
+    notice('Service Updated',`${check.model.serviceType} — ${check.model.name} was updated successfully.`,'success');
   }
 
   function populateFilterOptions(){
@@ -372,10 +381,10 @@
   window.geLoungeCardSourceV237=function(){return filteredRows()};
 
   function statusForAgreement(x){
-    const end=validDate(x?.endDate);if(!end)return {label:'Status tidak ditentukan',cls:'neutral'};
+    const end=validDate(x?.endDate);if(!end)return {label:'Status Unavailable',cls:'neutral'};
     const d=new Date(end+'T23:59:59');if(Number.isNaN(d.getTime()))return {label:'Requires Review',cls:'danger'};
-    const now=new Date();if(d<now)return {label:'Agreement expired',cls:'danger'};
-    const days=Math.ceil((d-now)/86400000);return days<90?{label:days+' hari tersisa',cls:'danger'}:days<180?{label:days+' hari tersisa',cls:'warning'}:{label:days+' hari tersisa',cls:'good'};
+    const now=new Date();if(d<now)return {label:'Agreement Expired',cls:'danger'};
+    const days=Math.ceil((d-now)/86400000);return days<90?{label:days+' days remaining',cls:'danger'}:days<180?{label:days+' days remaining',cls:'warning'}:{label:days+' days remaining',cls:'good'};
   }
 
   function renderCards(){
@@ -390,11 +399,11 @@
       const priceText=price.status==='CURRENT'||price.status==='LEGACY'?safePriceDisplay(price.currency,price.price):price.status==='NOT_APPLICABLE'?'Not Available':price.status==='INVALID'?'Requires Review':'Not Available';
       const priceMeta=scheduleCount?`${scheduleCount} Price Period${scheduleCount===1?'':'s'}`:'';
       const review=rt.status==='REVIEW'?`<div class="ge-p29-review-note">Requires Review: ${esc(rt.reason)}</div>`:'';
-      const update=canEdit()?`<button class="ge-btn secondary compact-btn" type="button" onclick="openLoungeEdit(${Number(x.id)})">Update</button>`:'';
-      const del=canEdit()?`<button class="ge-btn danger compact-btn" type="button" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button>`:'';
-      const detail=scheduleCount?`<button class="ge-btn secondary compact-btn" type="button" onclick="geP29ViewPriceSchedule(${Number(x.id)})">View Price Schedule</button>`:'';
+      const update=canEdit()?`<button class="ge-btn secondary compact-btn" type="button" onclick="openLoungeEdit(decodeURIComponent('${encodeURIComponent(String(x.id)).replace(/'/g,'%27')}'))">Update</button>`:'';
+      const del=canEdit()?`<button class="ge-btn danger compact-btn" type="button" onclick="deleteLoungeV239(decodeURIComponent('${encodeURIComponent(String(x.id)).replace(/'/g,'%27')}'))">Delete</button>`:'';
+      const detail=scheduleCount?`<button class="ge-btn secondary compact-btn" type="button" onclick="geP29ViewPriceSchedule(decodeURIComponent('${encodeURIComponent(String(x.id)).replace(/'/g,'%27')}'))">View Price Schedule</button>`:'';
       return `<article class="lounge-master-card-v237 ge-p29-lounge-card">
-        <div class="lounge-master-code-v237">${esc(x.airport||'-')}</div>
+        <div class="lounge-master-code-v237">${esc(x.airport||x.station||'-')}</div>
         <div class="lounge-master-card-body-v237">
           <div class="lounge-master-card-top-v237"><span class="lounge-type-pill-v237">${esc(type)}</span><span class="lounge-days-pill-v237 ${stateA.cls}">${esc(stateA.label)}</span></div>
           <h3 title="${esc(x.name||'')} ">${esc(x.name||'Not Available')}</h3>
@@ -409,7 +418,7 @@
         </div>
       </article>`;
     }).join('')||'<div class="lounge-master-empty-v237">Belum ada data Lounge/Tenant pada filter ini.</div>';
-    const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Halaman ${loungeCardPage} dari ${pages} • ${rows.length} data`;
+    const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Page ${loungeCardPage} of ${pages} • ${rows.length} records`;
     const prev=document.getElementById('loungeCardPrevV237'),next=document.getElementById('loungeCardNextV237');if(prev)prev.disabled=loungeCardPage<=1;if(next)next.disabled=loungeCardPage>=pages;
   }
   window.renderLoungeCardsV237=renderCards;
@@ -419,8 +428,8 @@
     const rows=filteredRows();
     tbody.innerHTML=rows.map((x,i)=>{
       const rt=resolveType(x),p=applicablePrice(x,new Date()),price=p.status==='CURRENT'||p.status==='LEGACY'?safePriceDisplay(p.currency,p.price):'Not Available';
-      const action=canEdit()?`<td><div class="row-actions"><button class="ge-btn secondary" onclick="openLoungeEdit(${Number(x.id)})">Update</button><button class="ge-btn ge-btn danger" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button></div></td>`:'';
-      return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
+      const action=canEdit()?`<td><div class="row-actions"><button class="ge-btn secondary" onclick="openLoungeEdit(decodeURIComponent('${encodeURIComponent(String(x.id)).replace(/'/g,'%27')}'))">Update</button><button class="ge-btn danger" onclick="deleteLoungeV239(decodeURIComponent('${encodeURIComponent(String(x.id)).replace(/'/g,'%27')}'))">Delete</button></div></td>`:'';
+      return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||x.station||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
     }).join('');
   }
   window.renderLounges=function(){try{populateFilterOptions();renderTable();renderCards();renderPriceSummary();window.geSetLoungeViewP87?.(document.getElementById('geLoungeViewSelectR6')?.value||'grid');}catch(e){console.error('P29 Lounge render guard',e);const g=document.getElementById('loungeCardGridV237');if(g)g.innerHTML='<div class="lounge-master-empty-v237">Data Lounge/Tenant tidak dapat ditampilkan. Periksa data yang memerlukan review.</div>';}};
@@ -429,7 +438,7 @@
     const box=document.getElementById('loungePriceSummaryV243');if(!box)return;
     const groups={};filteredRows().forEach(x=>{const p=applicablePrice(x,new Date());if((p.status==='CURRENT'||p.status==='LEGACY')&&p.currency&&Number.isFinite(p.price)) (groups[p.currency]??=[]).push(p.price)});
     const entries=Object.entries(groups).sort(([a],[b])=>a.localeCompare(b));
-    box.innerHTML=entries.length?entries.map(([c,vals])=>{const avg=vals.reduce((s,v)=>s+v,0)/vals.length;return `<article class="lounge-price-currency-card-v243"><div class="lounge-price-currency-v243">${esc(c)}</div><div><span>Rata-rata current</span><b>${esc(safePriceDisplay(c,avg))}</b></div><div><span>Terendah</span><b>${esc(safePriceDisplay(c,Math.min(...vals)))}</b></div><div><span>Tertinggi</span><b>${esc(safePriceDisplay(c,Math.max(...vals)))}</b></div><small>${vals.length} harga current</small></article>`}).join(''):'<div class="lounge-price-empty-v243">Belum ada harga current yang dapat dihitung dari data valid.</div>';
+    box.innerHTML=entries.length?entries.map(([c,vals])=>{const avg=vals.reduce((s,v)=>s+v,0)/vals.length;return `<article class="lounge-price-currency-card-v243"><div class="lounge-price-currency-v243">${esc(c)}</div><div><span>Current Average</span><b>${esc(safePriceDisplay(c,avg))}</b></div><div><span>Lowest</span><b>${esc(safePriceDisplay(c,Math.min(...vals)))}</b></div><div><span>Highest</span><b>${esc(safePriceDisplay(c,Math.max(...vals)))}</b></div><small>${vals.length} harga current</small></article>`}).join(''):'<div class="lounge-price-empty-v243">Belum ada harga current yang dapat dihitung dari data valid.</div>';
     const count=document.getElementById('loungePriceSummaryCountV243');if(count)count.textContent=`${Object.values(groups).reduce((n,v)=>n+v.length,0)} harga current`;
   }
   window.renderLoungePriceSummaryV243=renderPriceSummary;
@@ -438,9 +447,9 @@
     if(!canUpload())return;
     const lines=[
       '# Template CSV Layanan Lounge / Tenant',
-      '# Required: Station, Nama Layanan / Provider, Service Type',
+      '# Required: Station, Service / Provider Name, Service Type',
       '# Service Type: Lounge / Tenant / Snack Box. Date: YYYY-MM-DD. Currency: ISO 4217.',
-      '# Single price: isi Harga Per Pax + Mata Uang. Multi price: ulangi Agreement Number yang sama pada beberapa baris dan isi Price Period fields.',
+      '# Single price: isi Price per Pax + Currency. Multi price: ulangi Agreement Number yang sama pada beberapa baris dan isi Price Period fields.',
       '# Multi price rows dengan Agreement Number yang sama membentuk SATU Agreement + beberapa Price Period. Import bersifat CREATE-only; duplikat diblokir sebelum commit.',
       Object.values(FIELD_HEADERS).map(csvCell).join(','),
       ''
@@ -468,7 +477,7 @@
     const check=validateInput(raw);
     const warnings=[];
     if(anySchedule&&!allSchedule)warnings.push('Price Period belum lengkap');
-    if(!agreementNumber&&anySchedule)warnings.push('Nomor Dokumen / Agreement Identity wajib untuk grouping multi-price');
+    if(!agreementNumber&&anySchedule)warnings.push('Document Number / Agreement Identity wajib untuk grouping multi-price');
     if(anySchedule&&!check.ok){};
     return {rowNumber,raw,check,warnings,agreementNumber};
   }
@@ -482,7 +491,7 @@
       const multi=Array.isArray(m.priceSchedules)&&m.priceSchedules.length>0;
       if(!multi){
         const key=`single:${m.airport}|${m.name.toLowerCase()}|${m.documentNumber}`;
-        if(singleKeys.has(key)){item.warnings.push(`Potential duplicate within import; same Station + Provider + Nomor Dokumen as row ${singleKeys.get(key)}`);invalid.push(item);return}
+        if(singleKeys.has(key)){item.warnings.push(`Potential duplicate within import; same Station + Provider + Document Number as row ${singleKeys.get(key)}`);invalid.push(item);return}
         singleKeys.set(key,item.rowNumber);
         groups.set(`row:${item.rowNumber}`,{key,rows:[item],model:{...m,priceSchedules:[]},rowNumbers:[item.rowNumber]});
         return;
