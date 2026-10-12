@@ -55,10 +55,19 @@
   const SUPPORTED_CURRENCIES=(()=>{try{return new Set(typeof Intl.supportedValuesOf==='function'?Intl.supportedValuesOf('currency'):['AUD','CAD','CHF','CNY','EUR','GBP','HKD','IDR','INR','JPY','KRW','MYR','NZD','SAR','SGD','THB','USD'])}catch(e){return new Set(['AUD','CAD','CHF','CNY','EUR','GBP','HKD','IDR','INR','JPY','KRW','MYR','NZD','SAR','SGD','THB','USD'])}})();
   function airportMasterOptions(selected=''){
     let airports=[];
-    try{airports=typeof GECore?.list==='function'?(GECore.list('airports')||[]):[]}catch(e){airports=[]}
-    const rows=airports.map(x=>({code:String(x.code||x.airportCode||x.iata||x.stationCode||x.id||'').trim(),name:String(x.name||x.airportName||x.city||'').trim()})).filter(x=>x.code);
+    try{airports=typeof GECore?.list==='function'?(GECore.list('airports')||[]):[]}catch(e){}
+    airports=airports.concat(data.airports||[]);
+    const rows=airports.map(x=>({code:String(x.code||x.airportCode||x.iata||x.stationCode||x.id||'').trim().toUpperCase(),name:String(x.name||x.airportName||x.city||'').trim()}));
+    // Keep legacy stations available while editing existing records.
+    rows.push(...(data.lounges||[]).map(x=>({code:String(x.station||x.airport||'').trim().toUpperCase(),name:''})));
+    const code=String(selected||'').trim().toUpperCase();if(code)rows.push({code,name:''});
     const seen=new Set();
-    return rows.filter(x=>{if(seen.has(x.code))return false;seen.add(x.code);return true}).map(x=>`<option value="${esc(x.code)}" ${x.code===String(selected||'').trim()?'selected':''}>${esc(x.code+(x.name?' — '+x.name:''))}</option>`).join('');
+    return rows.filter(x=>x.code&&!seen.has(x.code)&&(seen.add(x.code),true)).sort((a,b)=>a.code.localeCompare(b.code)).map(x=>`<option value="${esc(x.code)}" ${x.code===code?'selected':''}>${esc(x.code+(x.name?' — '+x.name:''))}</option>`).join('');
+  }
+  function regionMasterOptions(selected=''){
+    const values=[...(data.airports||[]).map(x=>x.region||x.wilayah),...(data.lounges||[]).map(x=>x.region||x.wilayah),selected];
+    const unique=[...new Set(values.map(x=>String(x||'').trim()).filter(Boolean))].sort();
+    return unique.map(v=>`<option value="${esc(v)}" ${v===selected?'selected':''}>${esc(v)}</option>`).join('');
   }
   function currencyMasterOptions(selected=''){
     let rows=[];
@@ -244,9 +253,9 @@
   function commonFormMarkup(prefix,model){
     const m=model||{};
     return `<div class="formgrid ge-p29-form-grid">
-      <label>Region<select id="${prefix}Region"><option value="">Select Region</option><option ${m.region==='WEST'?'selected':''}>WEST</option><option ${m.region==='EAST'?'selected':''}>EAST</option><option ${m.region==='INT'?'selected':''}>INT</option></select></label>
+      <label>Region<select id="${prefix}Region"><option value="">Select Region</option>${regionMasterOptions(m.region||'')}</select></label>
       <label>Station<select id="${prefix}Airport" required><option value="">Select Station</option>${airportMasterOptions(m.station||m.airport)}</select></label>
-      <label>Service / Provider Name<input id="${prefix}Name" required value="${esc(m.name||'')}" placeholder="Enter service or provider name"></label>
+      <label>Service / Provider Name<input id="${prefix}Name" list="${prefix}ProviderOptions" required value="${esc(m.name||'')}" placeholder="Choose or enter a provider"><datalist id="${prefix}ProviderOptions">${[...new Set([...providerMasterNames(),...(data.lounges||[]).map(x=>x.name)].filter(Boolean))].map(x=>`<option value="${esc(x)}"></option>`).join('')}</datalist></label>
       <label>Service Type<select id="${prefix}ServiceType" required><option value="">Select Service Type</option>${TYPES.map(t=>`<option value="${t}" ${m.serviceType===t?'selected':''}>${t}</option>`).join('')}</select></label>
       <label>PIC<input id="${prefix}Pic" value="${esc(m.pic||'')}" placeholder="PIC name or contact"></label>
       <label>Agreement Start Date<input id="${prefix}Start" type="date" value="${esc(m.startDate||'')}"></label>
@@ -349,12 +358,18 @@
     notice('Service Updated',`${check.model.serviceType} — ${check.model.name} was updated successfully.`,'success');
   }
 
+  function providerMasterNames(){
+    // Include provider master records without discarding names referenced by legacy agreements.
+    const state=typeof GEStore?.get==='function'?GEStore.get():{};
+    const catalogs=[state?.serviceProviders,state?.providers,state?.masterProviders];
+    return catalogs.flatMap(a=>Array.isArray(a)?a:[]).filter(x=>x&&x.status!=='Inactive').map(x=>x.name||x.providerName||x.serviceProviderName||'').filter(Boolean);
+  }
   function populateFilterOptions(){
     const region=document.getElementById('loungeRegionFilter'),provider=document.getElementById('loungeNameFilter'),status=document.getElementById('loungeStatusFilter');
     const put=(el,values,label)=>{if(!el)return;const cur=el.value,items=[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));el.innerHTML=`<option value="">${label}</option>`+items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');el.value=items.includes(cur)?cur:''};
-    put(region,(data.lounges||[]).map(x=>x.region||x.wilayah),'All Regions');
-    put(provider,(data.lounges||[]).map(x=>x.name),'All Service Providers');
-    put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Status');
+    put(region,[...(data.airports||[]).map(x=>x.region||x.wilayah),...(data.lounges||[]).map(x=>x.region||x.wilayah)],'All Regions');
+    put(provider,[...(data.lounges||[]).map(x=>x.name),...providerMasterNames()],'All Providers');
+    put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Documents');
   }
 
   function filterType(){return document.querySelector('[data-ge-p29-service-filter].active')?.dataset.geP29ServiceFilter||''}
@@ -371,9 +386,9 @@
     const base=(data.lounges||[]).slice();
     const region=val('loungeRegionFilter'),provider=val('loungeNameFilter'),status=val('loungeStatusFilter'),type=filterType();
     const stations=selectedStations();
-    const regionText=comboText('loungeRegionFilter'),providerText=comboText('loungeNameFilter'),statusText=comboText('loungeStatusFilter');
+    const regionText='',providerText='',statusText='';
     return base.filter(x=>{
-      const rt=resolveType(x),t=rt.value,rv=String(x.region||''),sv=String(x.airport||'').trim().toUpperCase(),pv=String(x.name||''),st=String(x.documentStatus||'');
+      const rt=resolveType(x),t=rt.value,rv=String(x.region||''),sv=String(x.station||x.airport||'').trim().toUpperCase(),pv=String(x.name||''),st=String(x.documentStatus||'');
       return (!region||rv===region)&&(!stations.length||stations.includes(sv))&&(!provider||pv===provider)&&(!status||st===status)&&(!regionText||rv.toLowerCase().includes(regionText))&&(!providerText||pv.toLowerCase().includes(providerText))&&(!statusText||st.toLowerCase().includes(statusText))&&(!type||t===type);
     });
   }
@@ -417,7 +432,7 @@
           <div class="lounge-card-actions-v237">${detail}${update}${del}</div>
         </div>
       </article>`;
-    }).join('')||'<div class="lounge-master-empty-v237">Belum ada data Lounge/Tenant pada filter ini.</div>';
+    }).join('')||'<div class="lounge-master-empty-v237">No Lounge/Tenant records match these filters.</div>';
     const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Page ${loungeCardPage} of ${pages} • ${rows.length} records`;
     const prev=document.getElementById('loungeCardPrevV237'),next=document.getElementById('loungeCardNextV237');if(prev)prev.disabled=loungeCardPage<=1;if(next)next.disabled=loungeCardPage>=pages;
   }
@@ -432,7 +447,7 @@
       return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||x.station||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
     }).join('');
   }
-  window.renderLounges=function(){try{populateFilterOptions();renderTable();renderCards();renderPriceSummary();window.geSetLoungeViewP87?.(document.getElementById('geLoungeViewSelectR6')?.value||'grid');}catch(e){console.error('P29 Lounge render guard',e);const g=document.getElementById('loungeCardGridV237');if(g)g.innerHTML='<div class="lounge-master-empty-v237">Data Lounge/Tenant tidak dapat ditampilkan. Periksa data yang memerlukan review.</div>';}};
+  window.renderLounges=function(){try{populateFilterOptions();renderTable();renderCards();renderPriceSummary();window.geSetLoungeViewP87?.(window.GE_LOUNGE_VIEW_R19||'grid');}catch(e){console.error('P29 Lounge render guard',e);const g=document.getElementById('loungeCardGridV237');if(g)g.innerHTML='<div class="lounge-master-empty-v237">Data Lounge/Tenant tidak dapat ditampilkan. Periksa data yang memerlukan review.</div>';}};
 
   function renderPriceSummary(){
     const box=document.getElementById('loungePriceSummaryV243');if(!box)return;
@@ -612,7 +627,7 @@
     let rows=[];
     try{rows=(data.airports||[]).map(x=>({code:String(x.code||x.airportCode||x.iata||x.stationCode||x.id||'').trim().toUpperCase(),name:String(x.name||x.airportName||x.city||'').trim()}));}catch(e){}
     try{if(typeof GECore?.list==='function')rows=rows.concat((GECore.list('airports')||[]).map(x=>({code:String(x.code||x.airportCode||x.iata||x.stationCode||x.id||'').trim().toUpperCase(),name:String(x.name||x.airportName||x.city||'').trim()})));}catch(e){}
-    rows=rows.concat((data.lounges||[]).map(x=>({code:String(x.airport||'').trim().toUpperCase(),name:''})));
+    rows=rows.concat((data.lounges||[]).map(x=>({code:String(x.station||x.airport||'').trim().toUpperCase(),name:''})));
     const seen=new Set(),unique=rows.filter(x=>x.code&&!seen.has(x.code)&&(seen.add(x.code),true)).sort((a,b)=>a.code.localeCompare(b.code));
     select.innerHTML=unique.map(x=>`<option value="${esc(x.code)}" ${current.has(x.code)?'selected':''}>${esc(x.code+(x.name?' — '+x.name:''))}</option>`).join('');
   }
@@ -679,11 +694,14 @@
   }
 
   function setup(){
+    // The directory uses native select controls; legacy searchable wrappers are intentionally absent.
     setupFilterCombosR12();
     populateStationFilterOptions();
     setupStationMultiSelectR12();
     setupTypeFilter();
-    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template';}
+    const addAction=document.getElementById('loungeAddAction');
+    if(addAction){addAction.onclick=e=>{e.preventDefault();window.openLoungeAddModalV230()};}
+    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template|Download CSV Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template';}
     ['loungeRegionFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{loungeCardPage=1;renderLounges()})});
     try{if(typeof fillAirportSelects==='function')fillAirportSelects()}catch(e){}
     populateStationFilterOptions();
