@@ -1,19 +1,9 @@
-# Lounge/Tenant Planning — Revision Delta
+# CSS Consolidation — Experimental Delta
 
-## Scope
-Focused correction of Lounge/Tenant Planning only: restore dedicated Add/Edit controller, compact card presentation, action placement, Region/Station master filters, compact Grid/Details switch, and Update/Delete actions.
+Scope: Safe consolidation of adjacent identical declaration blocks in `assets/portal.css` without changing selector specificity, media context, or source order. 17 merges, 470088 → 469697 bytes. Updated existing `HISTORICAL-BASELINE.md` only.
 
-## Changed files
-- `assets/clean-page-registry.js`: load canonical Lounge/Tenant controller after shared runtime; separate navigation and actions; segmented view toggle.
-- `assets/lounge-planning-v29.js`: initialize controller on dynamically loaded pages; Region options include airport master and reference catalog; compact card actions; preserve view state.
-- `assets/portal.css`: scoped compact layout, toolbar, filters, cards, responsive behavior.
-- `HISTORICAL-BASELINE.md`: update existing historical record.
+Files changed: `assets/portal.css`, `HISTORICAL-BASELINE.md`; this note is package metadata.
 
-## Validation
-- `node --check assets/lounge-planning-v29.js`: PASS
-- `node --check assets/clean-page-registry.js`: PASS
-- `npm test` / `npm run build`: PASS (58 regression checks)
-- Browser-authenticated Firebase CRUD / visual screenshots: NOT RUN. Do not interpret static tests as end-to-end confirmation.
+Validation: CSS parsed without errors. `npm run build` was executed both before and after the CSS change. Both failed at the pre-existing `r106-checklist-share-public-contract.js` test (shared checklist submit action). **Netlify gate NOT passed.** No browser/Firebase validation performed. Do not deploy to production; test branch only after fixing the baseline failure.
 
-## Deployment
-Apply only to a branch whose source matches the latest Ground Experience Portal baseline, then commit and trigger Netlify rebuild. No Firestore Rules, Storage Rules, indexes, migrations, or environment changes included. Revert the patch commit and redeploy the previous Netlify deploy to roll back.
+Deployment: Apply this delta on the same repository baseline used for the CSS audit, commit to an isolated test branch, and run Netlify build. No Firestore Rules, Storage Rules, indexes, migration, or environment changes. Rollback by reverting this commit and rebuilding Netlify.

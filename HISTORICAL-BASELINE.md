@@ -3492,3 +3492,13 @@ Scope: Lounge/Tenant directory and Add/Update rendering. Standardized directory 
 - Lounge directory loads its dedicated planning controller after the shared runtime, restoring Add/Edit modal handlers and canonical filter initialization.
 - Action buttons are placed beneath the Service & Provider navigation. Region reference options combine airport master, reference catalog and legacy lounge data. Station selector remains visible with explicit OK/Cancel.
 - Grid/Details uses a compact segmented control; cards follow the approved compact visual reference with Update/Delete actions. Existing Firebase business logic, record identifiers and permission checks are retained.
+
+
+## CSS cascade consolidation — experimental branch validation (2026-10-13)
+
+Merged only adjacent CSS rules with identical declaration bodies into grouped selectors. Preserved cascade order and all @media/@supports blocks; no global override, !important, or JavaScript change. This is an experimental reversible delta for Netlify test branch, not a claim of complete CSS refactoring.
+
+- Adjacent rules merged: 17; original bytes: 470088; revised bytes: 469697.
+- Existing baseline regression r106-checklist-share-public-contract.js fails before CSS changes; this pre-existing blocker must be resolved separately.
+- No Firebase rules, storage rules, indexes, migrations, or environment changes.
+- Rollback: revert the CSS/history commit and trigger a fresh Netlify deploy.
