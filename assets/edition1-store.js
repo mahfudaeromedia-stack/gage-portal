@@ -16,7 +16,7 @@
   const CACHE_DB='GE_E1_CACHE_V30'; const CACHE_STORE='collections';
   function session(){return typeof window.gxGetSession==='function'?(window.gxGetSession()||{}):window.GX_CURRENT_USER||{}}
   function cacheAllowed(){return !!String(session().uid||session().id||session().email||'').trim()}
-  function cacheIdentity(){const s=session();return String(s.uid||s.id||s.email||'anon')+'|'+String(s.scopeType||'')+'|'+(Array.isArray(s.airports)?s.airports.join(','):'')}
+  function cacheIdentity(){const s=session();return String(s.uid||s.id||s.email||'anon')+'|'+String(s.scopeType||'')+'|'+(Array.isArray(s.assignedStations)?s.assignedStations.slice().sort().join(','):(Array.isArray(s.airports)?s.airports.slice().sort().join(','):''))}
   function cacheKey(k){return cacheIdentity()+':'+collKey(k)}
   function openCache(){return new Promise((resolve,reject)=>{if(!window.indexedDB)return reject(new Error('IndexedDB unavailable'));const q=indexedDB.open(CACHE_DB,1);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains(CACHE_STORE))q.result.createObjectStore(CACHE_STORE)};q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)})}
   async function cacheGet(key){try{const db=await openCache();return await new Promise((resolve,reject)=>{const tx=db.transaction(CACHE_STORE,'readonly'),q=tx.objectStore(CACHE_STORE).get(key);q.onsuccess=()=>resolve(q.result??null);q.onerror=()=>reject(q.error)})}catch{return null}}
@@ -146,11 +146,12 @@
     // navigation instant and avoids re-reading entire Firestore collections on every page load.
     if(cacheAllowed()&&!requested.includes('customerExperience')){
       let allCached=true;
-      for(const key of requested){
-        const cached=await readCache(key); if(!cached){allCached=false;continue}
+      const cachedCollections=await Promise.all(requested.map(key=>readCache(key)));
+      requested.forEach((key,index)=>{
+        const cached=cachedCollections[index];if(!cached){allCached=false;return}
         const rows=normalizeCollection(key,cached);
-        if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows);}else{state[key]=rows;baseline[key]=clone(rows)}
-      }
+        if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)}
+      });
       if(allCached){
         hydrated=true;
         // R29 stale-while-revalidate: cached data is returned immediately. Firestore/network
@@ -159,7 +160,11 @@
         const refreshRevision=localRevision;
         Promise.resolve().then(async()=>{
           try{
-            const local=await readManifestCache(); const remote=await apiManifest();
+            const local=await readManifestCache();
+            // Avoid a network round trip on every page transition; other tabs still refresh
+            // after the short bounded freshness interval or after a write invalidates it.
+            if(local&&Date.now()-Number(local.checkedAt||0)<60000)return;
+            const remote=await apiManifest();
             if(local && Number(local.version||0)===Number(remote.version||0)){await writeManifestCache(remote);return}
             const result=await apiGet(requested);
             if(localRevision!==refreshRevision)return;

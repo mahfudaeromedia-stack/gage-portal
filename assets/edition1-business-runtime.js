@@ -2359,7 +2359,7 @@ function populateAirportMasterFilters(){
     e.value=cur;
   };
   fill('airportWilayahFilter','Semua Wilayah',rows.map(x=>x.wilayah));
-  fill('airportRegionFilter','Semua Region',rows.map(x=>x.region));
+  fill('airportRegionFilter','Semua Region',[...rows.map(x=>x.region),...(data.referenceCatalog||[]).filter(x=>x.kind==='id:regions'&&x.status!=='Inactive').map(x=>x.name||x.id)]);
 }
 function airportMasterFiltered(){
   const q=(document.getElementById('airportSearch')?.value||'').toLowerCase();
@@ -9297,7 +9297,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     const put=(el,values,label)=>{if(!el)return;const cur=el.value,items=[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));el.innerHTML=`<option value="">${label}</option>`+items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(!el.multiple)el.value=items.includes(cur)?cur:''};
     put(provider,(data.lounges||[]).map(x=>x.name),'All Service Providers');
     put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Status');
-    put(region,(data.lounges||[]).map(x=>x.region||x.wilayah),'All Regions');
+    put(region,[...(data.lounges||[]).map(x=>x.region||x.wilayah),...(data.referenceCatalog||[]).filter(x=>x.kind==='id:regions'&&x.status!=='Inactive').map(x=>x.name||x.id)],'All Regions');
     if(station){const selected=new Set([...station.options].filter(o=>o.selected).map(o=>o.value));const airports=typeof geVisibleAirports==='function'?geVisibleAirports():[...(data.airports||[])].map(x=>x.code||x.iata||x.airportCode).filter(Boolean);station.innerHTML=airports.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');[...station.options].forEach(o=>o.selected=selected.has(o.value));}
   }
 

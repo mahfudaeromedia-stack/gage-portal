@@ -214,7 +214,8 @@ body:has(#initRows) .journey-tabs{grid-template-columns:repeat(5,minmax(130px,1f
   padding:12px 16px;
   border-radius:10px;
   font-weight:800;
-  background:linear-gradient(135deg,#0879b8,#2e6fb8);
+  background:#0b356b;
+  color:#fff;
 }
 .login-note{
   margin-top:14px;
@@ -5118,7 +5119,7 @@ button[onclick^="openInitiativeStepV224"]{min-height:36px;padding:8px 14px;borde
 .ge-touchpoint-filter-card .radial-chart .actual{stroke:var(--ge-progress-tone)}
 .ge-touchpoint-filter-card:focus-visible{outline:2px solid #164f78;outline-offset:3px}
 /* R18 consolidated master/partner reference */
-.ge-ref-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.ge-ref-tabs button{border:1px solid #d9e0e8;background:#fff;color:#24364b;border-radius:7px;padding:8px 12px;font:600 13px/1.2 inherit;cursor:pointer}.ge-ref-tabs button.active{background:#102a43;color:#fff;border-color:#102a43}.ge-ref-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px}.ge-ref-toolbar .ge-input{min-width:280px;max-width:440px}.ge-ref-table{width:100%;border-collapse:collapse}.ge-ref-table th,.ge-ref-table td{border-bottom:1px solid #e3e8ee;padding:9px 10px;text-align:left;font-size:13px}.ge-ref-table th{background:#f7f9fb;color:#34495e;font-size:12px}.ge-ref-guidance{margin-top:14px;padding:14px}.ge-ref-relations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ge-ref-relations>div{border:1px solid #e3e8ee;border-radius:8px;padding:10px}.ge-ref-relations b,.ge-ref-relations span{display:block}.ge-ref-relations span{color:#68788a;font-size:12px;margin-top:3px}.ge-ref-backdrop{position:fixed;inset:0;background:rgba(10,25,41,.45);z-index:9000;display:grid;place-items:center;padding:24px}.ge-ref-modal{width:min(760px,96vw);max-height:88vh;overflow:auto;background:#fff;border-radius:12px;padding:20px;box-shadow:0 24px 70px rgba(10,25,41,.28);position:relative}.ge-ref-x{position:absolute;right:14px;top:12px;border:0;background:transparent;font-size:24px;cursor:pointer}.ge-ref-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ge-ref-form label{font-size:12px;font-weight:600;color:#44576a}.ge-ref-form input{display:block;width:100%;box-sizing:border-box;margin-top:5px;height:38px;border:1px solid #ccd6e0;border-radius:7px;padding:0 10px}.ge-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}@media(max-width:760px){.ge-ref-form,.ge-ref-relations{grid-template-columns:1fr}.ge-ref-toolbar{align-items:stretch;flex-direction:column}.ge-ref-toolbar .ge-input{max-width:none;min-width:0}}
+.ge-ref-tabs{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.ge-ref-tabs button{border:1px solid #d9e0e8;background:#fff;color:#24364b;border-radius:7px;padding:8px 12px;font:600 13px/1.2 inherit;cursor:pointer}.ge-ref-tabs button.active{background:#102a43;color:#fff;border-color:#102a43}.ge-ref-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px}.ge-ref-toolbar .ge-input{min-width:280px;max-width:440px}.ge-ref-table{width:100%;border-collapse:collapse}.ge-ref-table th,.ge-ref-table td{border-bottom:1px solid #e3e8ee;padding:9px 10px;text-align:left;font-size:13px}.ge-ref-table th{background:#f7f9fb;color:#34495e;font-size:12px}.ge-ref-guidance{margin-top:14px;padding:14px}.ge-ref-relations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ge-ref-relations>div{border:1px solid #e3e8ee;border-radius:8px;padding:10px}.ge-ref-relations b,.ge-ref-relations span{display:block}.ge-ref-relations span{color:#68788a;font-size:12px;margin-top:3px}.ge-ref-backdrop{position:fixed;inset:0;background:rgba(10,25,41,.45);z-index:9000;display:grid;place-items:center;padding:24px}.ge-ref-modal{width:min(760px,96vw);max-height:88vh;overflow:auto;background:#fff;border-radius:12px;padding:20px;box-shadow:0 24px 70px rgba(10,25,41,.28);position:relative}.ge-ref-x{position:absolute;right:14px;top:12px;border:0;background:transparent;font-size:24px;cursor:pointer}.ge-ref-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ge-ref-form label{font-size:12px;font-weight:600;color:#44576a}.ge-ref-form input{display:block;width:100%;box-sizing:border-box;margin-top:5px;height:38px;border:1px solid #ccd6e0;border-radius:7px;padding:0 10px}.ge-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}@media(max-width:760px){.ge-ref-form,.ge-ref-relations{grid-template-columns:1fr}.ge-ref-toolbar{align-items:stretch;flex-direction:column}.ge-ref-toolbar .ge-input{max-width:none;min-width:0}}
 .ge-combo-input-r12{height:44px;min-height:44px;padding:0 38px 0 13px;border-radius:10px;font-size:13px}
 .lounge-card-grid-v237,#loungeCardGridV237{position:relative;z-index:1}
 .lounge-table-fallback-v237[hidden]{display:none}.lounge-table-fallback-v237.ge-p29-table-visible:not([hidden]){display:block}
@@ -5731,3 +5732,35 @@ body.lounge-reference-v237 .lounge-expiry-warning b{color:#855c17}
 .lounge-master-grid-v237 .lounge-card-actions-v237 .danger:hover{background:#cf2020;color:#fff}
 @media(max-width:900px){#loungeFilterGridR4{grid-template-columns:repeat(2,minmax(0,1fr))}.lounge-master-page-head{flex-wrap:wrap}}
 @media(max-width:560px){#loungeFilterGridR4{grid-template-columns:1fr}.lounge-directory-actions{justify-content:flex-start}.lounge-master-page-head .lounge-navigation{margin-left:0}}
+
+
+/* Planning category management uses the same toolbar/filter/card/table rhythm as Lounge/Tenant. */
+.planning-provider-workspace .planning-directory-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:16px 0}
+.planning-provider-workspace .planning-directory-actions .ge-btn{min-height:42px}
+.planning-provider-workspace .planning-view-picker{display:inline-flex;align-items:center;gap:8px;margin-left:auto;font-size:13px}
+.planning-provider-workspace .planning-view-picker select{min-height:42px}
+.planning-provider-workspace .planning-domain-list{padding:20px;min-width:0}
+.planning-provider-workspace .planning-filter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.planning-provider-workspace .planning-filter-grid select{width:100%;min-width:0;min-height:42px}
+.planning-provider-workspace .planning-list-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.planning-provider-workspace .planning-list-head h2{margin:0}
+.planning-provider-workspace .planning-list-head input{min-height:42px;min-width:min(320px,100%)}
+.planning-provider-workspace .planning-domain-grid-view{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.planning-provider-workspace .planning-domain-grid-view[hidden],.planning-provider-workspace .planning-domain-detail-view[hidden]{display:none}
+.planning-provider-workspace .planning-domain-card dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.planning-provider-workspace .planning-domain-detail-view table{width:100%}
+.planning-provider-workspace .planning-row-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+@media(max-width:1100px){.planning-provider-workspace .planning-domain-grid-view{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.planning-provider-workspace .planning-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.planning-provider-workspace .planning-domain-grid-view{grid-template-columns:minmax(0,1fr)}.planning-provider-workspace .planning-view-picker{margin-left:0}}
+@media(max-width:480px){.planning-provider-workspace .planning-filter-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Master Data table cells have a common middle alignment. */
+.portal-app.portal-shell .ge-ref-table thead th, .portal-app.portal-shell .ge-ref-table tbody td{vertical-align:middle}
+
+/* Record pager aligns with Lounge/Tenant navigation. */
+.planning-provider-workspace .planning-page-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px;font-size:13px;color:#536b7b}
+.planning-provider-workspace .planning-page-nav>div{display:flex;gap:8px}
+
+/* Initiative tables: width-safe layout and controlled user column resizing. */
+.ge-initiative-list th {position:relative;resize:horizontal;overflow:auto;min-width:100px}
+#initRows:has(.ge-initiative-list){width:100%;max-width:100%}
