@@ -56,7 +56,7 @@ function geTableSort(table,col,th){
   geTableApply(table);
 }
 function geEnhanceTable(table){
-  if(GETableState.has(table) || !table.tHead || !table.tBodies.length)return;
+  if(table.hasAttribute('data-table-manual') || GETableState.has(table) || !table.tHead || !table.tBodies.length)return;
   const wrap=table.closest('.table-scroll,.card')||table.parentElement;
   const controls=document.createElement('div');
   controls.className='table-controls';

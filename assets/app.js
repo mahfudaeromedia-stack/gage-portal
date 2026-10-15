@@ -2419,7 +2419,7 @@ function renderAirports(){
 }
 
 /* ---------- Dynamic world map ---------- */
-let GE_MAP_REGION='';
+window.GE_MAP_REGION=window.GE_MAP_REGION||'';
 const GE_MAP_ZOOM={
   '':{scale:1,origin:'50% 50%',label:'World View'},
   'Domestik':{scale:3.25,origin:'82.5% 52%',label:'Indonesia / Domestic View'},
@@ -2436,7 +2436,7 @@ function geMapFilteredAirports(){
   const status=document.getElementById('mapStatusFilter')?.value||'';
   const pending=document.getElementById('mapPendingFilter')?.value||'';
   return geAirportVisibleRows().filter(a=>
-    (!GE_MAP_REGION||a.wilayah===GE_MAP_REGION)&&
+    (!window.GE_MAP_REGION||a.wilayah===window.GE_MAP_REGION)&&
     (!q||`${a.code} ${a.city} ${a.gm}`.toLowerCase().includes(q))&&
     (!status||a.status===status)&&
     (!pending||(pending==='pending'?a.pending>0:a.pending===0))
@@ -2487,9 +2487,9 @@ function selectAirport(code,marker){
     ${contractRows.length?`<div class="map-contract-mini"><span>Provider Lounge</span>${contractRows.slice(0,4).map(l=>`<div>${geEsc(l.name)}<b>${geContractNeedsFollowup(l)?'Follow-up':'OK'}</b></div>`).join('')}${contractRows.length>4?`<small>+${contractRows.length-4} provider lainnya</small>`:''}</div>`:''}`;
 }
 function filterAirportMap(region,button){
-  GE_MAP_REGION=region||'';
+  window.GE_MAP_REGION=region||'';
   document.querySelectorAll('.map-chip').forEach(x=>x.classList.remove('active'));button?.classList.add('active');
-  const cfg=GE_MAP_ZOOM[GE_MAP_REGION]||GE_MAP_ZOOM[''],stage=document.getElementById('mapStage');
+  const cfg=GE_MAP_ZOOM[window.GE_MAP_REGION]||GE_MAP_ZOOM[''],stage=document.getElementById('mapStage');
   if(stage){stage.style.transformOrigin=cfg.origin;stage.style.transform=`scale(${cfg.scale})`}
   const label=document.getElementById('mapZoomLabel');if(label)label.textContent=cfg.label;
   hideAirportTooltip();renderAirportMapMarkers();
@@ -2512,7 +2512,7 @@ const GE_MAP_VIEW_215={
 };
 function geApplyMapView(){
   const stage=document.getElementById('mapStage');if(!stage)return;
-  const cfg=GE_MAP_VIEW_215[GE_MAP_REGION]||GE_MAP_VIEW_215[''];
+  const cfg=GE_MAP_VIEW_215[window.GE_MAP_REGION]||GE_MAP_VIEW_215[''];
   const scale=Math.max(.85,Math.min(2.6,cfg.scale*GE_MAP_USER_ZOOM));
   stage.style.transformOrigin=cfg.origin;
   stage.style.transform=`scale(${scale})`;
@@ -2541,10 +2541,10 @@ function geUpdateMapRegionCounts(){
   });
 }
 function filterAirportMap(region,button){
-  GE_MAP_REGION=region||'';GE_MAP_USER_ZOOM=1;
+  window.GE_MAP_REGION=region||'';GE_MAP_USER_ZOOM=1;
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   if(button)button.classList.add('active');
-  document.querySelectorAll(`.map-chip[data-region="${GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
+  document.querySelectorAll(`.map-chip[data-region="${window.GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
   hideAirportTooltip();renderAirportMapMarkers();geApplyMapView();geUpdateMapRegionCounts();
 }
 function geMapPosition(lat,lon){
@@ -2601,7 +2601,7 @@ function geMapPosition(lat,lon){
 
 function geApplyMapView(){
   const stage=document.getElementById('mapStage'); if(!stage)return;
-  const cfg=GE_MAP_VIEW_216[GE_MAP_REGION]||GE_MAP_VIEW_216[''];
+  const cfg=GE_MAP_VIEW_216[window.GE_MAP_REGION]||GE_MAP_VIEW_216[''];
   const scale=Math.max(.82,Math.min(3.15,cfg.scale*GE_MAP_USER_ZOOM_216));
   stage.style.transformOrigin=cfg.origin;
   stage.style.transform=`scale(${scale})`;
@@ -2616,7 +2616,7 @@ function geMapZoomStep(direction){
 }
 function geMapResetView(){
   GE_MAP_USER_ZOOM_216=1;
-  GE_MAP_REGION='';
+  window.GE_MAP_REGION='';
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   document.querySelector('.map-region-cards button:first-child')?.classList.add('active');
   document.querySelector('.map-chip[data-region=""]')?.classList.add('active');
@@ -2625,12 +2625,12 @@ function geMapResetView(){
 }
 
 function filterAirportMap(region,button){
-  GE_MAP_REGION=region||'';
+  window.GE_MAP_REGION=region||'';
   GE_MAP_USER_ZOOM_216=1;
 
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   if(button)button.classList.add('active');
-  document.querySelectorAll(`.map-chip[data-region="${GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
+  document.querySelectorAll(`.map-chip[data-region="${window.GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
 
   hideAirportTooltip();
   renderAirportMapMarkers();
@@ -6490,7 +6490,7 @@ function geApplyMapView(){
   const viewport=document.getElementById('mapViewport');
   if(!stage||!viewport)return;
 
-  const cfg=GE_MAP_PRESET_V245[GE_MAP_REGION]||GE_MAP_PRESET_V245[''];
+  const cfg=GE_MAP_PRESET_V245[window.GE_MAP_REGION]||GE_MAP_PRESET_V245[''];
   const scale=Math.max(.80,Math.min(3.20,cfg.base*GE_MAP_ZOOM_V245));
 
   const w=viewport.clientWidth||1, h=viewport.clientHeight||1;
@@ -6512,7 +6512,7 @@ function geMapZoomStep(direction){
 }
 function geMapResetView(){
   GE_MAP_ZOOM_V245=1;
-  GE_MAP_REGION='';
+  window.GE_MAP_REGION='';
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   document.querySelector('.map-region-cards button:first-child')?.classList.add('active');
   document.querySelector('.map-chip[data-region=""]')?.classList.add('active');
@@ -6521,11 +6521,11 @@ function geMapResetView(){
   geApplyMapView();
 }
 function filterAirportMap(region,button){
-  GE_MAP_REGION=region||'';
+  window.GE_MAP_REGION=region||'';
   GE_MAP_ZOOM_V245=1;
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   button?.classList.add('active');
-  document.querySelectorAll(`.map-chip[data-region="${GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
+  document.querySelectorAll(`.map-chip[data-region="${window.GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
   hideAirportTooltip();
   renderAirportMapMarkers();
   geApplyMapView();

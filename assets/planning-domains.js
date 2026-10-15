@@ -106,16 +106,19 @@ function renderDomain(){
 async function remove(x){
  if(!editable())return;
  const name=label(x.row);
- modal('Delete Record',`<p>Delete <b>${E(name)}</b> from ${E(d.title)}? This action cannot be undone.</p>`,async()=>{
+ const ok=window.gePortalConfirm?await window.gePortalConfirm({title:'Delete Record',message:`Delete ${name} from ${d.title}? This action cannot be undone.`,confirmLabel:'Delete',cancelLabel:'Cancel',danger:true}):false;
+ if(!ok)return;
+ try{
   const records=arr(state[x.collection]);
   const index=records.findIndex(v=>String(v.id)===String(x.row.id));
   if(index<0)throw Error('Record not found. Reload the page.');
   const linked=Object.entries(state||{}).some(([collection,items])=>collection!==x.collection&&Array.isArray(items)&&items.some(v=>v&&typeof v==='object'&&['providerId','sourceRecordId','referenceId','systemId','spaceId','materialId','documentId'].some(key=>String(v[key]||'')===String(x.row.id))));
   if(linked)throw Error('This record is referenced by another record. Deactivate it instead of deleting.');
-  if(x.collection==='groundHandlers'&&arr(records[index].stations).length>1){const remaining=arr(records[index].stations).filter(code=>String(code).toUpperCase()!==String(x.stationCode).toUpperCase());records[index]={...records[index],stations:remaining,station:remaining[0]||''};}else records.splice(index,1);GEStore.save(state);await GEStore.flush();
- });
- const saveButton=document.querySelector('body > #planningDialog [data-save]');if(saveButton){saveButton.textContent='Delete';saveButton.classList.add('danger');saveButton.classList.remove('primary')}
+  if(x.collection==='groundHandlers'&&arr(records[index].stations).length>1){const remaining=arr(records[index].stations).filter(code=>String(code).toUpperCase()!==String(x.stationCode).toUpperCase());records[index]={...records[index],stations:remaining,station:remaining[0]||''};}else records.splice(index,1);
+  GEStore.save(state);await GEStore.flush();renderDomain();status('Record deleted successfully.');
+ }catch(err){status(err?.message||'Unable to delete record.');}
 }
+
 function csvCell(x){return '"'+String(x??'').replace(/"/g,'""')+'"'}
 function csvDownload(value,name){const u=URL.createObjectURL(new Blob(['\ufeff'+value],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
 function exportRows(){const list=stationRecords(rows(d)).filter(x=>!selected||selected==='UNASSIGNED'?!selected||!x.category:x.category===selected),keys=[...new Set(list.flatMap(x=>fieldsFor(x.collection)))];if(!keys.length)keys.push(...fieldsFor(collectionFor()));csvDownload(keys.join(',')+'\r\n'+list.map(x=>keys.map(k=>csvCell(Array.isArray(x.row[k])?x.row[k].some(v=>typeof v==='object')?JSON.stringify(x.row[k]):x.row[k].join('; '):x.row[k]??'')).join(',')).join('\r\n'),page+(selected?'_'+selected:'')+'_data.csv')}
