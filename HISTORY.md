@@ -96,3 +96,25 @@ This is the single canonical work-history file for the portal. Entries are group
 - Added pending-auth shell hiding expected by the navigation readiness regression gate.
 - No new R/P/V runtime identity was introduced by this work.
 
+
+## 2026-10-15 — Planning Workspace Canonical Interaction Alignment
+
+### Planning Workspace / Service & Provider
+- Standardized Grid/Details to one segmented-control behavior shared with Lounge/Tenant.
+- Standardized provider-category cards to the Lounge/Tenant card hierarchy; station identity is a compact square element and card actions use the same control geometry.
+- Back navigation to Service & Provider uses one page-head placement across child pages.
+- Service/provider pages show agreement attention for Expired and Expiring Soon records.
+- Category totals use source-record counts; station-expanded entries are reported separately to avoid inflated GHA totals.
+- Bulk Upload now opens a dedicated review flow before import, including total/ready/failed validation counts and preview.
+- Delete uses the shared confirmation dialog and emits a success confirmation after persistence.
+
+### Lounge / Tenant
+- Restored the child page title as `Lounge/Tenant Planning` and retained Service & Provider only as the parent breadcrumb/navigation.
+- Fixed Grid/Details switching recursion that could make Details unresponsive.
+- Rebound Add and view controls during canonical page initialization.
+- Region filtering now derives region from the station/airport master when the lounge record itself has no region value.
+- Added Expired / Expiring Soon status filtering and standardized delete confirmation/result feedback.
+
+### Ground Handling Agent / Airport Operator / Other Provider Categories
+- Source-record totals no longer use station-expanded row counts, preventing totals such as 66/15 when the selected GHA source contains 12 records.
+- Per-station rows/cards are still preserved for operational display where one source record covers multiple stations.

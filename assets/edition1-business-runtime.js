@@ -6026,9 +6026,9 @@ resetLoungeAccess=function(){
 function deleteLoungeV239(id){
   if(!(typeof gePlanningCanAction==='function'?gePlanningCanAction('Delete'):(typeof geIsAdmin==='function'&&geIsAdmin()))) return;
   const x=(data.lounges||[]).find(a=>String(a.id)===String(id)); if(!x)return;
-  const run=()=>{data.lounges=(data.lounges||[]).filter(a=>String(a.id)!==String(id));save();renderLounges();renderLoungeCardsV237();};
-  if(typeof geConfirmDeleteV234==='function') geConfirmDeleteV234({title:'Hapus Lounge/Tenant?',item:x.name||'Lounge/Tenant',message:'Data master, harga, periode kerja sama, dan referensi layanan ini akan dihapus.'}).then(ok=>{if(ok)run()});
-  else if(confirm(`Hapus ${x.name||'Lounge/Tenant'}?`)) run();
+  const run=()=>{data.lounges=(data.lounges||[]).filter(a=>String(a.id)!==String(id));save();renderLounges();renderLoungeCardsV237();geStorageNoticeV223?.('Record Deleted',`${x.name||'Lounge/Tenant'} was deleted successfully.`,'success');};
+  if(typeof geConfirmDeleteV234==='function') geConfirmDeleteV234({title:'Delete Lounge/Tenant?',item:x.name||'Lounge/Tenant',message:'Master data, pricing, agreement period, and service references will be deleted.'}).then(ok=>{if(ok)run()});
+  else if(typeof window.gePortalConfirm==='function') window.gePortalConfirm({title:'Delete Record',message:`Delete ${x.name||'Lounge/Tenant'}? This action cannot be undone.`,confirmLabel:'Delete',cancelLabel:'Cancel',danger:true}).then(ok=>{if(ok)run()});
 }
 window.deleteLoungeV239=deleteLoungeV239;
 const GE_RENDER_CARDS_V239=renderLoungeCardsV237;
@@ -9308,12 +9308,18 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     summary();
   }
   function geInitLoungeSearchablesR4(){geLoungeSearchableR4('loungeStationSearchR4');geLoungeSearchableR4('loungeProviderSearchR4')}
+  function loungeRegionOf(x){
+    const direct=String(x?.region||x?.wilayah||'').trim();if(direct)return direct;
+    const code=String(x?.airport||x?.station||x?.stationCode||'').trim().toUpperCase();
+    const ap=(data.airports||[]).find(a=>String(a.code||a.iata||a.airportCode||a.stationCode||'').trim().toUpperCase()===code);
+    return String(ap?.region||ap?.networkRegion||ap?.wilayah||ap?.serviceRegion||'').trim();
+  }
   function populateFilterOptions(){
     const provider=document.getElementById('loungeNameFilter'),status=document.getElementById('loungeStatusFilter'),station=document.getElementById('loungeAirportFilter'),region=document.getElementById('loungeRegionFilter');
     const put=(el,values,label)=>{if(!el)return;const cur=el.value,items=[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));el.innerHTML=`<option value="">${label}</option>`+items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(!el.multiple)el.value=items.includes(cur)?cur:''};
     put(provider,(data.lounges||[]).map(x=>x.name),'All Service Providers');
-    put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Status');
-    put(region,[...(data.lounges||[]).map(x=>x.region||x.wilayah),...(data.referenceCatalog||[]).filter(x=>x.kind==='id:regions'&&x.status!=='Inactive').map(x=>x.name||x.id)],'All Regions');
+    put(status,[...(data.lounges||[]).map(x=>x.documentStatus),'Expired','Expiring Soon'],'All Status');
+    put(region,[...(data.lounges||[]).map(loungeRegionOf),...(data.referenceCatalog||[]).filter(x=>x.kind==='id:regions'&&x.status!=='Inactive').map(x=>x.name||x.id)],'All Regions');
     put(station,(typeof geVisibleAirports==='function'?geVisibleAirports():[...(data.airports||[])].map(x=>x.code||x.iata||x.airportCode).filter(Boolean)),'All Stations');
   }
 
@@ -9325,8 +9331,9 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     return base.filter(x=>{
       const rt=resolveType(x),t=rt.value;
       if(!showHistory&&(x.recordStatus==='Superseded'||x.supersededBy))return false;
-      const text=[x.region,x.airport,x.name,t,x.serviceCategory,x.documentNumber,x.documentType,x.documentStatus,x.remarks].map(v=>String(v||'')).join(' ').toLowerCase();
-      return (!q||text.includes(q))&&(!region||String(x.region||'')===region)&&(!stationValue||stationValue===String(x.airport||x.station||x.stationCode||'').toUpperCase())&&(!provider||String(x.name||'')===provider)&&(!status||String(x.documentStatus||'')===status)&&(!type||t===type);
+      const effectiveRegion=loungeRegionOf(x),text=[effectiveRegion,x.airport,x.name,t,x.serviceCategory,x.documentNumber,x.documentType,x.documentStatus,x.remarks].map(v=>String(v||'')).join(' ').toLowerCase();
+      const lifecycle=statusForAgreement(x).label==='Agreement expired'?'Expired':(/hari tersisa/.test(statusForAgreement(x).label)&&Number(String(statusForAgreement(x).label).split(' ')[0])<=90?'Expiring Soon':'');
+      return (!q||text.includes(q))&&(!region||effectiveRegion===region)&&(!stationValue||stationValue===String(x.airport||x.station||x.stationCode||'').toUpperCase())&&(!provider||String(x.name||'')===provider)&&(!status||(status==='Expired'||status==='Expiring Soon'?lifecycle===status:String(x.documentStatus||'')===status))&&(!type||t===type);
     });
   }
   window.loungeFiltered=function(){return filteredRows()};
@@ -9567,8 +9574,10 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
   }
 
   function setup(){
+    const pageHead=document.querySelector('.lounge-master-page-head h1');if(pageHead)pageHead.textContent='Lounge/Tenant Planning';
     const addButton=document.getElementById('loungeAddAction');
-    if(addButton&&!addButton.dataset.boundCanonical){addButton.dataset.boundCanonical='1';addButton.addEventListener('click',()=>window.openLoungeAddModalV230?.());}
+    if(addButton&&!addButton.dataset.boundCanonical){addButton.dataset.boundCanonical='1';addButton.onclick=()=>window.openLoungeAddModalV230?.();}
+    document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(btn=>{btn.onclick=()=>window.geSetLoungeView?.(btn.dataset.view)});
     const heading=document.querySelector('.lounge-master-view-label-v237');
     if(heading&&!document.getElementById('geP29ShowHistory')){const history=document.createElement('label');history.className='ge-p29-history-toggle';history.innerHTML='<input id="geP29ShowHistory" type="checkbox"> Show agreement history';heading.appendChild(history);document.getElementById('geP29ShowHistory').onchange=()=>renderLounges();}
     const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download Template';templateBtn.title='Download Template';}
@@ -9881,10 +9890,11 @@ function byId(id){return document.getElementById(id)}
 ['openPlanningRecordModal','closePlanningRecordModal','savePlanningRecord','deletePlanningRecord','openServiceProcurementModalV243','closeServiceProcurementModalV243','saveServiceProcurementV243','deleteServiceProcurementV243','renderLoungeProcurement','renderTouchpointStandards'].forEach(name=>{
   try{ if(typeof eval(name)==='function') window[name]=eval(name); }catch(_e){}
 });
+const applyCanonicalLoungeView=window.geSetLoungeView;
 function setLoungeView(view){
  const v=view==='detail'?'detail':'grid';
  window.GE_LOUNGE_VIEW=v;
- window.geSetLoungeView?.(v);
+ if(typeof applyCanonicalLoungeView==='function')applyCanonicalLoungeView(v);
 }
 window.geSetLoungeView=setLoungeView;
 function bindLoungeView(){
