@@ -16,7 +16,7 @@ const config={
  'admin':{perm:'admin',collections:['users','inbox','contactMessages','auditLogs','airports','lounges']},
  'berita':{perm:'news',collections:['articles','announcements','faqs','news','documents']},
  'kontak':{perm:'contact',collections:['contactMessages','inbox']},
- 'lounge-list':{perm:'planning',collections:['lounges','loungeVisitors','serviceProcurement','documents']},
+ 'lounge-list':{perm:'planning',collections:['lounges','loungeVisitors','serviceProcurement','documents','airports','referenceCatalog','auditLogs']},
  'branch-office-planning':{perm:'planning',collections:['lounges','boSpaces','serviceProcurement','airportSystems','stationMaterials','documents']},
  'gaso-planning':{perm:'planning',collections:['gasoMaster','gasoServiceSupport','gasoPlanningService','airports','documents']},
  'airport-experience':{perm:'services',collections:['airports','lounges','airportSystems','personnel','serviceProcurement','facilities','assets']}

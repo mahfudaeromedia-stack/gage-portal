@@ -10094,3 +10094,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 
 /* canonical action renderer compatibility token: typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):'' */
+
+
+try{if(typeof geReadTabularFileV223==='function')window.geReadTabularFileV223=geReadTabularFileV223}catch(_e){}
+/* Canonical Planning Workspace route bridge. */
+(function(){'use strict';function route(){return new URLSearchParams(location.search).get('page')||''}function initLoungeRoute(){if(route()!=='lounge-list')return;const title=document.querySelector('#cleanPageOutlet .lounge-master-page-head h1');if(title){title.textContent='Lounge/Tenant Planning';title.dataset.subpageTitle='1'}try{window.geInitLoungeP29?.()}catch(e){console.error('[Lounge canonical init]',e)}const add=document.getElementById('loungeAddAction');if(add){add.disabled=false;add.onclick=e=>{e.preventDefault();window.openLoungeAddModalV230?.()}}document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(btn=>{btn.onclick=e=>{e.preventDefault();window.geSetLoungeView?.(btn.dataset.view)}})}window.geInitLoungeRouteCanonical=initLoungeRoute;const mo=new MutationObserver(()=>initLoungeRoute());if(document.body)mo.observe(document.body,{childList:true,subtree:true});setTimeout(initLoungeRoute,0)})();

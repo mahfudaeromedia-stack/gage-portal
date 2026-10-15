@@ -15,7 +15,7 @@ if(page!=='planning-workspace'&&!definitions[page])return;
 const E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paths=Object.keys(definitions).filter(x=>x!=='airport-cost-structure'),d=definitions[page],hub=page==='planning-workspace';
 const planningImages=Object.assign({LOUNGE:'assets/lounge-garuda.webp',GHA:'assets/checkin-garuda.jpg',AIRPORT_OPERATOR:'assets/boarding-garuda.jpg'},window.GE_PLANNING_CATEGORY_IMAGES||{});
-const categoryImage=id=>planningImages[String(id||'').toUpperCase()]||'assets/boarding-garuda.jpg';let state,selected=new URLSearchParams(location.search).get('category')||'',query='',sortKey='',sortDir=1,viewMode='grid',regionFilter='',stationFilter='',statusFilter='',providerFilter='',pageNumber=1;
+const categoryImage=id=>planningImages[String(id||'').toUpperCase()]||'assets/boarding-garuda.jpg';let state,selected=new URLSearchParams(location.search).get('category')||'',query='',sortKey='',sortDir=1,viewMode='grid',regionFilter='',stationFilter='',statusFilter='',providerFilter='',pageNumber=1,showHistory=false;
 const host=document.getElementById('planningDomainContent');if(!host)return;
 const arr=x=>Array.isArray(x)?x:[];
 const currentRows=list=>Array.isArray(list)?list:[];
@@ -64,7 +64,7 @@ function renderHub(){
 }
 function renderDomain(){
  if(selected==='UNASSIGNED'){selected='';history.replaceState(null,'',url(page));}
- const sourceList=rows(d).filter(x=>x.category),list=stationRecords(sourceList),cats=categories(d),allStations=[...new Set([...airportOptions(),...list.map(x=>station(x.row)).filter(x=>x!=='—')])].sort();
+ const sourceList=rows(d).filter(x=>x.category).filter(x=>showHistory||!(x.row.recordStatus==='Superseded'||x.row.supersededBy)),list=stationRecords(sourceList),cats=categories(d),allStations=[...new Set([...airportOptions(),...list.map(x=>station(x.row)).filter(x=>x!=='—')])].sort();
  const statuses=[...new Set([...list.map(x=>rowStatus(x.row)).filter(Boolean),'Expired','Expiring Soon'])].sort();
  const providers=[...new Set(list.map(x=>rowProvider(x.row)).filter(Boolean))].sort();
  let visible=list.filter(x=>(!selected||x.category===selected)
@@ -83,8 +83,8 @@ function renderDomain(){
  const selectedName=cats.find(c=>c.id===selected)?.name||'All Records';
  const sourceVisible=sourceList.filter(x=>!selected||x.category===selected),expiredCount=sourceVisible.filter(x=>lifecycleStatus(x.row)==='Expired').length,expiringCount=sourceVisible.filter(x=>lifecycleStatus(x.row)==='Expiring Soon').length;
  const warning=(expiredCount||expiringCount)?`<div class="planning-warning"><strong>Agreement Attention</strong><span>${expiredCount?`${expiredCount} expired`:''}${expiredCount&&expiringCount?' · ':''}${expiringCount?`${expiringCount} expiring soon`:''}</span></div>`:'';
- host.innerHTML=header()+`<div class="planning-domain-intro"><strong>${sourceVisible.length} records</strong></div>${warning}
- ${selected?'':`<div class="planning-category-grid">${cats.map(c=>`<a class="planning-category-visual" href="${url(c.route||page,c.route?'':c.id)}"><img src="${E(categoryImage(c.id))}" alt="" loading="lazy"><div class="planning-category-copy"><span>${E(c.name)}</span><b>${sourceList.filter(x=>x.category===c.id).length} records</b></div></a>`).join('')}</div>`}
+ host.innerHTML=header()+`<div class="planning-domain-intro"><strong>${sourceVisible.length} data</strong></div>${warning}
+ ${selected?'':`<div class="planning-category-grid">${cats.map(c=>`<a class="planning-category-visual" href="${url(c.route||page,c.route?'':c.id)}"><img src="${E(categoryImage(c.id))}" alt="" loading="lazy"><div class="planning-category-copy"><span>${E(c.name)}</span><b>${sourceList.filter(x=>x.category===c.id).length} data</b></div></a>`).join('')}</div>`}
  <section class="planning-provider-workspace planning-provider-standard" aria-label="${E(selectedName)} management">
  <div class="lounge-directory-actions planning-directory-actions" data-planning-actions>
  ${editable()?`<button class="ge-btn primary" type="button" id="planningAdd">+ Add</button><button class="ge-btn secondary" type="button" id="planningTemplate">Download Template</button><button class="ge-btn secondary" type="button" id="planningUpload">Upload Data</button>`:''}
@@ -99,14 +99,15 @@ function renderDomain(){
  <select id="planningProvider" aria-label="Provider / Operator"><option value="">All Providers</option>${optionList(providers,providerFilter)}</select>
  <select id="planningStatusFilter" aria-label="Status"><option value="">All Status</option>${optionList(statuses,statusFilter)}</select>
  </div>
- <div class="lounge-master-toolbar planning-list-head"><h2>${E(selectedName)}</h2></div>
+ <div class="lounge-master-toolbar planning-list-head"><h2>${E(selectedName)}</h2><label class="ge-p29-history-toggle"><input id="planningShowHistory" type="checkbox" ${showHistory?'checked':''}> Show agreement history</label></div>
  <div class="planning-domain-grid-view" ${viewMode==='detail'?'hidden':''}>${cards}</div>
  <div class="ge-table-wrap planning-domain-detail-view" ${viewMode==='grid'?'hidden':''}><table><thead><tr>${th('Name / Record','name')}${th('Station','station')}<th>Region</th><th>Provider / Operator</th>${th('Agreement / Reference','agreement')}<th>Status</th><th>Actions</th></tr></thead><tbody>${table}</tbody></table></div>
- <div class="planning-page-nav"><span>${sourceVisible.length} records · ${totalRows} station entries · Page ${pageNumber} of ${pages} (12/page)</span><div><button type="button" class="ge-btn compact" id="planningPrev" ${pageNumber===1?'disabled':''}>‹ Previous</button><button type="button" class="ge-btn compact" id="planningNext" ${pageNumber===pages?'disabled':''}>Next ›</button></div></div>
+ <div class="planning-page-nav"><span>${sourceVisible.length} data · ${totalRows} station entries · Page ${pageNumber} of ${pages} (12/page)</span><div><button type="button" class="ge-btn compact" id="planningPrev" ${pageNumber===1?'disabled':''}>‹ Previous</button><button type="button" class="ge-btn compact" id="planningNext" ${pageNumber===pages?'disabled':''}>Next ›</button></div></div>
  </div></section><input type="file" id="planningFile" accept=".csv,text/csv" hidden><p id="planningStatus" role="status"></p>`;
  const search=host.querySelector('#planningSearch');search.oninput=e=>{const caret=e.target.selectionStart;query=e.target.value.toLocaleLowerCase().trim();pageNumber=1;renderDomain();const input=host.querySelector('#planningSearch');input.focus();input.setSelectionRange(caret,caret)};
  [['planningRegion','regionFilter'],['planningStation','stationFilter'],['planningProvider','providerFilter'],['planningStatusFilter','statusFilter']].forEach(([id,key])=>host.querySelector('#'+id)?.addEventListener('change',e=>{if(key==='regionFilter')regionFilter=e.target.value;else if(key==='stationFilter')stationFilter=e.target.value;else if(key==='providerFilter')providerFilter=e.target.value;else statusFilter=e.target.value;pageNumber=1;renderDomain()}));
  host.querySelectorAll('[data-planning-view]').forEach(b=>b.onclick=()=>{viewMode=b.dataset.planningView;pageNumber=1;renderDomain()});
+ host.querySelector('#planningShowHistory')?.addEventListener('change',e=>{showHistory=e.target.checked;pageNumber=1;renderDomain()});
  host.querySelector('#planningPrev').onclick=()=>{pageNumber--;renderDomain()};host.querySelector('#planningNext').onclick=()=>{pageNumber++;renderDomain()};
  host.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{sortDir=sortKey===b.dataset.sort?-sortDir:1;sortKey=b.dataset.sort;renderDomain()});
  host.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>detail(visible[Number(b.dataset.detail)]));host.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>form(visible[Number(b.dataset.edit)]));host.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>remove(visible[Number(b.dataset.delete)]));
@@ -134,12 +135,12 @@ function exportRows(){const list=stationRecords(rows(d)).filter(x=>!selected||se
 function parseCSV(value){const lines=[];let row=[],cell='',quoted=false;for(let i=0;i<value.length;i++){const c=value[i];if(c==='"'){if(quoted&&value[i+1]==='"'){cell+='"';i++}else quoted=!quoted}else if(c===','&&!quoted){row.push(cell);cell=''}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&value[i+1]==='\n')i++;row.push(cell);if(row.some(v=>v.trim()))lines.push(row);row=[];cell=''}else cell+=c}row.push(cell);if(row.some(v=>v.trim()))lines.push(row);return lines}
 
 function openBulkUpload(){
- modal('Bulk Upload',`<div class="planning-bulk-upload"><p>Upload template for the selected category. The file is validated before import.</p><label class="planning-upload-drop"><span>Choose CSV file</span><small>No data is saved until you confirm the preview.</small><input id="planningBulkFile" type="file" accept=".csv,text/csv"></label><div id="planningBulkPreview" class="planning-bulk-preview"><span>No file selected.</span></div></div>`);
+ modal('Bulk Data Import',`<div class="planning-bulk-upload"><span class="bulk-import-eyebrow">BULK DATA IMPORT</span><h3>Upload Data · ${E(categories(d).find(c=>c.id===selected)?.name||d.title)}</h3><p>Gunakan template. Data divalidasi dan ditampilkan sebagai preview sebelum disimpan.</p><label class="planning-upload-drop"><span>Pilih file Excel (.xlsx) atau CSV</span><small>Tidak ada data yang disimpan sampai preview dikonfirmasi.</small><input id="planningBulkFile" type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label><div id="planningBulkPreview" class="planning-bulk-preview"><span>Belum ada file dipilih.</span></div></div>`);
  document.querySelector('#planningDialog #planningBulkFile')?.addEventListener('change',e=>{const f=e.target.files?.[0];if(f)previewBulkFile(f)});
 }
 async function previewBulkFile(file){
  try{
-  const csv=parseCSV((await file.text()).replace(/^﻿/,'')),head=csv.shift()?.map(x=>x.trim())||[],source=collectionFor();
+  const rawRows=(/\.xlsx$/i.test(file.name)&&typeof window.geReadTabularFileV223==='function')?await window.geReadTabularFileV223(file):parseCSV((await file.text()).replace(/^﻿/,''));const csv=Array.isArray(rawRows)?rawRows.slice():[],head=csv.shift()?.map(x=>String(x||'').trim())||[],source=collectionFor();
   if(source==='lounges'){document.querySelector('#planningDialog [data-close]')?.click();return window.openBulkImportV223?.('lounge')}
   if(!head.some(k=>fieldsFor(source).includes(k)&&k!=='id'))throw Error('CSV headers do not match this page template.');
   const incoming=csv.map((line,i)=>({line:i+2,row:Object.fromEntries(head.map((key,j)=>[key,line[j]||'']))})),allowed=new Set(categories(d).map(x=>x.id));
@@ -155,37 +156,12 @@ async function commitBulkRows(incoming,source){
 }
 async function importCSV(file){try{const csv=parseCSV((await file.text()).replace(/^\ufeff/,'')),head=csv.shift()?.map(x=>x.trim())||[];const source=collectionFor();if(source==='lounges')throw Error('Use the upload feature on the Lounge/Tenant page.');if(!head.some(k=>fieldsFor(source).includes(k)&&k!=='id'))throw Error('CSV headers do not match this page template.'),incoming=csv.map((line,i)=>({line:i+2,row:Object.fromEntries(head.map((key,j)=>[key,line[j]||'']))}));const existing=new Set(arr(state[source]).map(x=>String(x.id))),categoriesAllowed=new Set(categories(d).map(x=>x.id));const invalid=incoming.filter(x=>x.row.planningCategoryId&&!categoriesAllowed.has(x.row.planningCategoryId));if(invalid.length)throw Error('Unknown category on row '+invalid.map(x=>x.line).join(', '));modal('Confirm Upload',`<p>${incoming.length} rows found. Records must use a valid service category. Existing IDs update only the columns supplied in the file; other fields are preserved.</p><div class="ge-table-wrap"><table><thead><tr><th>Row</th><th>Name</th><th>Station</th><th>Category</th></tr></thead><tbody>${incoming.slice(0,30).map(x=>`<tr><td>${x.line}</td><td>${E(x.row.name)}</td><td>${E(x.row.stationCode)}</td><td>${E(x.row.planningCategoryId||'—')}</td></tr>`).join('')}</tbody></table></div>`,async()=>{const staged=arr(state[source]).map(row=>({...row}));const stagedIds=new Set(staged.map(row=>String(row.id)));for(const x of incoming){const id=x.row.id||globalThis.crypto?.randomUUID?.()||String(Date.now())+'-'+x.line;const item={...x.row,id,planningCategoryId:x.row.planningCategoryId||(selected==='UNASSIGNED'?'':selected)||''};if(x.row.pricePeriods){try{item.pricePeriods=JSON.parse(x.row.pricePeriods);if(!Array.isArray(item.pricePeriods))throw Error()}catch{throw Error('Price periods on row '+x.line+' must be a JSON array exported from Download Data.') }}if(source==='groundHandlers'&&x.row.stations!==undefined)item.stations=String(x.row.stations||'').split(/[;,|]/).map(v=>v.trim()).filter(Boolean);if(stagedIds.has(String(id))){const old=staged.find(v=>String(v.id)===String(id));Object.assign(old,item);continue}staged.push(item);stagedIds.add(String(id))}state[source]=staged;auditPlanning('Import',`${source}: ${incoming.length} rows`);GEStore.save(state);await GEStore.flush()})}catch(e){status('Unable to process upload: '+e.message)}}
 function modal(title,content,save){
- // A native dialog occupies the browser top layer; header/sidebar can never cover it.
- // Keep the dialog outside the SPA outlet to avoid DOM replacement during background refresh.
  document.getElementById('planningDialog')?.remove();
- const dialog=document.createElement('dialog');
- dialog.id='planningDialog';
- dialog.className='planning-dialog';
- dialog.setAttribute('aria-label',title);
- dialog.innerHTML=`<div class="planning-modal">
-  <div class="planning-modal-header"><div><h2>${E(title)}</h2><p>Manage service details and agreement information by station.</p></div>
-   <button type="button" class="ge-btn planning-modal-close" data-close aria-label="Close dialog">×</button></div>
-  <div class="planning-modal-content">${content}</div>
-  <p id="planningError" class="planning-error" role="alert" aria-live="polite"></p>
-  <div class="ge-id-actions"><button type="button" class="ge-btn" data-close>Cancel</button>${save?'<button type="button" class="ge-btn primary" data-save>Save</button>':''}</div>
- </div>`;
- document.body.appendChild(dialog);
- const close=()=>{if(dialog.open)dialog.close();dialog.remove()};
- dialog.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',close));
- dialog.addEventListener('close',()=>dialog.remove(),{once:true});
- dialog.addEventListener('click',e=>{if(e.target===dialog)close()});
- dialog.querySelector('[data-save]')?.addEventListener('click',async e=>{
-  const btn=e.currentTarget;if(btn.disabled)return;
-  const error=dialog.querySelector('#planningError');error.textContent='';
-  const required=dialog.querySelector('.planning-domain-form [required]:invalid');
-  if(required){required.focus();error.textContent='Complete the required fields.';return}
-  btn.disabled=true;
-  try{await save(dialog);close();renderDomain();status('Data saved successfully.')}
-  catch(err){error.textContent=err?.message||'Unable to save record.';btn.disabled=false}
- });
- dialog.showModal();
- dialog.querySelector('[data-autofocus]')?.focus({preventScroll:true});
- return dialog;
+ const layer=document.createElement('div');layer.id='planningDialog';layer.className='planning-dialog-layer';
+ layer.innerHTML=`<section class="planning-dialog planning-modal" role="dialog" aria-modal="true" aria-labelledby="planningDialogTitle"><div class="planning-modal-header"><div><h2 id="planningDialogTitle">${E(title)}</h2><p>Manage service details and agreement information by station.</p></div><button type="button" class="ge-btn planning-modal-close" data-close aria-label="Close dialog">×</button></div><div class="planning-modal-content">${content}</div><p id="planningError" class="planning-error" role="alert" aria-live="polite"></p><div class="ge-id-actions"><button type="button" class="ge-btn" data-close>Cancel</button>${save?'<button type="button" class="ge-btn primary" data-save>Save</button>':''}</div></section>`;
+ document.body.appendChild(layer);const close=()=>layer.remove();layer.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',close));layer.addEventListener('click',e=>{if(e.target===layer)close()});const onKey=e=>{if(e.key==='Escape'){document.removeEventListener('keydown',onKey,true);close()}};document.addEventListener('keydown',onKey,true);
+ layer.querySelector('[data-save]')?.addEventListener('click',async e=>{const btn=e.currentTarget;if(btn.disabled)return;const error=layer.querySelector('#planningError');error.textContent='';const required=layer.querySelector('.planning-domain-form [required]:invalid');if(required){required.focus();error.textContent='Complete the required fields.';return}btn.disabled=true;try{await save(layer);close();renderDomain();status('Data saved successfully.')}catch(err){error.textContent=err?.message||'Unable to save record.';btn.disabled=false}});
+ return layer;
 }
 function detail(x){const r=x.row,fields=Object.entries(r).filter(([k,v])=>!['id','_order','createdBy','updatedBy'].includes(k)&&v!==null&&v!==''&&typeof v!=='object').slice(0,32);modal('Detail · '+label(r),`<p><b>ID:</b> ${E(r.id)}</p><div class="planning-detail-grid">${fields.map(([k,v])=>`<div><small>${E(k)}</small><b>${E(v)}</b></div>`).join('')}</div>${x.collection==='lounges'?`<p><a class="ge-btn" href="${url('lounge-list')}">Manage Lounge / Tenant</a></p>`:x.collection==='groundHandlers'&&editable()?`<p><button type="button" class="ge-btn" id="planningEdit">Edit Ground Handling Agent</button></p>`:editable()?'<p><button type="button" class="ge-btn" id="planningEdit">Ubah Data / Category</button></p>':''}`);document.querySelector('#planningDialog #planningEdit')?.addEventListener('click',()=>form(x));}
 const fieldLabels={name:'Name',product:'Material Name',title:'Title',stationCode:'Station',gasoCode:'GASO',stations:'Applicable Stations',scope:'Service Scope',agreement:'Agreement Number',sla:'SLA / KPI',ahan:'AHAN',basePrice:'Base Rate',currency:'Currency',from:'Effective From',until:'Effective Until',pic:'PIC',building:'Building',terminal:'Terminal',floor:'Floor',room:'Room',areaSize:'Area Size',areaUnit:'Area Unit',quantity:'Quantity',unit:'Unit',provider:'Provider / Operator',remarks:'Remarks',code:'Code',area:'Area',vendor:'Vendor',contractPeriod:'Contract Period',startDate:'Start Date',endDate:'End Date',status:'Status',documentName:'Document Name',airport:'Airport',checkin:'Check-in',kiosk:'Kiosk',sbd:'Self Bag Drop',boardingGate:'Boarding Gate',transferDesk:'Transfer Desk',documentNumber:'Document Number',owner:'Owner',version:'Version',documentReference:'Document / Link',airline:'Airline',relationship:'Partnership Type',capability:'Capability',gaStandard:'Garuda Standard',partnerRule:'Partner Rule',applicability:'Applicability',source:'Source',station:'Station',costType:'Cost Type',basis:'Cost Basis',charge:'Charge Amount',unit:'Unit',referenceSource:'Reference Source',reference:'Reference',budgetAccount:'Budget Account',billingBasis:'Billing Basis',rate:'Rate',currency:'Currency',budgetYear:'Budget Year',budgetAmount:'Budget Amount',costCenter:'Cost Center',itemName:'Item',technicalSpecification:'Technical Specification',deliverables:'Deliverables'};

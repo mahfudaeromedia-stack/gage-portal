@@ -118,3 +118,13 @@ This is the single canonical work-history file for the portal. Entries are group
 ### Ground Handling Agent / Airport Operator / Other Provider Categories
 - Source-record totals no longer use station-expanded row counts, preventing totals such as 66/15 when the selected GHA source contains 12 records.
 - Per-station rows/cards are still preserved for operational display where one source record covers multiple stations.
+
+
+## Planning Workspace — Canonical behavior recovery
+- Restored Lounge/Tenant child title; first-level sidebar title normalization no longer overwrites Planning Workspace subpages.
+- Unified Grid/Details segmented control and Planning Workspace card proportions.
+- Replaced Planning Workspace native dialog usage with one fixed shared overlay layer so Close/Cancel/Save remain interactive above header/sidebar even with desktop density mode.
+- Shared delete confirmation now uses the same fixed overlay behavior instead of browser/native dialog.
+- Generic bulk upload uses the same professional import/review pattern and accepts XLSX/CSV when the shared reader is available.
+- Lounge/Tenant page hydrates Airport/Region master data and rebinds Add/Grid/Details on SPA route entry.
+- Service & Provider child pages use `data` wording, support Show agreement history, and retain Expired / Expiring Soon lifecycle filters and warnings.
