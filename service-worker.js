@@ -1,4 +1,4 @@
-const CACHE='ge-portal-static-current';
+const CACHE='ge-portal-static-r30';
 const CORE=['/app.html','/login.html','/assets/portal.css','/assets/clean-shell.css','/assets/global-ui-canonical.css','/assets/portal-shell.js','/assets/clean-page-registry.js','/assets/portal-ui-runtime.js','/assets/table-runtime.js'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE&&k.startsWith('ge-portal-')).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

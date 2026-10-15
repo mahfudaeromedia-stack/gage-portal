@@ -8035,6 +8035,7 @@ function geCalEventHTMLV2533(e){
 }
 
 function geCalRenderV2533(){
+  geEnsureCalendarYearViewR30();
   const grid=document.getElementById('geCalendarV251');
   const agenda=document.getElementById('geCalendarAgendaR2');
   if(!grid)return;
@@ -8047,7 +8048,11 @@ function geCalRenderV2533(){
   if(agenda)agenda.style.display='none';
   grid.style.display='';
 
-  if(view==='month'){
+  if(view==='year'){
+    if(window.geCalendarTitleV251)geCalendarTitleV251.textContent=String(y);
+    grid.className='calendar-year-r30';
+    grid.innerHTML=Array.from({length:12},(_,month)=>{const first=new Date(y,month,1),last=new Date(y,month+1,0),prefix=`${y}-${String(month+1).padStart(2,'0')}`,rows=events.filter(e=>String(e.date||'').startsWith(prefix));return `<button type="button" class="calendar-year-month-r30" onclick="geCalendarOpenMonthR30(${month})"><span>${first.toLocaleDateString('id-ID',{month:'long'})}</span><b>${rows.length}</b><small>${rows.length?'agenda':'Tidak ada agenda'}</small><i>${last.getDate()} hari</i></button>`}).join('');
+  } else if(view==='month'){
     const first=new Date(y,m,1), start=new Date(y,m,1-first.getDay());
     if(window.geCalendarTitleV251)geCalendarTitleV251.textContent=
       new Intl.DateTimeFormat('id-ID',{month:'long',year:'numeric'}).format(first);
@@ -8111,9 +8116,12 @@ function geCalMoveV2533(n){
   const v=window.GE_CAL_VIEW_R2||'month';
   if(v==='day')geV251CalDate.setDate(geV251CalDate.getDate()+n);
   else if(v==='week')geV251CalDate.setDate(geV251CalDate.getDate()+7*n);
+  else if(v==='year')geV251CalDate=new Date(geV251CalDate.getFullYear()+n,0,1);
   else geV251CalDate=new Date(geV251CalDate.getFullYear(),geV251CalDate.getMonth()+n,1);
   geCalRenderV2533();
 }
+window.geCalendarOpenMonthR30=function(month){window.geV251CalDate=new Date((window.geV251CalDate||new Date()).getFullYear(),Number(month)||0,1);window.GE_CAL_VIEW_R2='month';document.querySelectorAll('[data-cal-view]').forEach(x=>x.classList.toggle('active',x.dataset.calView==='month'));geCalRenderV2533()};
+function geEnsureCalendarYearViewR30(){const group=document.querySelector('[data-cal-view]')?.parentElement;if(!group||group.querySelector('[data-cal-view="year"]'))return;const b=document.createElement('button');b.type='button';b.dataset.calView='year';b.textContent='Year';b.onclick=()=>geCalSetViewV2533('year',b);group.appendChild(b)}
 function geCalTodayV2533(){window.geV251CalDate=new Date();geCalRenderV2533()}
 
 /* self-contained add/update activity modal — avoids dependency on older calendar wrappers */
@@ -9808,8 +9816,10 @@ function geSortGanttHierarchyR18(rows){
  return out;
 }
 function gantt(rows,tp){
+ const range=geScaleRangeR16(rows),min=range.min,max=range.max;
+ if(geGanttStateR16.scale!=='default')rows=rows.filter(r=>{const a=geDate(r.start||r.due),b=geDate(r.due||r.start);return a&&b&&b>=min&&a<=max});
  rows=geSortGanttHierarchyR18(rows);
- const {min,max}=geScaleRangeR16(rows),span=Math.max(864e5,max-min),h=geTimelineHeaderR16(min,max);
+ const span=Math.max(864e5,max-min),h=geTimelineHeaderR16(min,max);
  const heads=h.cells.map(c=>`<div style="flex:${c.days}"><b>${esc(c.label)}</b><small>${esc(c.sub)}</small></div>`).join('');
  const arrow=k=>geGanttSortStateR13.key===k?(geGanttSortStateR13.dir>0?' ↑':' ↓'):'';
  const today=new Date();today.setHours(0,0,0,0);const todayPct=(today-min)/span*100;

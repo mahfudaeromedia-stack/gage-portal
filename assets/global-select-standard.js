@@ -11,6 +11,7 @@ const isExcluded=select=>{
  if(!select||select.tagName!=='SELECT')return true;
  if(select.dataset[GLOBAL])return true;
  if(select.closest('.ge-station-multi-r12'))return true; /* already a canonical station picker */
+ if(select.closest('#planningDomainContent,#planningDialog,.planning-domain-form'))return true; /* Planning Workspace owns native selects */
  if(select.closest('[data-ge-native-select-exempt]'))return true;
  if(select.classList.contains('ge-combo-source-r12')||select.classList.contains('search-filter-native-v245'))return false;
  return false;
@@ -116,7 +117,7 @@ function enhance(select){
  const arrow=document.createElement('span');arrow.className='ge-select-arrow';arrow.textContent='⌄';
  const menu=document.createElement('div');menu.className='ge-select-menu';menu.setAttribute('role','listbox');
  display.appendChild(input);wrap.append(display,arrow,menu);
- select.parentNode.insertBefore(wrap,select);wrap.appendChild(select);
+ const parent=select.parentNode;if(!parent||parent.closest?.('.ge-global-select'))return;parent.insertBefore(wrap,select);wrap.appendChild(select);
  select.classList.add('ge-global-select-source');
  wrap._select=select;wrap._input=input;wrap._menu=menu;wrap._display=display;
  input.addEventListener('focus',()=>{open(wrap);input.setAttribute('aria-expanded','true')});

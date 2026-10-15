@@ -144,7 +144,7 @@
     const requested=[...new Set(keys)];
     // Non-Super Admin pages use a persistent per-user/per-scope cache. This makes page-to-page
     // navigation instant and avoids re-reading entire Firestore collections on every page load.
-    if(cacheAllowed()&&!requested.includes('customerExperience')){
+    if(cacheAllowed()){
       let allCached=true;
       const cachedCollections=await Promise.all(requested.map(key=>readCache(key)));
       requested.forEach((key,index)=>{
@@ -152,29 +152,29 @@
         const rows=normalizeCollection(key,cached);
         if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)}
       });
-      if(allCached){
-        hydrated=true;
-        // R29 stale-while-revalidate: cached data is returned immediately. Firestore/network
-        // validation is never on the critical path for page rendering on a previously loaded device.
-        // The tiny manifest check runs behind the page and refreshes IndexedDB only when data changed.
-        const refreshRevision=localRevision;
-        Promise.resolve().then(async()=>{
-          try{
-            const local=await readManifestCache();
-            // Avoid a network round trip on every page transition; other tabs still refresh
-            // after the short bounded freshness interval or after a write invalidates it.
-            if(local&&Date.now()-Number(local.checkedAt||0)<60000)return;
-            const remote=await apiManifest();
-            if(local && Number(local.version||0)===Number(remote.version||0)){await writeManifestCache(remote);return}
-            const result=await apiGet(requested);
-            if(localRevision!==refreshRevision)return;
-            for(const key of requested){const apiKey=collKey(key),rows=normalizeCollection(key,result[apiKey]||[]);if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)};await writeCache(key,result[apiKey]||[])}
-            await writeManifestCache(remote);
-            window.dispatchEvent(new CustomEvent('gx-data-background-refresh',{detail:{collections:requested}}));
-          }catch(e){console.warn('[Edition1 cache] background refresh unavailable; cached data remains active',e)}
-        });
-        return state;
+      const missing=requested.filter((key,index)=>!cachedCollections[index]);
+      if(missing.length){
+        const fresh=await apiGet(missing);
+        for(const key of missing){const apiKey=collKey(key),rows=normalizeCollection(key,fresh[apiKey]||[]);if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)};await writeCache(key,fresh[apiKey]||[])}
       }
+      hydrated=true;
+      // stale-while-revalidate: cached data stays off the critical render path. A small manifest
+      // check runs at most once per five minutes per user/scope and refreshes only in background.
+      const refreshRevision=localRevision;
+      Promise.resolve().then(async()=>{
+        try{
+          const local=await readManifestCache();
+          if(local&&Date.now()-Number(local.checkedAt||0)<60000)return;
+          const remote=await apiManifest();
+          if(local && Number(local.version||0)===Number(remote.version||0)){await writeManifestCache(remote);return}
+          const result=await apiGet(requested);
+          if(localRevision!==refreshRevision)return;
+          for(const key of requested){const apiKey=collKey(key),rows=normalizeCollection(key,result[apiKey]||[]);if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)};await writeCache(key,result[apiKey]||[])}
+          await writeManifestCache(remote);
+          window.dispatchEvent(new CustomEvent('gx-data-background-refresh',{detail:{collections:requested}}));
+        }catch(e){console.warn('[Edition1 cache] background refresh unavailable; cached data remains active',e)}
+      });
+      return state;
     }
     const result=await apiGet(requested);
     for(const key of requested){

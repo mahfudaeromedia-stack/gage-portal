@@ -57,7 +57,9 @@ function geTableSort(table,col,th){
 }
 function geEnhanceTable(table){
   if(table.hasAttribute('data-table-manual') || GETableState.has(table) || !table.tHead || !table.tBodies.length)return;
-  const wrap=table.closest('.table-scroll,.card')||table.parentElement;
+  const anchor=table.closest('.table-scroll,.ge-table-wrap,.planning-domain-detail-view')||table;
+  const wrap=anchor.parentElement||table.parentElement;
+  if(!wrap)return;
   const controls=document.createElement('div');
   controls.className='table-controls';
   controls.innerHTML=`<div class="table-size-control"><span>Tampilkan</span>
@@ -68,7 +70,7 @@ function geEnhanceTable(table){
       <span class="table-page-info"></span>
       <button type="button" class="table-page-btn next" aria-label="Halaman berikutnya">›</button>
     </div>`;
-  wrap.insertBefore(controls,table);
+  wrap.insertBefore(controls,anchor);
 
   const state={
     size:10,page:1,sortCol:null,sortDir:null,muting:false,

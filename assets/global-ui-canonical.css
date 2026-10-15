@@ -364,3 +364,61 @@ html body>.ge-portal-overlay .modal-card,
 html body>.ge-portal-overlay .initiative-dialog-card,
 html body>.ge-portal-overlay .ge-id-modal,
 html body>.ge-portal-overlay .ge-ref-modal{font-family:inherit}
+
+
+/* R30 shared refinements — dialogs, monitoring charts, calendar/year, Gantt cells and action spacing. */
+html body .ge-page-actions,html body .modal-actions,html body .ge-id-actions,html body .bulk-action-group,
+html body .lounge-directory-actions,html body .planning-directory-actions,html body .lounge-card-actions,
+html body .ge-checklist-share-dialog-actions,html body .ge-gantt-scale-actions-r16{gap:8px}
+
+html body .ge-checklist-share-dialog-shell{width:min(620px,calc(100vw - 32px));max-width:620px;margin:auto;padding:0;border:0;border-radius:14px;background:transparent;box-shadow:none;color:var(--ui-text)}
+html body .ge-checklist-share-dialog-shell::backdrop{background:rgba(4,28,58,.58);backdrop-filter:blur(2px)}
+html body .ge-checklist-share-dialog{overflow:hidden;border:1px solid #d8e3ed;border-radius:14px;background:#fff;box-shadow:var(--ui-shadow)}
+html body .ge-checklist-share-dialog>header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 18px;border-bottom:1px solid #dbe4ee}
+html body .ge-checklist-share-dialog>header h2{margin:0 0 4px;font-size:21px;line-height:1.2;color:var(--ui-text)}
+html body .ge-checklist-share-dialog>header p{margin:0;color:var(--ui-muted);font-size:12px}
+html body .ge-checklist-share-x{width:40px;min-width:40px;padding:0;font-size:21px}
+html body .ge-checklist-share-body{display:grid;gap:12px;padding:20px 24px}
+html body .ge-checklist-share-body label{display:grid;gap:6px}
+html body .ge-checklist-share-result{padding:12px;border:1px solid #dbe4ee;border-radius:10px;background:#f8fafc}
+html body .ge-share-link-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+html body .ge-share-feedback{min-height:18px;margin:0;color:#536b7b;font-size:12px}
+html body .ge-checklist-share-dialog>footer{display:flex;justify-content:flex-end;padding:16px 24px;border-top:1px solid #dbe4ee;background:#fbfcfe}
+
+html body #cleanPageOutlet .ge-submission-chart{min-width:0;padding:16px;border:1px solid #d6e0e9;border-radius:10px;background:#fff}
+html body #cleanPageOutlet .ge-chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+html body #cleanPageOutlet .ge-chart-head h3{margin:0;font-size:16px;color:var(--ui-text)}
+html body #cleanPageOutlet .ge-chart-head span{display:block;margin-top:3px;font-size:11px;color:var(--ui-muted)}
+html body #cleanPageOutlet .ge-pie-wrap{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;align-items:center}
+html body #cleanPageOutlet .ge-pie{width:138px;height:138px;border-radius:50%;background:conic-gradient(var(--ui-navy) 0 var(--dom),#d8e3ed var(--dom) 100%);position:relative}
+html body #cleanPageOutlet .ge-pie:after{content:"";position:absolute;inset:31px;border-radius:50%;background:#fff}
+html body #cleanPageOutlet .ge-pie-legend{display:grid;gap:8px}
+html body #cleanPageOutlet .ge-pie-key{border-color:#d6e0e9}
+html body #cleanPageOutlet .ge-pie-key i{width:10px;height:10px;border-radius:50%;background:var(--ui-navy);flex:0 0 auto}
+html body #cleanPageOutlet .ge-pie-key:nth-child(2) i{background:#d8e3ed;border:1px solid #b7c7d6}
+html body #cleanPageOutlet .ge-pie-key b{margin-left:auto}
+html body #cleanPageOutlet .ge-bars{display:grid;gap:10px}
+html body #cleanPageOutlet .ge-bar-row{display:grid;grid-template-columns:86px minmax(0,1fr) 28px;gap:10px;align-items:center;font-size:12px;color:var(--ui-text)}
+html body #cleanPageOutlet .ge-bar-row>div{height:12px;overflow:hidden;border-radius:2px;background:#edf2f6}
+html body #cleanPageOutlet .ge-bar-row i{display:block;height:100%;background:var(--ui-navy);border-radius:2px}
+html body #cleanPageOutlet .ge-submission-station-chart{margin-top:12px}
+
+html body .calendar-year-r30{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;background:transparent}
+html body .calendar-year-month-r30{min-height:118px;padding:14px;border:1px solid #d8e3ed;border-radius:10px;background:#fff;color:var(--ui-text);display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:6px;text-align:left;cursor:pointer}
+html body .calendar-year-month-r30 span{font-size:13px;font-weight:600}
+html body .calendar-year-month-r30 b{font-size:22px;justify-self:end;color:var(--ui-navy)}
+html body .calendar-year-month-r30 small{align-self:end;color:var(--ui-muted)}
+html body .calendar-year-month-r30 i{align-self:end;justify-self:end;color:var(--ui-muted);font-size:10px;font-style:normal}
+html body .calendar-year-month-r30:hover{border-color:var(--ui-navy);background:#f7faff}
+
+html body .ge-gantt-grid-r13 button.ge-gantt-label-r13,
+html body .ge-gantt-grid-r13 button.ge-gantt-deadline-r13{border-radius:0;border-top:0;border-left:0;border-bottom:1px solid var(--ge-gantt-line,#dce7ea);box-shadow:none}
+html body .ge-gantt-grid-r13 button.ge-gantt-label-r13{border-right:1px solid var(--ge-gantt-line,#dce7ea)}
+html body .ge-gantt-grid-r13 button.ge-gantt-deadline-r13{border-right:1px solid var(--ge-gantt-line,#dce7ea)}
+html body .ge-gantt-grid-r13 .ge-gantt-track-r13{border-radius:0;border-bottom:1px solid var(--ge-gantt-line,#dce7ea)}
+
+@media(max-width:900px){
+ html body #cleanPageOutlet .ge-pie-wrap{grid-template-columns:1fr}
+ html body .calendar-year-r30{grid-template-columns:repeat(2,minmax(0,1fr))}
+ html body .ge-share-link-row{grid-template-columns:1fr}
+}
