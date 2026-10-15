@@ -51,7 +51,7 @@ html body .lounge-add-modal select,
 html body .lounge-add-modal textarea{
   box-sizing:border-box;width:100%;min-height:var(--ui-control-h);height:var(--ui-control-h);margin-top:0;padding:0 12px;
   border:1px solid var(--ui-border);border-radius:var(--ui-radius);background:#fff;color:var(--ui-text);
-  font-family:inherit;font-size:13px;font-weight:400;line-height:1.35;outline:0;box-shadow:none;
+  font-family:inherit;font-size:13px;font-weight:400;line-height:1.35;text-align:left;outline:0;box-shadow:none;
 }
 html body #cleanPageOutlet textarea,
 html body .modal-card textarea,
@@ -90,11 +90,13 @@ html body #cleanPageOutlet select:not([multiple]),
 html body .modal-card select:not([multiple]),
 html body .planning-modal select:not([multiple]),
 html body .lounge-add-modal select:not([multiple]){
-  appearance:none;-webkit-appearance:none;padding-right:38px;background-color:#fff;
+  appearance:none;-webkit-appearance:none;padding-right:38px;background-color:#fff;text-align:left;text-align-last:left;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1.5 7 8l6-6.5' fill='%23082b59'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 13px center;background-size:13px 10px;
 }
-html body #cleanPageOutlet select[multiple]{height:auto;min-height:90px;padding:8px 10px}
+html body #cleanPageOutlet select[multiple]{height:auto;min-height:90px;padding:8px 10px;text-align:left}
+html body #cleanPageOutlet option,html body .modal-card option,html body .planning-modal option,html body .lounge-add-modal option{text-align:left}
+html body #cleanPageOutlet button,html body #cleanPageOutlet .btn,html body #cleanPageOutlet .ge-btn{overflow:hidden;text-overflow:ellipsis}
 html body #cleanPageOutlet select:has(option:checked[value=""]){color:#91a2b5}
 html body #cleanPageOutlet select:has(option:checked[value=""]) option{color:var(--ui-text)}
 
@@ -104,7 +106,7 @@ html body .ge-btn,html body button.ge-btn,html body a.ge-btn{
   box-sizing:border-box;min-height:var(--ui-control-h);height:var(--ui-control-h);padding:0 14px;
   display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--ui-navy);border-radius:var(--ui-radius);
   background:#fff;color:var(--ui-navy);font-family:inherit;font-size:var(--ui-button-font);font-weight:var(--ui-button-weight);
-  line-height:1.15;letter-spacing:0;text-decoration:none;white-space:nowrap;box-shadow:none;transform:none;
+  line-height:1.15;letter-spacing:0;text-decoration:none;white-space:nowrap;max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;box-shadow:none;transform:none;
   appearance:none;-webkit-appearance:none;cursor:pointer;
 }
 html body .btn:not(.primary):not(.danger):not(.btn-danger),
@@ -160,8 +162,8 @@ html body #cleanPageOutlet .ge-page-head{display:flex;align-items:flex-start;jus
 html body #cleanPageOutlet .ge-page-head h1{font-size:20px;line-height:1.2;font-weight:600;letter-spacing:0;color:var(--ui-text);margin:0}
 html body #cleanPageOutlet .ge-page-head p{font-size:13px;line-height:1.45;color:#7b8c9d;margin:6px 0 0}
 html body #cleanPageOutlet .ge-page-actions,html body #cleanPageOutlet .bulk-action-group{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-html body .ge-view-toggle{display:inline-flex;align-items:center;gap:2px;padding:2px;border:1px solid #d0dbe6;border-radius:8px;background:var(--ui-soft)}
-html body .ge-view-toggle button{height:30px;min-height:30px;min-width:70px;padding:0 12px;border:0;border-radius:6px;background:transparent;color:#536b7b;font:500 12px/1 inherit;cursor:pointer}
+html body .ge-view-toggle{display:inline-flex;align-items:center;gap:2px;height:var(--ui-control-h);min-height:var(--ui-control-h);padding:1px;border:1px solid #d0dbe6;border-radius:var(--ui-radius);background:var(--ui-soft);box-sizing:border-box}
+html body .ge-view-toggle button{height:38px;min-height:38px;min-width:70px;padding:0 12px;border:0;border-radius:6px;background:transparent;color:#536b7b;font:600 12px/1 inherit;cursor:pointer;box-shadow:none}
 html body .ge-view-toggle button.active{background:var(--ui-navy);color:#fff}
 html body .ge-view-toggle button:hover:not(.active){background:#e9eff5;color:var(--ui-navy)}
 html body #cleanPageOutlet table{border-collapse:collapse}
@@ -198,11 +200,10 @@ html body #cleanPageOutlet .ge-form-row{display:flex;align-items:flex-end;gap:10
 html body #cleanPageOutlet .ge-form-row>label{min-width:0;flex:1}
 html body #cleanPageOutlet .ge-form-row>.ge-btn{flex:0 0 auto}
 html body #cleanPageOutlet .ge-form-grid>label{min-width:0}
-html body #cleanPageOutlet .ge-network-toolbar,
-html body #cleanPageOutlet .ge-submission-toolbar{display:grid;align-items:end;grid-template-columns:minmax(0,2fr) repeat(2,minmax(180px,1fr));gap:10px}
-html body #cleanPageOutlet .ge-submission-toolbar{grid-template-columns:repeat(4,minmax(0,1fr)) auto}
-html body #cleanPageOutlet .ge-network-toolbar>label,
-html body #cleanPageOutlet .ge-submission-toolbar>label{display:grid;grid-template-rows:auto var(--ui-control-h);min-width:0;gap:5px}
+html body #cleanPageOutlet .ge-network-toolbar{display:grid;align-items:end;grid-template-columns:minmax(0,2fr) repeat(2,minmax(180px,1fr));gap:10px}
+html body #cleanPageOutlet .ge-network-toolbar>label{display:grid;grid-template-rows:auto var(--ui-control-h);min-width:0;gap:5px}
+html body #cleanPageOutlet .ge-submission-toolbar{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr)) auto;gap:10px;align-items:center}
+html body #cleanPageOutlet .ge-submission-toolbar>*{height:var(--ui-control-h);min-height:var(--ui-control-h);margin:0}
 html body #cleanPageOutlet .ge-table-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 10px;color:#718296;font-size:12px}
 html body #cleanPageOutlet .ge-table-controls label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:400;color:#718296}
 html body #cleanPageOutlet .ge-table-controls select{width:auto;min-width:62px;height:var(--ui-compact-h);min-height:var(--ui-compact-h);margin:0;padding:0 30px 0 9px;font-size:12px}
@@ -319,9 +320,10 @@ html body>.initiative-dialog .ge-picker-pop{z-index:2147482500}
 
 /* Monitoring & Assessment professional layout. */
 #cleanPageOutlet #r43Monitoring{display:grid;gap:14px}
-#cleanPageOutlet #r43Monitoring .ge-assess-tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid #dce5ee;padding:0 0 8px}
-#cleanPageOutlet #r43Monitoring .ge-assess-tab{height:38px;min-height:38px;padding:0 14px;border:1px solid transparent;border-radius:8px;background:transparent;color:#526b82;font:600 13px/1 inherit;cursor:pointer}
-#cleanPageOutlet #r43Monitoring .ge-assess-tab:hover,#cleanPageOutlet #r43Monitoring .ge-assess-tab.active{background:#fff;color:var(--ui-navy);border-color:#b8c9dc;box-shadow:inset 0 -2px 0 var(--ui-navy)}
+#cleanPageOutlet #r43Monitoring .ge-assess-tabs{display:flex;gap:20px;flex-wrap:wrap;border-bottom:1px solid #dce5ee;padding:0;background:transparent}
+#cleanPageOutlet #r43Monitoring .ge-assess-tab{height:42px;min-height:42px;padding:0 2px;border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:#62778b;font:600 13px/1 inherit;cursor:pointer;box-shadow:none}
+#cleanPageOutlet #r43Monitoring .ge-assess-tab:hover{color:var(--ui-navy);background:transparent}
+#cleanPageOutlet #r43Monitoring .ge-assess-tab.active{color:var(--ui-navy);border-bottom-color:var(--ui-navy);background:transparent;box-shadow:none}
 #cleanPageOutlet #r43Monitoring .ge-monitor-kpis{grid-template-columns:repeat(5,minmax(0,1fr));margin:0}
 #cleanPageOutlet #r43Monitoring .ge-monitor-kpi{min-height:104px;padding:16px;border:1px solid #d6e0e9;border-radius:10px;background:#fff;display:flex;flex-direction:column;gap:5px;justify-content:center}
 #cleanPageOutlet #r43Monitoring .ge-monitor-kpi small{font-size:11px;color:#72869a}.ge-monitor-kpi b{font-size:24px;color:var(--ui-text)}
@@ -330,7 +332,7 @@ html body>.initiative-dialog .ge-picker-pop{z-index:2147482500}
 #cleanPageOutlet #r43Monitoring .ge-monitor-flow>div{min-height:82px;padding:14px;border:1px solid #dce5ee;border-radius:10px;background:#f9fbfd;display:grid;align-content:center;gap:3px}
 #cleanPageOutlet #r43Monitoring .ge-monitor-flow small{color:#6f8397;font-weight:700}.ge-monitor-flow b{color:var(--ui-text)}.ge-monitor-flow span{font-size:12px;color:#73879a}
 #cleanPageOutlet #r43Monitoring .ge-submission-dashboard{padding:18px;display:grid;gap:14px}
-#cleanPageOutlet #r43Monitoring .ge-submission-toolbar{grid-template-columns:repeat(5,minmax(150px,1fr)) auto}
+#cleanPageOutlet #r43Monitoring .ge-submission-toolbar{grid-template-columns:repeat(5,minmax(130px,1fr)) auto}
 #cleanPageOutlet #r43Monitoring .ge-submission-chart{padding:16px;border:1px solid #dbe4ed;border-radius:10px;background:#fff}
 #cleanPageOutlet #r43Monitoring .ge-chart-head h3{margin:0;font-size:15px;color:var(--ui-text)}#cleanPageOutlet #r43Monitoring .ge-chart-head span{font-size:11px;color:var(--ui-muted)}
 #cleanPageOutlet #r43Monitoring .ge-bars{display:grid;gap:8px;margin-top:12px}.ge-bar-row{display:grid;grid-template-columns:90px 1fr 28px;align-items:center;gap:8px;font-size:12px}.ge-bar-row>div{height:8px;border-radius:999px;background:#e8eef4;overflow:hidden}.ge-bar-row i{display:block;height:100%;background:var(--ui-navy);border-radius:999px}
@@ -344,7 +346,7 @@ html body>.initiative-dialog .ge-picker-pop{z-index:2147482500}
 #cleanPageOutlet #r43Monitoring .ge-checklist-preview-head h2{margin:2px 0 3px;font-size:20px;color:#fff}#cleanPageOutlet #r43Monitoring .ge-checklist-preview-head p{margin:0;font-size:12px;color:#dce8f5}
 #cleanPageOutlet #r43Monitoring .ge-checklist-preview-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-bottom:1px solid #dce5ee;background:#f7f9fc}.ge-checklist-preview-meta span{padding:12px 16px;border-right:1px solid #dce5ee;display:grid;gap:3px}.ge-checklist-preview-meta small{font-size:10px;color:#73869a}.ge-checklist-preview-meta b{font-size:12px;color:var(--ui-text)}
 #cleanPageOutlet #r43Monitoring .ge-checklist-preview .ge-form-completion{padding:20px 24px}.ge-checklist-preview-foot{display:flex;justify-content:space-between;gap:12px;padding:12px 24px;border-top:1px solid #dce5ee;background:#f7f9fc;color:#71869a;font-size:10px}
-@media(max-width:1100px){#cleanPageOutlet #r43Monitoring .ge-monitor-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}#cleanPageOutlet #r43Monitoring .ge-submission-toolbar{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1100px){#cleanPageOutlet #r43Monitoring .ge-monitor-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}#cleanPageOutlet #r43Monitoring .ge-submission-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){#cleanPageOutlet #r43Monitoring .ge-monitor-kpis,#cleanPageOutlet #r43Monitoring .ge-submission-toolbar,#cleanPageOutlet #r43Monitoring .ge-checklist-preview-meta{grid-template-columns:1fr}#cleanPageOutlet #r43Monitoring .ge-monitor-flow{grid-template-columns:1fr}#cleanPageOutlet #r43Monitoring .ge-monitor-flow>i{transform:rotate(90deg);justify-self:center}#cleanPageOutlet #r43Monitoring .ge-checklist-preview-head{grid-template-columns:1fr}.ge-checklist-preview-foot{flex-direction:column}}
 
 /* Master Data content should size to content, never to a dashboard-sized minimum. */
@@ -430,3 +432,101 @@ html body .ge-checklist-share-result{display:grid;gap:12px}
 @media(max-width:620px){html body .ge-share-link-row{grid-template-columns:1fr}html body .ge-share-link-row .ge-btn{width:100%}}
 
 html body .timeline-card-head-v224>div:last-child{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+
+/* Canonical shell interaction and density */
+html body #cleanPageOutlet select,html body #cleanPageOutlet option,html body #cleanPageOutlet .ge-searchable-trigger,html body #cleanPageOutlet .search-filter-input{text-align:left;text-align-last:left}
+html body #cleanPageOutlet label:has(input[type=checkbox]),html body #cleanPageOutlet label:has(input[type=radio]){text-align:left;justify-content:flex-start}
+html body.portal-ready.portal-shell-ready .ge-nav-link.active,html body.portal-ready.portal-shell-ready .ge-nav-link[aria-current=page]{opacity:1;visibility:visible;background:#e8f1fa;color:#082b59;box-shadow:inset 3px 0 0 #0b4d8a;font-weight:700}
+html body.portal-ready.portal-shell-ready .ge-nav-link.active *,html body.portal-ready.portal-shell-ready .ge-nav-link[aria-current=page] *{color:inherit;opacity:1}
+html body #cleanPageOutlet .ge-page-actions .ge-btn,html body #cleanPageOutlet .bulk-action-group .ge-btn,html body #cleanPageOutlet .lounge-directory-actions .ge-btn,html body #cleanPageOutlet .planning-directory-actions .ge-btn{height:var(--ui-control-h);min-height:var(--ui-control-h)}
+
+/* Canonical interface refinements — shared page, controls, maps and planning cards. */
+:root{--ui-control-h:44px;--ui-gap:10px;--ui-radius:10px}
+html body #cleanPageOutlet .ge-btn,html body #cleanPageOutlet button,html body #cleanPageOutlet select,html body #cleanPageOutlet input:not([type=checkbox]):not([type=radio]){max-width:100%;box-sizing:border-box}
+html body #cleanPageOutlet .ge-btn,html body #cleanPageOutlet button.ge-btn{min-height:var(--ui-control-h);height:var(--ui-control-h);padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1;font-family:inherit;font-weight:600}
+html body #cleanPageOutlet select,html body #cleanPageOutlet input,html body #cleanPageOutlet textarea{text-align:left;text-align-last:left}
+html body #cleanPageOutlet label:has(input[type=checkbox]),html body #cleanPageOutlet label:has(input[type=radio]){justify-content:flex-start;text-align:left}
+html body .ge-nav-link.active,html body .sidebar a.active,html body [data-nav].active{opacity:1;visibility:visible;background:#e8f1fa;color:#082b59;box-shadow:inset 3px 0 0 #0b4d8a;font-weight:700}
+
+/* Monitoring uses navigation tabs, not elevated buttons. */
+#cleanPageOutlet #r43Monitoring .ge-assess-tabs{display:flex;align-items:flex-end;gap:4px;overflow-x:auto;padding:0 0 1px;margin:12px 0 18px;border-bottom:1px solid #d7e2ec;background:transparent;border-radius:0}
+#cleanPageOutlet #r43Monitoring .ge-assess-tab{height:42px;min-height:42px;padding:0 14px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;box-shadow:none;color:#63788d;font:600 13px/1 inherit}
+#cleanPageOutlet #r43Monitoring .ge-assess-tab:hover{background:#f3f7fb;color:#0b3768}
+#cleanPageOutlet #r43Monitoring .ge-assess-tab.active{background:transparent;color:#082b59;border-bottom-color:#082b59;box-shadow:none}
+#cleanPageOutlet #r43Monitoring .ge-submission-toolbar{display:grid;grid-template-columns:repeat(5,minmax(145px,1fr)) auto;gap:var(--ui-gap);align-items:center}
+#cleanPageOutlet #r43Monitoring .ge-submission-toolbar>*{height:var(--ui-control-h);min-height:var(--ui-control-h);margin:0}
+#cleanPageOutlet #r43Monitoring .ge-submission-toolbar select{padding-top:0;padding-bottom:0}
+
+/* Network detail preserves information hierarchy; photos live inside records, not in the station header. */
+#cleanPageOutlet .airport-map-shell-v216{grid-template-columns:minmax(0,1fr) minmax(360px,390px);gap:12px}
+#cleanPageOutlet .r42-map-detail{padding:18px;overflow:hidden}
+#cleanPageOutlet .r42-map-head h2{font-size:24px;line-height:1.1}
+#cleanPageOutlet .r42-provider-chips{display:flex;gap:6px;flex-wrap:wrap;max-width:100%}
+#cleanPageOutlet .r42-provider-chips span{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+#cleanPageOutlet .r42-map-tabscroll{width:100%;overflow-x:auto;overflow-y:hidden}
+#cleanPageOutlet .r42-map-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(82px,1fr);width:max-content;min-width:100%;gap:6px}
+#cleanPageOutlet .r42-map-tabs button{min-width:82px;width:auto;max-width:none}
+#cleanPageOutlet .r42-map-item{min-width:0;overflow:hidden}
+#cleanPageOutlet .r42-map-item img,#cleanPageOutlet .ge-network-record-photo{display:block;width:100%;height:120px;object-fit:cover;border-radius:9px;margin-top:10px;border:1px solid #dbe4ec}
+
+/* Planning hierarchy: compact heading action, one-line filters, Lounge-style cards. */
+#cleanPageOutlet .planning-page-head,#cleanPageOutlet .lounge-master-page-head{align-items:flex-start}
+#cleanPageOutlet .planning-page-head .ge-page-actions,#cleanPageOutlet .lounge-master-page-head .ge-page-actions{margin-top:2px;margin-right:2px}
+#cleanPageOutlet .planning-directory-actions,#cleanPageOutlet .lounge-directory-actions{display:flex;align-items:center;justify-content:flex-end;gap:var(--ui-gap);flex-wrap:wrap}
+#cleanPageOutlet .planning-directory-actions>* ,#cleanPageOutlet .lounge-directory-actions>*{height:var(--ui-control-h);min-height:var(--ui-control-h)}
+#cleanPageOutlet .planning-filter-grid,#cleanPageOutlet #loungeFilterGridR4,#cleanPageOutlet .lounge-filter-grid-ref{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(4,minmax(150px,1fr));gap:10px;align-items:center}
+#cleanPageOutlet .planning-filter-grid>* ,#cleanPageOutlet #loungeFilterGridR4>* ,#cleanPageOutlet .lounge-filter-grid-ref>*{height:var(--ui-control-h);min-height:var(--ui-control-h);margin:0}
+#cleanPageOutlet .planning-domain-grid-view{grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
+#cleanPageOutlet .planning-record-card{display:grid;grid-template-columns:minmax(68px,18%) minmax(0,1fr);gap:18px;align-items:start;min-height:0;padding:20px;border-radius:16px}
+#cleanPageOutlet .planning-record-station{width:100%;max-width:none;aspect-ratio:1;border-radius:15px;font-size:20px}
+#cleanPageOutlet .planning-record-body{min-width:0;display:flex;flex-direction:column;gap:8px}
+#cleanPageOutlet .planning-record-body h3{margin:0;font-size:18px;line-height:1.25;overflow-wrap:anywhere}
+#cleanPageOutlet .planning-record-body dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;margin:2px 0 8px}
+#cleanPageOutlet .planning-record-body dl>div{display:block;min-width:0}
+#cleanPageOutlet .planning-record-body dd{overflow-wrap:anywhere}
+#cleanPageOutlet .planning-row-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto}
+#cleanPageOutlet .planning-category-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+#cleanPageOutlet .planning-category-grid>a.planning-category-visual{display:grid;grid-template-rows:145px auto;overflow:hidden;padding:0;min-height:230px}
+#cleanPageOutlet .planning-category-visual img{width:100%;height:145px;object-fit:cover;display:block}
+#cleanPageOutlet .planning-category-copy{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;min-width:0}
+#cleanPageOutlet .planning-category-copy span{padding:0;background:transparent;border-radius:0;font-weight:700;overflow-wrap:anywhere}
+#cleanPageOutlet .planning-category-copy b{white-space:nowrap}
+
+/* Initiative list shares Lounge table language and starts in a deterministic grid state. */
+#cleanPageOutlet .ge-initiative-list{border:1px solid #d6e0ea;border-radius:12px;background:#fff;overflow:auto}
+#cleanPageOutlet .ge-initiative-list table{width:100%;min-width:1120px;border-collapse:collapse;table-layout:auto}
+#cleanPageOutlet .ge-initiative-list th{padding:11px 12px;background:#f3f7fb;border-bottom:1px solid #d6e0ea;color:#526a80;font-size:12px;font-weight:700;text-align:left;white-space:nowrap;resize:none;overflow:visible}
+#cleanPageOutlet .ge-initiative-list td{padding:12px;border-bottom:1px solid #dde6ee;color:#2e4a64;font-size:13px;vertical-align:top}
+#cleanPageOutlet .ge-initiative-list tbody tr:last-child td{border-bottom:0}
+#cleanPageOutlet .ge-initiative-actions{display:flex;gap:8px;flex-wrap:nowrap}
+#cleanPageOutlet #initRows{min-height:120px;transition:opacity .12s ease}
+
+/* Master Data — content-height panels, consistent tabs and tool row. */
+#cleanPageOutlet .ge-master-tabs-panel{padding:14px 16px;min-height:0;height:auto}
+#cleanPageOutlet .ge-ref-tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#cleanPageOutlet .ge-ref-tabs>button{height:var(--ui-control-h);min-height:var(--ui-control-h);padding:0 16px;border:1px solid #0b3768;border-radius:9px;background:#fff;color:#082b59;font:600 13px/1 inherit;box-shadow:none}
+#cleanPageOutlet .ge-ref-tabs>button.active{background:#082f64;color:#fff;border-color:#082f64}
+#cleanPageOutlet .ge-master-catalog{min-height:0;height:auto;padding:16px}
+#cleanPageOutlet .ge-master-catalog .ge-ref-type-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#cleanPageOutlet .ge-master-catalog .ge-ref-type-tabs button{min-height:36px;height:36px;padding:0 12px;border-radius:8px;box-shadow:none}
+
+/* Improvement Opportunity — readable workspace, no narrow floating column. */
+#cleanPageOutlet .p31.p3-user-page{display:grid;gap:18px;max-width:none}
+#cleanPageOutlet .p31.p3-user-page>.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+#cleanPageOutlet .p31.p3-user-page>.cards{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px;margin:0}
+#cleanPageOutlet .p31.p3-user-page>.cards>.card{min-height:104px;padding:16px;display:grid;align-content:center;gap:4px}
+#cleanPageOutlet .p31.p3-user-page>.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start;margin:0}
+#cleanPageOutlet .p31.p3-user-page .panel{padding:20px;border:1px solid #d6e1eb;border-radius:12px;background:#fff;min-width:0}
+#cleanPageOutlet .p31.p3-user-page .panel h2{margin:0 0 14px}
+#cleanPageOutlet .p31.p3-user-page .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
+#cleanPageOutlet .p31.p3-user-page .toolbar>*{height:var(--ui-control-h);min-height:var(--ui-control-h);margin:0}
+#cleanPageOutlet .p31.p3-user-page .table-wrap{max-height:420px;overflow:auto}
+
+/* Responsive density and controls. */
+@media(min-width:1100px){html.ge-portal-density{zoom:.9}}
+@media(max-width:1099px){html.ge-portal-density{zoom:1}}
+@media(max-width:1100px){#cleanPageOutlet .airport-map-shell-v216{grid-template-columns:1fr}#cleanPageOutlet .planning-filter-grid,#cleanPageOutlet #loungeFilterGridR4,#cleanPageOutlet .lounge-filter-grid-ref{grid-template-columns:repeat(2,minmax(0,1fr))}#cleanPageOutlet .p31.p3-user-page>.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){#cleanPageOutlet #r43Monitoring .ge-assess-tabs{gap:0}#cleanPageOutlet #r43Monitoring .ge-assess-tab{padding:0 10px}#cleanPageOutlet #r43Monitoring .ge-submission-toolbar,#cleanPageOutlet .planning-filter-grid,#cleanPageOutlet #loungeFilterGridR4,#cleanPageOutlet .lounge-filter-grid-ref{grid-template-columns:1fr}#cleanPageOutlet .planning-domain-grid-view{grid-template-columns:1fr}#cleanPageOutlet .planning-record-card{grid-template-columns:72px minmax(0,1fr);padding:15px;gap:12px}#cleanPageOutlet .planning-record-body dl{grid-template-columns:1fr}#cleanPageOutlet .p31.p3-user-page>.head{flex-direction:column}#cleanPageOutlet .p31.p3-user-page>.cards,#cleanPageOutlet .p31.p3-user-page>.grid2{grid-template-columns:1fr}}
+
+html body #cleanPageOutlet select option{text-align:left}

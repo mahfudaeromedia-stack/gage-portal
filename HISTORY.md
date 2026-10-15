@@ -1,0 +1,98 @@
+# Ground Experience Portal — Work History
+
+This is the single canonical work-history file for the portal. Entries are grouped by functional area/page so changes, root causes, deleted files, and validation can be traced without versioned history files.
+
+## Global / Shared UI
+- Canonical control geometry: buttons, fields, dropdowns, modal layering, active sidebar state, responsive/mobile behavior, and desktop density.
+- Replacement cleanup: versioned runtime asset names were migrated to domain/canonical names; obsolete files are removed explicitly, not disabled by overwrite.
+
+## Network & Map
+- Preserve Station/Airport detail information hierarchy while adding optional image thumbnails and gallery behavior.
+- Gallery upload/display is additive; it must not rearrange provider/service metadata.
+
+## Monitoring & Assessment
+- Professional flat workspace tabs; submission filters use in-field labels only.
+- Share Checklist uses portal dialog and public short-link routes. Public share routes boot without protected-shell authentication.
+- Submission includes KPI summary, pie chart, bar chart, and pageable/sortable history.
+
+## Initiative & Improvement
+- Grid/List share the same filter source. Journey, touch point, achievement, priority and search filters are synchronized.
+- List table follows the Lounge table standard and exposes Update/Delete according to permissions.
+
+## Improvement Opportunity
+- Dashboard cards, Source Intake, Create Opportunity, Review/Disposition and Integrity sections use a responsive page layout.
+- Page-level runtime errors are contained inside the page and must never replace the portal shell.
+
+## Planning Workspace / Service & Provider
+- Lounge/Tenant is the presentation reference for GHA, Airport Operator and other provider categories.
+- Unassigned is hidden from the user-facing workspace; existing uncategorized records are not deleted.
+- Provider category images are configurable through the central category-image mapping.
+
+## Lounge / Tenant
+- Add/Edit/Delete and station/provider filters use canonical bindings.
+- Card/detail views retain Lounge/Tenant naming and parent navigation to Service & Provider.
+
+## Master Data & Partners
+- Master references and IDs are Add/Edit capable.
+- Only Touch Points sourced from NPS/CSI remain locked; manually maintained Touch Points remain editable.
+- Currency and exchange-rate collections are supported by the data API.
+
+## Audit Log
+- CRUD audit events from both the canonical and legacy audit stores are merged for Super Admin viewing.
+- Login and logout are written as server-side audit events.
+
+## Performance & Cache
+- Static assets use Service Worker caching and data collections use scoped IndexedDB cache with background refresh.
+- Protected-route authentication remains authoritative; public checklist share routes bypass the protected bootstrap only where explicitly allowed.
+
+## Deployment
+- Netlify regression gate must pass before handoff. Obsolete runtime files are deleted explicitly from the repository; no auto-delete build step is used.
+
+## 2026-10-15 — Canonical UI & Runtime Regression Recovery
+
+### Global / Shared
+- Standardized desktop density so browser 100% uses the compact portal density previously seen around 90%, while mobile remains 100%.
+- Kept dropdown, text field, radio, and checkbox content left-aligned.
+- Restored visible active-sidebar state and constrained button content so zoom does not escape button borders.
+- Changed Service Worker navigation caching to network-first and static assets to stale-while-revalidate to prevent stale `app.html` / authentication bootstrap mismatches while preserving fast repeat navigation.
+
+### Network & Map
+- Restored station-detail hierarchy after gallery support: provider metadata and service tabs retain their layout; service/lounge/facility images stay inside record content and no longer reshape the station header.
+- Made station detail responsive without oversized/overflowing tab controls.
+
+### Monitoring & Assessment
+- Reworked Overview / Monitoring Works / Form Templates / Submissions into flat professional navigation tabs without elevated-button shadows.
+- Standardized submission filters and Download Data to one control height and kept filters self-describing without separate field titles.
+- Protected shared-checklist routes against stale cached HTML/auth bootstrap mismatch.
+
+### Initiative & Improvement
+- Normalized the initial “Semua Journey” state so search and Grid View render correctly on first open, not only after changing Journey filters.
+- Aligned List View table presentation with the Lounge/Tenant table language and kept Update/Delete action rendering for editable roles.
+
+### Improvement Opportunity
+- Reworked the page to a full-width two-column workspace with separated KPI cards, source intake, create opportunity, register, and integrity panels.
+- Added initialization guards to prevent duplicate event binding / page lockups after route re-entry.
+
+### Planning Workspace / Service & Provider
+- Removed Unassigned from category presentation.
+- Standardized provider cards to the Lounge-style content hierarchy with station identity limited to about 15–20% of card width.
+- Standardized filter row and Grid/Details/action heights; editable roles use Edit/Delete while viewer-only roles use View.
+- Category imagery remains configurable through `GE_PLANNING_CATEGORY_IMAGES`.
+
+### Lounge/Tenant
+- Kept child title `Lounge/Tenant Planning` under the top-level `Service & Provider` navigation.
+- Restored canonical initialization for Add/Edit controls after Firestore hydration rather than relying on suppressed DOMContentLoaded handlers.
+- Standardized heading/back-action and Grid/Details heights.
+
+### Master Data & Partners
+- Preserved editable reference/ID behavior while keeping NPS/CSI-derived locked Touch Points read-only.
+- Ensured deployment includes server allow-list support for `currencies` and `exchangeRates`.
+- Standardized master tabs and content-height panels to avoid blank oversized areas.
+
+### Audit Log
+- Authentication audit path remains enabled for Login and Logout; canonical mutation flows continue to write their page/module audit records.
+
+### Deployment / Regression
+- Added pending-auth shell hiding expected by the navigation readiness regression gate.
+- No new R/P/V runtime identity was introduced by this work.
+

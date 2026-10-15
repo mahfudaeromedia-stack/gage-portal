@@ -44,7 +44,7 @@ async function waitStore(){
 function hasAccess(){if(cfg.perm==='admin')return window.gxHasUserManagementPermission?.()||session().role==='Super Admin';return window.gxHasPermission?.(cfg.perm)!==false}
 function rerender(){
  if(page==='standar'){const panel=new URLSearchParams(location.search).get('panel');const panelButton=panel?document.querySelector(`[data-standard-panel="${panel}"]`):null;if(panel&&window.showStandardPanel)window.showStandardPanel(panel,panelButton);window.renderTouchpointStandards?.();window.renderPersonnelReadiness?.();window.renderSkyPriority?.();window.geEnsureStandardModalV248?.();window.geApplyStandardContentV248?.();window.renderAnnouncementLibraryV246?.()}
- else if(page==='inisiatif'){window.geInitInitiativeCanonical?.();window.geApplyInitiativePresentationV224?.();const params=new URLSearchParams(location.search),id=params.get('initiative');if(id)window.geFocusInitiativeR65?.(id,params.get('milestone'))}
+ else if(page==='inisiatif'){window.geInitInitiativeCanonical?.();window.geApplyInitiativePresentationV224?.();window.geResetInitiativeJourneyState?.();const params=new URLSearchParams(location.search),id=params.get('initiative');if(id)window.geFocusInitiativeR65?.(id,params.get('milestone'))}
  else if(page==='service-planning'){window.geRenderPlanningPage?.();window.renderStationMaterials?.()}
  else if(page==='calendar'){window.geUpgradeCalendarModalV252?.();window.geUpgradeReminderV253?.();window.geCalBuildFiltersV2533?.();window.geCalRenderV2533?.();window.geBindCalendarControlsCanonical?.();window.geInitCalendarWorkspaceCanonical?.()}
  else if(page==='planning-documents'){window.renderPlanningDocuments?.()}
@@ -52,7 +52,7 @@ function rerender(){
  else if(page==='admin'){window.renderAdminOverview?.();window.renderAdminInbox?.();window.renderAuditLogs?.();window.p26RenderUsers?.();window.pmLoadPageR2?.();const params=new URLSearchParams(location.search),id=params.get('support'),message=params.get('inbox');if(id||message)window.showAdminSection?.('inbox',null);if(id)window.openSupportConversation?.(id);else if(message)window.openInboxDetail?.(message)}
  else if(page==='berita'){window.renderArticles?.();window.renderAnnouncements?.();window.renderFaqs?.();window.renderAnnouncementLibraryV246?.()}
  else if(page==='kontak'){if(!document.getElementById('supportConversations')){const el=document.createElement('section');el.id='supportConversations';el.className='card contact-form-card';document.querySelector('.contact-layout')?.after(el)}window.supportList?.();const id=new URLSearchParams(location.search).get('support');if(id)window.openSupportConversation?.(id)}
- else if(page==='lounge-list'){window.renderLounges?.();window.renderLoungeVisitors?.();window.renderLoungePriceSummaryV243?.();window.renderLoungeCardsV237?.();window.geInitFilterCombosR8?.('lounge')}
+ else if(page==='lounge-list'){window.geInitLoungeP29?.();window.renderLounges?.();window.renderLoungeVisitors?.();window.renderLoungePriceSummaryV243?.();window.renderLoungeCardsV237?.();window.geInitFilterCombosR8?.('lounge')}
  else if(page==='branch-office-planning'){window.geRenderPlanningPage?.();window.renderAirportSystems?.();window.renderLoungeProcurement?.();window.renderBOSpaces?.()}
  else if(page==='gaso-planning'){window.renderGasoAllV231?.()}
  else if(page==='airport-experience'){window.geInitAirportCanonical?.();}

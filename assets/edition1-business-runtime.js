@@ -5959,7 +5959,7 @@ function renderLoungeCardsV237(){
         <dl><div><dt>Periode kerja sama</dt><dd>${geEsc(x.startDate||x.contractStart||x.start||'-')} — ${geEsc(x.endDate||x.contractEnd||x.end||'-')}</dd></div>
         <div><dt>Harga per pax</dt><dd>${geEsc(geLoungePriceV237(x))}</dd></div></dl>
         <div class="lounge-card-actions-v237">
-          ${typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn secondary compact-btn" onclick="openLoungeEdit?.(${Number(x.id)})">Edit</button>`:''}
+          ${typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn secondary compact-btn" onclick='openLoungeEdit?.(${JSON.stringify(String(x.id))})'>Edit</button>`:''}
         </div>
       </div>
     </article>`;
@@ -6039,7 +6039,7 @@ renderLoungeCardsV237=function(){
   document.querySelectorAll('#loungeCardGridV237 .lounge-master-card-v237').forEach((card,i)=>{
     const x=rows[start+i]; if(!x)return;
     const actions=card.querySelector('.lounge-card-actions-v237');
-    if(actions && !actions.querySelector('.danger')) actions.insertAdjacentHTML('beforeend',`<button class="ge-btn danger compact-btn" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button>`);
+    if(actions && !actions.querySelector('.danger')) actions.insertAdjacentHTML('beforeend',`<button class="ge-btn danger compact-btn" onclick='deleteLoungeV239(${JSON.stringify(String(x.id))})'>Delete</button>`);
   });
 };
 
@@ -9351,8 +9351,8 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       const priceText=price.status==='CURRENT'||price.status==='LEGACY'?safePriceDisplay(price.currency,price.price):price.status==='NOT_APPLICABLE'?'Not Available':price.status==='INVALID'?'Requires Review':'Not Available';
       const priceMeta=scheduleCount?`${scheduleCount} Price Period${scheduleCount===1?'':'s'}`:'';
       const review=rt.status==='REVIEW'?`<div class="ge-p29-review-note">Requires Review: ${esc(rt.reason)}</div>`:'';
-      const update=canEdit()?`<button class="ge-btn secondary compact-btn" type="button" onclick="openLoungeEdit(${Number(x.id)})">Edit</button>`:'';
-      const del=typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn danger compact-btn" type="button" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button>`:'';
+      const update=canEdit()?`<button class="ge-btn secondary compact-btn" type="button" onclick='openLoungeEdit(${JSON.stringify(String(x.id))})'>Edit</button>`:'';
+      const del=typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn danger compact-btn" type="button" onclick='deleteLoungeV239(${JSON.stringify(String(x.id))})'>Delete</button>`:'';
       return `<article class="lounge-master-card-v237 ge-p29-lounge-card">
         <div class="lounge-master-code-v237">${esc(x.airport||'-')}</div>
         <div class="lounge-master-card-body-v237">
@@ -9380,7 +9380,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     const rows=filteredRows();
     tbody.innerHTML=rows.map((x,i)=>{
       const rt=resolveType(x),p=applicablePrice(x,new Date()),price=p.status==='CURRENT'||p.status==='LEGACY'?safePriceDisplay(p.currency,p.price):'Not Available';
-      const action=canEdit()?`<td><div class="row-actions"><button class="ge-btn secondary" onclick="openLoungeEdit(${Number(x.id)})">Edit</button><button class="ge-btn ge-btn danger" onclick="deleteLoungeV239(${Number(x.id)})">Delete</button></div></td>`:'';
+      const action=canEdit()?`<td><div class="row-actions"><button class="ge-btn secondary" onclick='openLoungeEdit(${JSON.stringify(String(x.id))})'>Edit</button><button class="ge-btn ge-btn danger" onclick='deleteLoungeV239(${JSON.stringify(String(x.id))})'>Delete</button></div></td>`:'';
       return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
     }).join('');
   }
@@ -9567,6 +9567,8 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
   }
 
   function setup(){
+    const addButton=document.getElementById('loungeAddAction');
+    if(addButton&&!addButton.dataset.boundCanonical){addButton.dataset.boundCanonical='1';addButton.addEventListener('click',()=>window.openLoungeAddModalV230?.());}
     const heading=document.querySelector('.lounge-master-view-label-v237');
     if(heading&&!document.getElementById('geP29ShowHistory')){const history=document.createElement('label');history.className='ge-p29-history-toggle';history.innerHTML='<input id="geP29ShowHistory" type="checkbox"> Show agreement history';heading.appendChild(history);document.getElementById('geP29ShowHistory').onchange=()=>renderLounges();}
     const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download Template';templateBtn.title='Download Template';}
@@ -9597,7 +9599,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
   }
 
   window.geInitLoungeP29=setup;
-  window.addEventListener('DOMContentLoaded',()=>setTimeout(setup,0));
+  if(document.getElementById('loungeAddAction'))setTimeout(setup,0);
 })();
 
   // Canonical SPA bridge: legacy inline handlers must remain globally callable after consolidation into this IIFE.
@@ -9771,7 +9773,7 @@ window.geFocusInitiativeR65=function(id,milestone){
  const typedId=typeof row.id==='number'?Number(row.id):row.id;window.openInitiativeTimelineV224?.(typedId);
  if(milestone!==null&&milestone!==undefined&&milestone!==''){const index=Number(milestone),step=row.workflow?.[index],cards=document.querySelectorAll('#initiativeTimelineModalV224 .timeline-card-v224');if(!step||!cards[index]){notice.textContent='Milestone yang dituju tidak tersedia dalam Initiative ini.';return}cards[index].style.outline='3px solid #287db5';cards[index].scrollIntoView({block:'center'})}
 };
-window.geInitInitiativeCanonical=function(){window.renderInitiatives?.()};
+window.geInitInitiativeCanonical=function(){if(typeof activeJourney==='undefined'||activeJourney==null)activeJourney='';const selected=document.querySelector('.journey-tab.active[data-journey]');activeJourney=selected?String(selected.dataset.journey||''):'';document.querySelectorAll('.journey-tab[data-journey]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.journey||'')===activeJourney));window.renderInitiatives?.();queueMicrotask(()=>window.renderInitiatives?.())};
 window.geFilterInitiativeTouchpoint=tp=>{location.href='app.html?page=calendar&view=gantt&touchpoint='+encodeURIComponent(tp||'')};
 
 let geGanttSortStateR13={key:'title',dir:1};
@@ -9926,8 +9928,12 @@ function geInitiativeFilterValue(id){const el=document.getElementById(id);return
 function geInitiativeCanUpdate(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||['Admin','Editor'].includes(String(s.accessLevel||''))}
 function geInitiativeCanDelete(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||String(s.accessLevel||'')==='Admin'}
 function geInitiativeListActions(x){const id=String(x?.id||'');const parts=[];if(geInitiativeCanUpdate())parts.push(`<button type="button" class="ge-btn compact" onclick="window.openInitiativeModalV224?.('${id}')">Update</button>`);if(geInitiativeCanDelete())parts.push(`<button type="button" class="ge-btn danger compact" onclick="window.deleteInitiativeV224?.('${id}')">Delete</button>`);if(!parts.length&&typeof geInitiativeManageButtonsV224==='function')return geInitiativeManageButtonsV224(x);return `<div class="planning-row-actions ge-initiative-actions">${parts.join('')}</div>`}
+function geInitiativeJourney(){
+  const raw=String(typeof activeJourney==='undefined'?'':activeJourney||'').trim();
+  return /^(semua|all)(\s+journey)?$/i.test(raw)?'':raw;
+}
 function geInitiativeFilteredRows(){
-  const d=store(),q=geInitiativeFilterValue('q').toLowerCase(),tp=geInitiativeFilterValue('ft'),ach=geInitiativeFilterValue('fs'),priority=geInitiativeFilterValue('geV2554Priority');
+  const d=store(),q=geInitiativeFilterValue('q').toLowerCase(),tp=geInitiativeFilterValue('ft'),ach=geInitiativeFilterValue('fs'),priority=geInitiativeFilterValue('geV2554Priority'),journeyFilter=geInitiativeJourney();
   return (d.initiatives||[]).filter(x=>{
     if(typeof geInitiativeScopedV224==='function'&&!geInitiativeScopedV224(x))return false;
     const tps=geInitiativeArray(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint));
@@ -9938,7 +9944,7 @@ function geInitiativeFilteredRows(){
     if(tp&&!tps.some(v=>v.toLowerCase()===tp.toLowerCase()))return false;
     if(ach&&typeof achievement==='function'&&achievement(x.plan,x.real)!==ach)return false;
     if(priority&&String(x.priority||'Normal')!==priority)return false;
-    if(typeof activeJourney!=='undefined'&&activeJourney&&!journeys.includes(activeJourney))return false;
+    if(journeyFilter&&!journeys.some(v=>v.toLowerCase()===journeyFilter.toLowerCase()))return false;
     return true;
   });
 }
@@ -9950,9 +9956,16 @@ if(initRender)window.renderInitiatives=function(){
     if(typeof renderInitiativeCharts==='function')renderInitiativeCharts(rows);
     return;
   }
-  host.innerHTML=`<div class="ge-initiative-list"><table data-initiative-list><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th data-table-no-sort>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc(geInitiativeArray(x.journeyScopes?.length?x.journeyScopes:x.journey).join(', ')||'-')}</td><td>${esc(geInitiativeArray(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint)).join(', ')||'-')}</td><td>${esc(geInitiativeArray(x.stations?.length?x.stations:x.airport).join(', ')||'-')}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${geInitiativeListActions(x)}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;
+  host.innerHTML=`<div class="ge-initiative-list"><table class="lounge-reference-table ge-initiative-table" data-initiative-list><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th data-table-no-sort>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc(geInitiativeArray(x.journeyScopes?.length?x.journeyScopes:x.journey).join(', ')||'-')}</td><td>${esc(geInitiativeArray(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint)).join(', ')||'-')}</td><td>${esc(geInitiativeArray(x.stations?.length?x.stations:x.airport).join(', ')||'-')}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${geInitiativeListActions(x)}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;
   if(typeof renderInitiativeCharts==='function')renderInitiativeCharts(rows);
   setTimeout(()=>window.geEnhanceAllTables?.(),0);
+};
+
+window.geResetInitiativeJourneyState=function(){
+  const valid=['','Pre-Journey','Pre-Flight','Post-Flight','Post-Journey'];
+  if(typeof activeJourney!=='undefined'&&!valid.includes(String(activeJourney||'')))activeJourney='';
+  document.querySelectorAll('.journey-tab').forEach(b=>b.classList.toggle('active',String(b.dataset.journey||'')===String(activeJourney||'')));
+  if(!window.GE_INITIATIVE_VIEW)window.GE_INITIATIVE_VIEW='grid';
 };
 window.geSetInitiativeView=function(v){window.GE_INITIATIVE_VIEW=v;document.querySelectorAll('#geInitiativeViewToggle [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));window.renderInitiatives?.()};
 setTimeout(()=>{document.querySelectorAll('#geInitiativeViewToggle [data-view]').forEach(b=>b.onclick=()=>window.geSetInitiativeView(b.dataset.view));const s=document.getElementById('geInitiativeViewSelect');if(s)s.onchange=()=>window.geSetInitiativeView(s.value)},0);
@@ -10045,7 +10058,7 @@ function geMapCanPhoto42(){const s=window.gxGetSession?.()||{};return s.role==='
 window.geMapOpenGallery42=function(urls,index=0){urls=Array.isArray(urls)?urls:[];if(!urls.length)return;let i=Math.max(0,Math.min(Number(index)||0,urls.length-1));let d=document.getElementById('geMapGallery42');if(!d){d=document.createElement('dialog');d.id='geMapGallery42';d.className='ge-map-gallery';document.body.appendChild(d)}const draw=()=>{d.innerHTML=`<button class="ge-dialog-close" type="button" data-close>×</button><button class="ge-gallery-nav prev" type="button" data-prev ${urls.length<2?'hidden':''}>‹</button><img src="${esc42(urls[i])}" alt="Service photo"><button class="ge-gallery-nav next" type="button" data-next ${urls.length<2?'hidden':''}>›</button><div class="ge-gallery-count">${i+1} / ${urls.length}</div>`;d.querySelector('[data-close]').onclick=()=>d.close();d.querySelector('[data-prev]')?.addEventListener('click',()=>{i=(i-1+urls.length)%urls.length;draw()});d.querySelector('[data-next]')?.addEventListener('click',()=>{i=(i+1)%urls.length;draw()})};draw();d.showModal()}
 function renderPanel42(c){const x=airport42(c),sets=sets42(c),host=document.getElementById('airportDetail');if(!host)return;const city=x.city||x.location||x.airportName||c,airport=x.airportName||x.name||x.airport||'Airport / Branch Office',cat=x.category||x.type||x.domInt||x.internationalDomestic||x.wilayah||x.region||'';const tabs=[['service','Service'],['lounge','Lounge'],['people','People'],['facility','Facility'],['system','System'],['contract','Contract']];host.innerHTML=`<div class="r42-map-detail"><div class="r42-map-head"><div><h2>${esc42(city)}</h2><p>${esc42(airport)}${cat?` • ${esc42(cat)}`:''}</p></div><a class="r42-station360" href="app.html?page=station-360&station=${encodeURIComponent(c)}">Station 360</a></div><div class="r42-map-tabscroll"><div class="r42-map-tabs">${tabs.map(([k,l],i)=>`<button type="button" class="${i?'':'active'}" data-r42-tab="${k}"><span>${l}</span><b>${sets[k].length}</b></button>`).join('')}</div></div><div class="r42-map-tabbody"></div></div>`;
  const body=host.querySelector('.r42-map-tabbody');
- const draw=k=>{const rows=sets[k]||[];body.innerHTML=rows.length?rows.map((r,ri)=>{const imgs=geMapImages42(r),canPhoto=geMapCanPhoto42()&&['service','lounge','facility'].includes(k),first=imgs[0];return `<div class="r42-map-item"><small>${esc42(k.toUpperCase())}</small><b>${esc42(r.name||r.title||r.provider||r.product||r.serviceName||'-')}</b><span>${esc42(r.status||r.documentStatus||r.type||'')}</span>${imgs.length?`<button class="ge-map-thumb" type="button" data-img-index="${ri}"><img ${first?.url?`src="${esc42(first.url)}"`:''} data-map-photo-key="${esc42(first?.key||'')}" alt="${esc42(first?.name||'Service photo')}" loading="lazy"><em>${imgs.length>1?imgs.length+' photos':'View photo'}</em></button>`:''}${canPhoto?`<button class="ge-btn compact secondary ge-map-photo-upload" type="button" data-map-photo-upload data-kind="${esc42(k)}" data-index="${ri}">+ Upload Photo</button>`:''}</div>`}).join(''):'<div class="r42-map-empty">No data available.</div>';
+ const draw=k=>{const rows=sets[k]||[];body.innerHTML=rows.length?rows.map((r,ri)=>{const imgs=geMapImages42(r),canPhoto=geMapCanPhoto42()&&['service','lounge','facility'].includes(k),first=imgs[0];return `<div class="r42-map-item"><small>${esc42(k.toUpperCase())}</small><b>${esc42(title42(r,k))}</b>${sub42(r,k)?`<span>${esc42(sub42(r,k))}</span>`:''}${imgs.length?`<button class="ge-map-thumb" type="button" data-img-index="${ri}" aria-label="Open ${esc42(title42(r,k))} photo gallery"><img ${first?.url?`src="${esc42(first.url)}"`:''} data-map-photo-key="${esc42(first?.key||'')}" alt="${esc42(first?.name||title42(r,k)+' photo')}" loading="lazy"><em>${imgs.length>1?imgs.length+' photos':'View photo'}</em></button>`:''}${canPhoto?`<button class="ge-btn compact secondary ge-map-photo-upload" type="button" data-map-photo-upload data-kind="${esc42(k)}" data-index="${ri}">+ Upload Photo</button>`:''}</div>`}).join(''):'<div class="r42-map-empty">No data available.</div>';
    const resolveUrls=async r=>{const imgs=geMapImages42(r),urls=[];for(const im of imgs){if(im.url){urls.push(im.url);continue}if(im.key&&window.GEFiles?.get){try{const blob=await window.GEFiles.get(im.key);if(blob)urls.push(URL.createObjectURL(blob))}catch(_){}}}return urls};
    body.querySelectorAll('[data-img-index]').forEach(btn=>btn.onclick=async()=>{const r=rows[Number(btn.dataset.imgIndex)];const urls=await resolveUrls(r);window.geMapOpenGallery42(urls,0)});
    body.querySelectorAll('img[data-map-photo-key]').forEach(async img=>{const key=img.dataset.mapPhotoKey;if(!key||img.src)return;try{const blob=await window.GEFiles?.get?.(key);if(blob){const u=URL.createObjectURL(blob);img.src=u;img.onload=()=>setTimeout(()=>URL.revokeObjectURL(u),2000)}}catch(_){}});

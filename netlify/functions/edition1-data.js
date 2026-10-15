@@ -10,7 +10,7 @@ const COLLECTIONS = new Set([
   'inbox','auditLogs','users','lounges','standardContent','portalManager','contactMessages','guestbook',
   'airlines','groundHandlers','serviceAlignments','airportCosts','aircraftConfigs','assets','facilities',
   'monitoringTemplates','monitoringAssessments','formTemplates','monitoringWorks','formSubmissions','customerExperience','attentionSettings',
-  'referenceCatalog','requirementMatrix','stationCapabilities','planningDomains'
+  'referenceCatalog','requirementMatrix','stationCapabilities','planningDomains','currencies','exchangeRates'
 ]);
 const DATA_GROUP_BY_COLLECTION = Object.fromEntries([...COLLECTIONS].map(name => [name, name]));
 const METADATA_COLLECTIONS = new Set(['standardContent','portalManager','attentionSettings']);
@@ -42,7 +42,7 @@ const MODULE_BY_COLLECTION = {
   news:'news', articles:'news', announcements:'news', faqs:'news', contactMessages:'contact', guestbook:'contact',
   touchpoints:'services', skyPriority:'services', touchpointStandards:'services', standardContent:'services',
   portalManager:'admin', auditLogs:'admin', users:'admin', airlines:'data', groundHandlers:'data', serviceAlignments:'services', airportCosts:'planning', aircraftConfigs:'data', assets:'planning', facilities:'planning',
-  monitoringTemplates:'services', monitoringAssessments:'services', formTemplates:'services', monitoringWorks:'services', formSubmissions:'services', customerExperience:'services', attentionSettings:'services', referenceCatalog:'data', requirementMatrix:'services', stationCapabilities:'services', planningDomains:'planning', events:'calendar'
+  monitoringTemplates:'services', monitoringAssessments:'services', formTemplates:'services', monitoringWorks:'services', formSubmissions:'services', customerExperience:'services', attentionSettings:'services', referenceCatalog:'data', requirementMatrix:'services', stationCapabilities:'services', planningDomains:'planning', currencies:'data', exchangeRates:'data', events:'calendar'
 };
 function active(actor){return actor && String(actor.status || 'Active').toLowerCase() !== 'inactive';}
 function isOperationalAdmin(actor){ return actor?.role === 'Admin' || String(actor?.accessLevel||'') === 'Admin'; }
@@ -142,10 +142,27 @@ async function readCollection(db,actor,c){
     const snap=await dataQuery(db,c).where('recipientId','==',String(actor.id)).get(); docs=snap.docs;
   } else if(c==='users'){
     const snap=await db.collection('users').get(); docs=snap.docs;
+  } else if(c==='auditLogs'){
+    const [canonical,legacy]=await Promise.all([dataQuery(db,c).get(),db.collection('auditLogs').get()]);
+    const merged=new Map();
+    [...canonical.docs,...legacy.docs].forEach(doc=>merged.set(String(doc.id),doc));
+    docs=[...merged.values()];
   } else {
     const snap=await dataQuery(db,c).get(); docs=snap.docs;
   }
   let rows=docs.map(d=>({id:d.id,...sanitize(d.data())}));
+  if(c==='auditLogs'){
+    rows=rows.map(x=>({
+      ...x,
+      timestamp:x.timestamp||x.at||x.createdAt||x.updatedAt||'',
+      name:x.name||x.actorName||x.user||x.username||'',
+      username:x.username||x.email||'',
+      role:x.role||x.actorRole||'',
+      module:x.module||(/^(Login|Logout)$/i.test(String(x.action||''))?'Authentication':'Portal'),
+      object:x.object||x.targetType||x.page||'Activity',
+      detail:x.detail||x.message||''
+    })).sort((a,b)=>String(b.timestamp||'').localeCompare(String(a.timestamp||'')));
+  }
   if(c==='inbox' && (isOperationalAdmin(actor)||actor.role==='Super Admin')) rows=rows.filter(x=>!x.recipientId||String(x.recipientId)===String(actor.id));
   if(c==='users') rows=rows.map(x=>{delete x.password;delete x.passwordHash;delete x.temporaryPassword;return x});
   if(c==='formTemplates' && !isOperationalAdmin(actor) && actor.role!=='Super Admin'){
@@ -180,7 +197,7 @@ async function writeOne(db,actor,collection,action,id,raw){
     if(collection==='initiatives' && !isExternalActor(actor) && actor.role!=='Super Admin' && !isOperationalAdmin(actor)) throw Object.assign(new Error('Admin access required to delete initiatives.'),{statusCode:403,code:'HIERARCHY_FORBIDDEN'});
     await ref.delete();
     await bumpCacheVersion(db,collection);
-    await db.collection('auditLogs').add({actorId:actor.id,actorRole:actor.role,name:actor.name||actor.username||actor.email||actor.id,username:actor.username||actor.email||'',module:collection,object:ref.id,detail:`${collection} ${action.toLowerCase()}`,targetType:`EDITION1_${collection.toUpperCase()}`,targetId:ref.id,action:'Delete',timestamp:FieldValue.serverTimestamp(),result:'SUCCESS'});
+    await dataQuery(db,'auditLogs').add({actorId:actor.id,actorRole:actor.role,name:actor.name||actor.username||actor.email||actor.id,username:actor.username||actor.email||'',module:collection,object:ref.id,detail:`${collection} ${action.toLowerCase()}`,targetType:`EDITION1_${collection.toUpperCase()}`,targetId:ref.id,action:'Delete',timestamp:FieldValue.serverTimestamp(),result:'SUCCESS'});
     return {id:ref.id,deleted:true};
   }
   const data=cleanData(raw); const existing=await ref.get(); const prev=existing.exists?existing.data()||{}:{};
@@ -261,7 +278,7 @@ async function writeOne(db,actor,collection,action,id,raw){
     }));
   }
   const out=await ref.get();
-  await db.collection('auditLogs').add({actorId:actor.id,actorRole:actor.role,name:actor.name||actor.username||actor.email||actor.id,username:actor.username||actor.email||'',module:collection,object:ref.id,detail:`${collection} ${action.toLowerCase()}`,targetType:`EDITION1_${collection.toUpperCase()}`,targetId:ref.id,action:action.charAt(0)+action.slice(1).toLowerCase(),timestamp:FieldValue.serverTimestamp(),result:'SUCCESS'});
+  await dataQuery(db,'auditLogs').add({actorId:actor.id,actorRole:actor.role,name:actor.name||actor.username||actor.email||actor.id,username:actor.username||actor.email||'',module:collection,object:ref.id,detail:`${collection} ${action.toLowerCase()}`,targetType:`EDITION1_${collection.toUpperCase()}`,targetId:ref.id,action:action.charAt(0)+action.slice(1).toLowerCase(),timestamp:FieldValue.serverTimestamp(),result:'SUCCESS'});
   return {id:ref.id,...sanitize(out.data())};
 }
 exports.handler=async(event)=>{

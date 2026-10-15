@@ -1,18 +1,20 @@
 <!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ground Experience Portal</title>
-<script>document.documentElement.classList.add('ge-route-pending')</script><style>html.ge-route-pending,html.ge-route-pending body{background:#f4f7fb}html.ge-route-pending body.e1-page>.top,html.ge-route-pending body.e1-page>.shell,html.ge-route-pending body.e1-page>.footer,html.ge-route-pending body.e1-page>.back-to-top{display:none}html.ge-route-pending body.e1-page:before{content:'Memuat halaman tujuan…';position:fixed;inset:0;display:grid;place-items:center;color:#123d72;font:600 16px Arial,sans-serif}</style>
+<script>document.documentElement.classList.add('ge-route-pending')</script><style>html.ge-route-pending,html.ge-route-pending body{background:#f4f7fb}html.ge-route-pending body.e1-page>.shell{display:none}html.ge-route-pending #cleanPageOutlet{min-height:240px;opacity:.72;transition:opacity .12s ease}html:not(.ge-route-pending) #cleanPageOutlet{opacity:1;transition:opacity .12s ease}.clean-page-loading{display:flex;align-items:center;min-height:180px;padding:24px;color:#607a92;font:600 13px Arial,sans-serif}</style>
 <link rel="stylesheet" href="assets/portal.css"><link rel="stylesheet" href="assets/clean-shell.css"><link rel="stylesheet" href="assets/global-ui-canonical.css">
-<script>try{if((localStorage.getItem('GE_SIDEBAR_COLLAPSED') ?? localStorage.getItem('GE_V257_SIDEBAR_COLLAPSED'))==='1')document.documentElement.classList.add('ge-precollapsed')}catch(e){}</script><script src="assets/portal-shell.js"></script><script src="assets/firebase-config.js"></script><script src="assets/firebase-client.js"></script><script src="assets/auth.js"></script><script src="assets/clean-page-registry.js"></script></head><body id="top" class="e1-page"><header class="top"></header><div class="shell"><aside class="side"></aside><main class="main" id="cleanPageOutlet"><div class="clean-page-loading">Memuat halaman…</div></main></div><footer class="footer"><b>GROUND EXPERIENCE — GARUDA INDONESIA</b><br>Portal Service Experience</footer><button aria-label="Kembali ke atas" class="back-to-top" id="backToTop">↑</button>
+<script>try{document.documentElement.classList.add('ge-portal-density');if((localStorage.getItem('GE_SIDEBAR_COLLAPSED') ?? localStorage.getItem('GE_V257_SIDEBAR_COLLAPSED'))==='1')document.documentElement.classList.add('ge-precollapsed')}catch(e){}</script><script src="assets/portal-shell.js"></script><script src="assets/firebase-config.js"></script><script src="assets/firebase-client.js"></script><script src="assets/auth.js"></script><script src="assets/clean-page-registry.js"></script></head><body id="top" class="e1-page"><header class="top"></header><div class="shell"><aside class="side"></aside><main class="main" id="cleanPageOutlet"><div class="clean-page-loading">Memuat halaman…</div></main></div><footer class="footer"><b>GROUND EXPERIENCE — GARUDA INDONESIA</b><br>Portal Service Experience</footer><button aria-label="Kembali ke atas" class="back-to-top" id="backToTop">↑</button>
 <script src="assets/edition1-overlay-manager.js"></script><script src="assets/clean-route-adapter.js"></script><script src="assets/table-runtime.js"></script><script src="assets/portal-ui-runtime.js"></script><script src="assets/cache-runtime.js"></script><script>
 (async function(){
  const outlet=document.getElementById('cleanPageOutlet');
  const reveal=()=>document.documentElement.classList.remove('ge-route-pending');
  try{
-  // Protected page content must never boot before Firebase auth + authoritative profile/role are resolved.
-  if(!window.GX_AUTH_READY) throw new Error('Authentication bootstrap tidak tersedia.');
   const params=new URLSearchParams(location.search); let route=String(params.get('page')||'index').trim().toLowerCase();
   const isSharedChecklist=['monitoring-assessment','monitoring-checklist'].includes(route)&&!!params.get('share');
-  if(!isSharedChecklist) await window.GX_AUTH_READY;
-  if(!isSharedChecklist&&!window.gxGetSession?.()) return; // auth bootstrap is redirecting to login or access fallback.
+  // Public checklist links must boot without the protected-shell auth bootstrap.
+  if(!isSharedChecklist){
+    if(!window.GX_AUTH_READY) throw new Error('Authentication bootstrap tidak tersedia.');
+    await window.GX_AUTH_READY;
+    if(!window.gxGetSession?.()) return; // auth bootstrap is redirecting to login or access fallback.
+  }
   if(isSharedChecklist){ const shareCss=document.createElement('link');shareCss.rel='stylesheet';shareCss.href='assets/checklist-share.css';document.head.appendChild(shareCss); document.body.classList.add('ge-shared-public-route'); document.querySelector('.top')?.remove(); document.querySelector('.side')?.remove(); document.querySelector('.footer')?.remove(); document.querySelector('.back-to-top')?.remove(); document.querySelector('.shell')?.classList.add('ge-shared-public-shell'); }
   if(window.gxCurrentPageKey?.()==='admin.html'&&!window.gxHasUserManagementPermission?.()){outlet.innerHTML='<div class="clean-page-error"><h2>Akses User &amp; Role tidak tersedia</h2><p>Hanya Super Admin atau HO/GE Team dengan access level Admin yang dapat mengelola pengguna.</p></div>';reveal();return;}
   // app.html is the SPA host, never a logical page. Recover stale/legacy ?page=app links before rendering.
@@ -29,6 +31,9 @@
   // Destination content is prepared, but the route remains hidden until route-specific styles/scripts are ready.
   // Route-specific styles not already in the canonical shell.
   for(const href of def.styles||[]){ if([...document.styleSheets].some(x=>x.href&&x.href.includes(href.split('?')[0]))) continue; const l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l); }
+  // Shared controls own the final cascade so page-specific CSS cannot silently regress button/field/tab geometry.
+  const canonicalUi=[...document.querySelectorAll('link[rel="stylesheet"]')].find(x=>x.href&&x.href.includes('/assets/global-ui-canonical.css'));
+  if(canonicalUi)document.head.appendChild(canonicalUi);
   function loadSrc(src){
     if(src.includes('assets/master-reference.js'))src='assets/master-reference.js';
     if(src.includes('assets/dashboard-firestore.js'))src='assets/dashboard-firestore.js';
