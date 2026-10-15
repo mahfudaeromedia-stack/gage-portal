@@ -16,7 +16,7 @@
 
 const store=window.GEStore;
 let data=store.get();
-let activeJourney='';
+let activeJourney='';window.GE_INITIATIVE_STATE=window.GE_INITIATIVE_STATE||{journey:''};try{Object.defineProperty(window,'activeJourney',{configurable:true,get:()=>activeJourney,set:v=>{activeJourney=String(v||'');window.GE_INITIATIVE_STATE.journey=activeJourney}})}catch(_){window.activeJourney=activeJourney}
 
 function save(){store.save(data)}
 function achievement(plan,real){return +real<+plan?'Below':(+real===+plan?'Meet':'Exceed')}
@@ -156,7 +156,7 @@ function renderInitiatives(){
  renderInitiativeCharts(rows);
 }
 function setJourneyFilter(journey){
- activeJourney=journey||'';
+ activeJourney=journey||'';window.GE_INITIATIVE_STATE.journey=activeJourney;
  document.querySelectorAll('.journey-tab').forEach(x=>
    x.classList.toggle('active',x.dataset.journey===activeJourney)
  );
@@ -9939,7 +9939,7 @@ function geInitiativeCanUpdate(){const s=window.gxGetSession?.()||{};return s.ro
 function geInitiativeCanDelete(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||String(s.accessLevel||'')==='Admin'}
 function geInitiativeListActions(x){const id=String(x?.id||'');const parts=[];if(geInitiativeCanUpdate())parts.push(`<button type="button" class="ge-btn compact" onclick="window.openInitiativeModalV224?.('${id}')">Update</button>`);if(geInitiativeCanDelete())parts.push(`<button type="button" class="ge-btn danger compact" onclick="window.deleteInitiativeV224?.('${id}')">Delete</button>`);if(!parts.length&&typeof geInitiativeManageButtonsV224==='function')return geInitiativeManageButtonsV224(x);return `<div class="planning-row-actions ge-initiative-actions">${parts.join('')}</div>`}
 function geInitiativeJourney(){
-  const raw=String(typeof activeJourney==='undefined'?'':activeJourney||'').trim();
+  const raw=String(window.GE_INITIATIVE_STATE?.journey??activeJourney??'').trim();
   return /^(semua|all)(\s+journey)?$/i.test(raw)?'':raw;
 }
 function geInitiativeFilteredRows(){
@@ -9973,7 +9973,7 @@ if(initRender)window.renderInitiatives=function(){
 
 window.geResetInitiativeJourneyState=function(){
   const valid=['','Pre-Journey','Pre-Flight','Post-Flight','Post-Journey'];
-  if(typeof activeJourney!=='undefined'&&!valid.includes(String(activeJourney||'')))activeJourney='';
+  if(!valid.includes(String(activeJourney||'')))activeJourney='';window.GE_INITIATIVE_STATE.journey=activeJourney;
   document.querySelectorAll('.journey-tab').forEach(b=>b.classList.toggle('active',String(b.dataset.journey||'')===String(activeJourney||'')));
   if(!window.GE_INITIATIVE_VIEW)window.GE_INITIATIVE_VIEW='grid';
 };

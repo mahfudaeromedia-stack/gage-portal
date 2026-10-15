@@ -7,8 +7,8 @@
  const outlet=document.getElementById('cleanPageOutlet');
  const reveal=()=>document.documentElement.classList.remove('ge-route-pending');
  try{
-  const params=new URLSearchParams(location.search); let route=String(params.get('page')||'index').trim().toLowerCase();
-  const isSharedChecklist=['monitoring-assessment','monitoring-checklist'].includes(route)&&!!params.get('share');
+  const params=new URLSearchParams(location.search); const shortMatch=location.pathname.match(/\/s\/([^/?#]+)/i); if(shortMatch&&!params.get('share')){params.set('share',decodeURIComponent(shortMatch[1]));params.set('page','monitoring-checklist')} let route=String(params.get('page')||'index').trim().toLowerCase();
+  const isSharedChecklist=(['monitoring-assessment','monitoring-checklist'].includes(route)&&!!params.get('share'))||!!shortMatch;
   // Public checklist links must boot without the protected-shell auth bootstrap.
   if(!isSharedChecklist){
     if(!window.GX_AUTH_READY) throw new Error('Authentication bootstrap tidak tersedia.');

@@ -128,3 +128,47 @@ This is the single canonical work-history file for the portal. Entries are group
 - Generic bulk upload uses the same professional import/review pattern and accepts XLSX/CSV when the shared reader is available.
 - Lounge/Tenant page hydrates Airport/Region master data and rebinds Add/Grid/Details on SPA route entry.
 - Service & Provider child pages use `data` wording, support Show agreement history, and retain Expired / Expiring Soon lifecycle filters and warnings.
+
+
+## 2026-10-15 — Planning Workspace canonicalization and Monitoring recovery
+### Planning Workspace
+- Lounge/Tenant, GHA, Airport Operator and other Planning Workspace children now use the same `planning-domains.js` renderer and behavior for cards, details table, filters, pagination, Add/Edit, bulk import, warnings, delete confirmation and feedback.
+- Planning counts are user-facing data rows/station entries rather than source-object counts.
+- Space & Building category visuals use domain-appropriate images and consistent card geometry.
+### Monitoring & Assessment
+- Public shortlinks can bootstrap directly from `/s/<code>` without protected authentication.
+- Shared checklist removes internal Checklist ID/version and mapping metadata; rating/numeric scale render as selectable circles.
+- Form builder supports respondent information required/optional.
+- Submission filters use placeholder/options without separate field-title labels.
+### Master Data & Partners
+- Canonical hydration includes every collection consumed by editable master references.
+### Initiative
+- Initial Journey state is synchronized through a canonical state object to prevent `activeJourney` initialization errors.
+- Initiative list container and document-action overflow are normalized.
+
+## 2026-10-15 — Shared Component Recovery / Root-Cause Audit
+### Planning Workspace / Lounge / GHA / Space & Building
+- Replaced the independent Lounge route implementation with the same `planning-domains.js` renderer used by the other Planning Workspace children; UI similarity is no longer achieved by page-specific patches.
+- One shared behavior now owns Grid/Details, filters, card/table rendering, pagination, lifecycle warnings, Add/Edit, Bulk Upload, Delete confirmation, and user feedback.
+- GHA displayed data count follows station-entry rows shown to the user, not hidden source-object totals.
+- Space & Building image cards use domain-appropriate imagery and consistent image cropping/geometry.
+
+### Master Data & Partners
+- Root cause of dead Add/Edit modal was conflicting legacy `#geGlobalRefModal` ownership in `portal.css` (`pointer-events:none`) versus the new modal runtime.
+- Removed the obsolete duplicated modal ownership from `portal.css`; `global-ui-canonical.css` is now the single overlay owner.
+- Save retains duplicate-submit prevention, busy state, live status, and error feedback.
+
+### Monitoring & Assessment / Shared Checklist
+- Direct `/s/<code>` routes are recognized by both authentication bypass and checklist runtime token resolution; share behavior no longer depends only on query-string rewriting.
+- Public checklist focuses on operational questions: Checklist ID/version and unmapped-touch-point diagnostics are not displayed.
+- Rating/numeric-scale fields render selectable circular choices; respondent identity can be required or optional by template.
+- Submission filter controls have no redundant visible field-title row.
+
+### Initiative & Improvement
+- Shared initiative state bridges route/runtime scope to avoid `activeJourney is not defined` during first entry.
+- Legacy internal recovery text is removed from the visible registry content.
+- List-view framing and document/milestone action overflow are normalized.
+
+### Regression / Ownership
+- Master modal legacy CSS ownership was deleted rather than overridden.
+- Regression tests were updated to assert semantic canonical ownership (`planning-domains.js`, `global-ui-canonical.css`, direct shortlink routing) instead of preserving obsolete implementation names.
