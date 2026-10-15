@@ -38,4 +38,4 @@ Kelompok temuan:
 - `P40_CLEAN_ALIASES`, `P40_CLEAN_PAGES`, key storage, dan class CSS lintas file **belum** diubah karena merupakan kontrak runtime/data; tidak boleh diganti tanpa migrasi dan validasi interaksi.
 
 ## Cleanup aman fungsi lokal (11 Oktober 2026)
-`geProgressToneR17` → `geProgressTone`; `geEnsureStationMaterialViewR65` → `geEnsureStationMaterialView`; `geP29RenderTableBaseR4` → `renderLoungeTableBase` pada `assets/edition1-business-runtime.js`. `pmPageKeyR2` **tidak diubah** karena ditemukan caller pada `assets/page-identity-v28.js`. Nama DOM ID, persisted key, dan public API tidak dimigrasi.
+`geProgressToneR17` → `geProgressTone`; `geEnsureStationMaterialViewR65` → `geEnsureStationMaterialView`; `geP29RenderTableBaseR4` → `renderLoungeTableBase` pada `assets/edition1-business-runtime.js`. `pmPageKeyR2` **tidak diubah** karena ditemukan caller pada `assets/page-identity.js`. Nama DOM ID, persisted key, dan public API tidak dimigrasi.

@@ -49,10 +49,10 @@ Rule: CBNR (Canonical Baseline No-Regression Rule)
 | Master Data hydration | `assets/master-reference.js` | TEST-1 logic retained, operational hydration removed | R38.1 proves operational collections must not be hydrated as Master Data |
 | Initiative delete/filter | `assets/edition1-business-runtime.js` | TEST-1 change retained for semantic merge | Later runtime behavior uses GEStore persistence and explicit confirmation |
 | Planning cache/data | `assets/planning-domains.js` + `assets/edition1-store.js` | TEST-1 retained pending full route audit | Planning uses GEStore; store already implements IndexedDB cache-first + background manifest refresh |
-| Customer Experience | `assets/customer-experience-v257.js` | TEST-1 change retained | Adds derived performance API without removing existing canonical exports |
-| Management Outcome | `assets/management-outcome-v257.js` | TEST-1 change retained | Adds outcome metrics while preserving existing API |
-| Improvement / Monitoring bridge | `assets/improvement-v257.js` | TEST-1 change retained | Adds Monitoring Assessment → Opportunity traceability |
-| Permission scope | `assets/permission-v257.js` | TEST-1 change retained | Extends station/menu/effective scope while preserving existing station scope |
+| Customer Experience | `assets/customer-experience.js` | TEST-1 change retained | Adds derived performance API without removing existing canonical exports |
+| Management Outcome | `assets/management-outcome.js` | TEST-1 change retained | Adds outcome metrics while preserving existing API |
+| Improvement / Monitoring bridge | `assets/improvement.js` | TEST-1 change retained | Adds Monitoring Assessment → Opportunity traceability |
+| Permission scope | `assets/permission.js` | TEST-1 change retained | Extends station/menu/effective scope while preserving existing station scope |
 | Global UI | `assets/portal.css` + branch UI modules | NOT YET FINAL | Requires semantic consolidation; current CSS still contains overlapping historical layers |
 | Master catalog | MAIN `assets/reference-id-catalog.js` + TEST-1 `master-reference.js` | MERGE REQUIRED | MAIN-only catalog functionality must be incorporated into canonical Master Data, then standalone catalog removed |
 
@@ -129,7 +129,7 @@ Rule: CBNR (Canonical Baseline No-Regression Rule)
 ## 2026-10-02 — UI Canonical Consolidation Follow-up
 
 - Continued from the existing CBNR baseline; no MAIN + TEST-1 reconsolidation.
-- Removed duplicate `assets/lounge-planning-v29.js`; its valid implementation was already consolidated into `assets/edition1-business-runtime.js`.
+- Removed duplicate `assets/lounge-planning.js`; its valid implementation was already consolidated into `assets/edition1-business-runtime.js`.
 - Removed dormant `assets/global-select-standard.js`; no production element used its opt-in marker.
 - Lounge/Tenant Grid/Details is now the shared segmented control, not a legacy select.
 - Default dropdown is native select with filled navy triangle treatment.

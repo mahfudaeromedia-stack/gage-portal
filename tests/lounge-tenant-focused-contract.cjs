@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const js = fs.readFileSync(path.join(root,'assets/lounge-planning-v29.js'),'utf8');
+const js = fs.readFileSync(path.join(root,'assets/edition1-business-runtime.js'),'utf8');
 const css = fs.readFileSync(path.join(root,'assets/portal.css'),'utf8');
 const cases = [
   ['station supports legacy airport field', /x\.airport\|\|x\.station/.test(js)],

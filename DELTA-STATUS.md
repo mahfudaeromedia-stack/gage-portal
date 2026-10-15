@@ -18,7 +18,7 @@ Changed paths:
 - assets/edition1-business-runtime.js
 - assets/form-management.js
 - assets/global-ui-canonical.css
-- assets/lounge-planning-v29.js
+- assets/lounge-planning.js
 - assets/master-reference.js
 - assets/password.js
 - assets/planning-domains.js

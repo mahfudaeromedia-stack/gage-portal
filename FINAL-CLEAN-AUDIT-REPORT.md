@@ -52,7 +52,7 @@ The work addresses the UI regressions identified during visual review:
 
 ### Lounge/Tenant
 
-- Standalone `assets/lounge-planning-v29.js` was removed because its implementation was already consolidated into `assets/edition1-business-runtime.js`.
+- Standalone `assets/lounge-planning.js` was removed because its implementation was already consolidated into `assets/edition1-business-runtime.js`.
 - Registry no longer loads that duplicate runtime.
 - Add action is `Add`.
 - Grid/Details uses the shared segmented control.

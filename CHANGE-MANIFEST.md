@@ -6,7 +6,7 @@
 - Existing filter event is dispatched only on confirmation.
 
 ## Verification
-- `node --check assets/lounge-planning-v29.js` — passed.
+- `node --check assets/lounge-planning.js` — passed.
 - `npm test` — 58 existing regression tests passed.
 
 ## Not yet verified / not delivered in this delta

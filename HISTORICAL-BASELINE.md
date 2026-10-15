@@ -296,7 +296,7 @@ Therefore the confirmed collision was treated as an identity-resolution weakness
 
 ### Stable identity registry
 
-`assets/page-identity-v28.js` adds independent stable identities, including:
+`assets/page-identity.js` adds independent stable identities, including:
 
 - `touchpoint.html → journey-touchpoint`
 - `admin.html → account-access-management`
@@ -325,7 +325,7 @@ Existing CSS already contained multiple modal z-index patches, which made isolat
 
 ### Shared solution
 
-`assets/overlay-v30.js` establishes a reusable overlay-root rule:
+`assets/overlay.js` establishes a reusable overlay-root rule:
 
 - blocking overlays are promoted to `document.body`
 - the overlay receives a fixed viewport root
@@ -357,7 +357,7 @@ All 60 HTML pages that load the portal shell now load the shared P30 overlay mod
 
 ### Unchanged business/data implementation
 
-- `assets/lounge-planning-v29.js` is unchanged from P29.
+- `assets/lounge-planning.js` is unchanged from P29.
 - P29 Lounge/Tenant service-type resolution is preserved.
 - P29 single-price compatibility is preserved.
 - P29 multi-period pricing is preserved.
@@ -728,8 +728,8 @@ The following approved foundation files were checksum-verified unchanged:
 
 Also preserved unchanged:
 
-- `assets/lounge-planning-v29.js`
-- `assets/overlay-v30.js`
+- `assets/lounge-planning.js`
+- `assets/overlay.js`
 - `assets/access-assistance-p32.js`
 
 No Authentication initialization, login pipeline, Session Profile service, Role resolver, Access Level resolver, Scope resolver, Permission resolver, or Dashboard POV resolver was refactored.
@@ -918,7 +918,7 @@ Manual Add/Update normalizes the selected value into both fields with the same v
 
 - `assets/app.js` — existing Lounge Master behavior audited; P29 overrides are kept in a separate focused module.
 - `lounge-list.html` — Lounge/Tenant Add/Update and filter UI entry points aligned.
-- `assets/lounge-planning-v29.js` — canonical type resolution, normalized input contract, card/table rendering, CSV workflow.
+- `assets/lounge-planning.js` — canonical type resolution, normalized input contract, card/table rendering, CSV workflow.
 
 ## 2. Lounge / Tenant filter
 
@@ -953,7 +953,7 @@ Existing `Snack Box` records, if present, remain visible under All so the older 
 
 ### Storage/source audit
 
-The audited Lounge Master is exposed through `GEStore`/`data.lounges` in `assets/data.js` and `assets/app.js`. The package does not contain a direct Firestore collection implementation for the Lounge Master itself. `assets/agreement-v257.js` and `assets/service-location-v257.js` bootstrap separate relational compatibility views from the legacy Lounge Master; these were not migrated or destructively merged in P29.
+The audited Lounge Master is exposed through `GEStore`/`data.lounges` in `assets/data.js` and `assets/app.js`. The package does not contain a direct Firestore collection implementation for the Lounge Master itself. `assets/agreement.js` and `assets/service-location.js` bootstrap separate relational compatibility views from the legacy Lounge Master; these were not migrated or destructively merged in P29.
 
 ## 4. Data contract
 
@@ -1156,7 +1156,7 @@ Existing malformed data is rendered safely and flagged where appropriate. Render
 
 The package already contains a useful **Service Location** capability:
 
-- `assets/service-location-v257.js`
+- `assets/service-location.js`
 - storage key `GE_V257_LOCATION_P22`
 - `GECore.masters.serviceLocations`
 - explicit `station_service_location` relationships
@@ -1248,7 +1248,7 @@ The only persisted data-shape extension is the **optional** `priceSchedules[]` f
 
 ### Static / unit validation
 
-- `node --check assets/lounge-planning-v29.js` — PASS
+- `node --check assets/lounge-planning.js` — PASS
 - P29 service-type resolution tests — PASS
 - Legacy single-price resolution — PASS
 - 3-period current-price resolution — PASS
@@ -1272,7 +1272,7 @@ HTTP 200 verified for:
 - `gaso-planning.html`
 - `planning-documents.html`
 - `admin.html`
-- `assets/lounge-planning-v29.js`
+- `assets/lounge-planning.js`
 - `templates/Template_Layanan_Lounge_Tenant_P29.csv`
 
 ### Local production preview
@@ -1465,7 +1465,7 @@ It was **not** the cause of Firebase credential failure and was not reverted. Th
 4. `login.html`
    - Adds controlled user-facing messages for missing profile/session failures.
    - Adds safe development session/redirect tracing.
-   - Removes only `overlay-v30.js` from the login page; P30 remains on portal pages.
+   - Removes only `overlay.js` from the login page; P30 remains on portal pages.
    - Login branding/layout/form structure is unchanged.
 
 5. `tests/p31-authentication.js`
@@ -1565,7 +1565,7 @@ The execution environment previously could not complete a usable Chromium headle
 
 ## PRESERVATION CHECKS
 
-- P29 `assets/lounge-planning-v29.js`: unchanged.
+- P29 `assets/lounge-planning.js`: unchanged.
 - P29 Dashboard implementation: unchanged.
 - P26 User Management implementation remains present.
 - P28 Page Identity implementation remains present.
@@ -1616,7 +1616,7 @@ Contract-specific presentation:
 Status text remains visible; color is not the sole carrier of meaning.
 
 ## P35 — Navigation / Tab / Page Identity Consistency
-A stable route → pageId registry was extended in `assets/page-identity-v28.js` and exposed through `assets/p33-p37-presentation.js`.
+A stable route → pageId registry was extended in `assets/page-identity.js` and exposed through `assets/p33-p37-presentation.js`.
 
 Key mappings:
 - `service-planning.html` → `planning-overview`
@@ -1767,8 +1767,8 @@ Critical frozen P27 files were compared byte-for-byte with the supplied P27 base
 - `assets/firebase-client.js`
 - `assets/portal-shell.js`
 - `assets/dashboard-pov.js`
-- `assets/lounge-planning-v29.js`
-- `assets/overlay-v30.js`
+- `assets/lounge-planning.js`
+- `assets/overlay.js`
 - `assets/access-assistance-p32.js`
 - `assets/profile-p27.js`
 - `assets/password-p27.js`
@@ -2319,7 +2319,7 @@ Preserved: Firebase SDK, Firebase Authentication, Firestore-facing client/backen
 - Dashboard, Firebase/Firestore, production data, business logic, and unrelated modules intentionally preserved.
 
 ## R10.20.3 — P29 Lounge/Tenant planning and asset readiness audit
-- `assets/lounge-planning-v29.js`: added focused P29 service-type resolution, defensive rendering, shared manual/CSV normalization and validation, multi-period pricing, CSV preview/CREATE-only import, duplicate blocking, price schedule detail, and responsive card behavior. **Risk: low–medium**, scoped to Lounge/Tenant Planning.
+- `assets/lounge-planning.js`: added focused P29 service-type resolution, defensive rendering, shared manual/CSV normalization and validation, multi-period pricing, CSV preview/CREATE-only import, duplicate blocking, price schedule detail, and responsive card behavior. **Risk: low–medium**, scoped to Lounge/Tenant Planning.
 - `lounge-list.html`: aligned Add/Update entry points, added Service Type filter presentation, switched template action to CSV, and retained existing Lounge/Tenant Planning shell.
 - `assets/portal.css`: added P29-scoped card/form/import styles only; P22/P23/P24 shell and Dashboard styles were not reopened.
 - `templates/Template_Layanan_Lounge_Tenant_P29.csv`: added a static CSV template using the same logical contract as the P29 importer.
@@ -2562,10 +2562,10 @@ The existing boot file only looked at `location.pathname`, which is `app.html`, 
 
 These pages currently use the older runtime family:
 - `data.js`
-- `core-v257.js`
+- `core.js`
 - `app.js`
 - domain `*-v257.js`
-- `overlay-v30.js`
+- `overlay.js`
 - related compatibility/runtime files
 
 They can render their existing HTML from the Clean registry, but the audit found remaining `location.pathname` checks in shared legacy runtime code. Examples include Touchpoint rendering and several active-navigation/planning helpers.

@@ -9,35 +9,35 @@ header.top{z-index:200}.side{z-index:190}.dropdown,.menu-dropdown{z-index:500}
 .initiative-dialog{position:fixed;inset:0}
 .ge-clean-combined[data-section="map"]{margin-top:18px}
 /* R2 canonical runtime corrections: shell must never outrank dialogs. */
-html body.final-v257.final-shell-r5 .modal-backdrop,
-html body.final-v257.final-shell-r5 .overlay-backdrop,
-html body.final-v257.final-shell-r5 .tp-modal-backdrop,
-html body.final-v257.final-shell-r5 .map-move-modal-backdrop,
-html body.final-v257.final-shell-r5 .ge-viewport-overlay,
-html body.final-v257.final-shell-r5 [aria-modal="true"]{z-index:100000}
-html body.final-v257.final-shell-r5 .modal-backdrop.show,
-html body.final-v257.final-shell-r5 .tp-modal-backdrop.show{display:grid;place-items:center;position:fixed;inset:0;padding:20px;overflow:auto}
-html body.final-v257.final-shell-r5 .modal-backdrop>.modal-card,
-html body.final-v257.final-shell-r5 .tp-modal-backdrop>.tp-modal{position:relative;z-index:100001;margin:auto;max-height:calc(100vh - 40px);overflow:auto}
-html body.final-v257.final-shell-r5>.shell>.side{overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
-html body.final-v257.final-shell-r5>.shell>.side .ge-sidebar-toggle{position:sticky;bottom:-54px;margin:12px -8px -54px;width:calc(100% + 16px)}
+html body.portal-ready.portal-shell-ready .modal-backdrop,
+html body.portal-ready.portal-shell-ready .overlay-backdrop,
+html body.portal-ready.portal-shell-ready .tp-modal-backdrop,
+html body.portal-ready.portal-shell-ready .map-move-modal-backdrop,
+html body.portal-ready.portal-shell-ready .ge-viewport-overlay,
+html body.portal-ready.portal-shell-ready [aria-modal="true"]{z-index:100000}
+html body.portal-ready.portal-shell-ready .modal-backdrop.show,
+html body.portal-ready.portal-shell-ready .tp-modal-backdrop.show{display:grid;place-items:center;position:fixed;inset:0;padding:20px;overflow:auto}
+html body.portal-ready.portal-shell-ready .modal-backdrop>.modal-card,
+html body.portal-ready.portal-shell-ready .tp-modal-backdrop>.tp-modal{position:relative;z-index:100001;margin:auto;max-height:calc(100vh - 40px);overflow:auto}
+html body.portal-ready.portal-shell-ready>.shell>.side{overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+html body.portal-ready.portal-shell-ready>.shell>.side .ge-sidebar-toggle{position:sticky;bottom:-54px;margin:12px -8px -54px;width:calc(100% + 16px)}
 .ge-airport-network-child{margin-top:18px}
-html.ge-precollapsed body.final-v257.final-shell-r5>.shell{grid-template-columns:64px minmax(0,1fr)}
+html.ge-precollapsed body.portal-ready.portal-shell-ready>.shell{grid-template-columns:64px minmax(0,1fr)}
 
 /* R3 runtime/UI normalization */
-html body.final-v257.final-shell-r5 .ge-nav-link.active{background:#123f78;box-shadow:inset 3px 0 #86a9cf}
-html body.final-v257.final-shell-r5 .map-region-cards button.active,html body.final-v257.final-shell-r5 .map-chip.active{background:#062b63;border-color:#062b63}
-html body.final-v257.final-shell-r5 .p26-account-modal{width:min(960px,calc(100vw - 48px));max-height:calc(100dvh - 48px);display:flex;flex-direction:column;overflow:hidden}
-html body.final-v257.final-shell-r5 .p26-account-modal>#p26FormHost{display:flex;flex-direction:column;min-height:0;overflow:hidden}
-html body.final-v257.final-shell-r5 .p26-account-modal #p26UserForm{overflow:auto;min-height:0;padding-right:8px}
-html body.final-v257.final-shell-r5 .p26-modal-actions{display:flex;flex:0 0 auto;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px;padding:14px 0 0;background:#fff}
-html body.final-v257.final-shell-r5 .p26-modal-actions .ge-btn{width:auto;min-width:118px;height:40px;min-height:40px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px}
-html body.final-v257.final-shell-r5 .p26-account-modal .modal-x{position:absolute;top:16px;right:16px;float:none;margin:0;width:36px;height:36px;display:grid;place-items:center;border-radius:8px}
-html body.final-v257.final-shell-r5 input,html body.final-v257.final-shell-r5 select,html body.final-v257.final-shell-r5 .ge-btn{box-sizing:border-box}
-html body.final-v257.final-shell-r5 input:not([type=checkbox]):not([type=radio]),html body.final-v257.final-shell-r5 select{min-height:40px}
-html body.final-v257.final-shell-r5 .ge-planning-tabs a.active,html body.final-v257.final-shell-r5 [role=tab].active,html body.final-v257.final-shell-r5 .admin-section-tab.active{background:#062b63;color:#fff;border-color:#062b63}
+html body.portal-ready.portal-shell-ready .ge-nav-link.active{background:#123f78;box-shadow:inset 3px 0 #86a9cf}
+html body.portal-ready.portal-shell-ready .map-region-cards button.active,html body.portal-ready.portal-shell-ready .map-chip.active{background:#062b63;border-color:#062b63}
+html body.portal-ready.portal-shell-ready .p26-account-modal{width:min(960px,calc(100vw - 48px));max-height:calc(100dvh - 48px);display:flex;flex-direction:column;overflow:hidden}
+html body.portal-ready.portal-shell-ready .p26-account-modal>#p26FormHost{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+html body.portal-ready.portal-shell-ready .p26-account-modal #p26UserForm{overflow:auto;min-height:0;padding-right:8px}
+html body.portal-ready.portal-shell-ready .p26-modal-actions{display:flex;flex:0 0 auto;justify-content:flex-end;align-items:center;gap:10px;margin-top:12px;padding:14px 0 0;background:#fff}
+html body.portal-ready.portal-shell-ready .p26-modal-actions .ge-btn{width:auto;min-width:118px;height:40px;min-height:40px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px}
+html body.portal-ready.portal-shell-ready .p26-account-modal .modal-x{position:absolute;top:16px;right:16px;float:none;margin:0;width:36px;height:36px;display:grid;place-items:center;border-radius:8px}
+html body.portal-ready.portal-shell-ready input,html body.portal-ready.portal-shell-ready select,html body.portal-ready.portal-shell-ready .ge-btn{box-sizing:border-box}
+html body.portal-ready.portal-shell-ready input:not([type=checkbox]):not([type=radio]),html body.portal-ready.portal-shell-ready select{min-height:40px}
+html body.portal-ready.portal-shell-ready .ge-planning-tabs a.active,html body.portal-ready.portal-shell-ready [role=tab].active,html body.portal-ready.portal-shell-ready .admin-section-tab.active{background:#062b63;color:#fff;border-color:#062b63}
 .clean-page-loading{min-height:240px;display:grid;place-items:center;color:#6f8298}
-@media(max-width:680px){html body.final-v257.final-shell-r5 .p26-account-modal{width:calc(100vw - 20px);max-height:calc(100dvh - 20px)}.p26-form-grid{grid-template-columns:1fr}}
+@media(max-width:680px){html body.portal-ready.portal-shell-ready .p26-account-modal{width:calc(100vw - 20px);max-height:calc(100dvh - 20px)}.p26-form-grid{grid-template-columns:1fr}}
 
 /* Keep shell geometry stable while auth/page runtime boots; avoids wide-sidebar bridge frame. */
 body.e1-page>.shell{display:grid;grid-template-columns:206px minmax(0,1fr);min-height:calc(100vh - 74px)}

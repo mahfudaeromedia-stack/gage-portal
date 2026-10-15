@@ -122,8 +122,8 @@ html body .btn:disabled,html body .ge-btn:disabled,
 html body .btn[aria-disabled="true"],html body .ge-btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;transform:none}
 html body .btn:focus-visible,html body .ge-btn:focus-visible{outline:2px solid rgba(8,43,89,.22);outline-offset:2px}
 /* Production shell used smaller legacy button typography. Override its geometry here, once. */
-html body.final-v257.final-shell-r5 .ge-btn{height:var(--ui-control-h);min-height:var(--ui-control-h);font-family:inherit;font-size:var(--ui-button-font);font-weight:var(--ui-button-weight);line-height:1.2}
-html body.final-v257.final-shell-r5 .ge-btn.compact{height:var(--ui-compact-h);min-height:var(--ui-compact-h);font-size:12.5px;font-weight:500}
+html body.portal-ready.portal-shell-ready .ge-btn{height:var(--ui-control-h);min-height:var(--ui-control-h);font-family:inherit;font-size:var(--ui-button-font);font-weight:var(--ui-button-weight);line-height:1.2}
+html body.portal-ready.portal-shell-ready .ge-btn.compact{height:var(--ui-compact-h);min-height:var(--ui-compact-h);font-size:12.5px;font-weight:500}
 
 html body .btn.compact,html body .ge-btn.compact,
 html body .row-actions .btn,html body .row-actions .ge-btn,
@@ -293,7 +293,7 @@ html body>.initiative-dialog .formgrid{display:grid;grid-template-columns:repeat
 html body>.initiative-dialog .formgrid>label{display:grid;align-content:start;gap:6px;min-width:0;margin:0;font-size:12px;font-weight:600;color:#536b7b}
 html body>.initiative-dialog .formgrid .span2{grid-column:1/-1}
 html body>.initiative-dialog form>.modal-actions,html body>.initiative-dialog form>.ge-assess-actions{position:sticky;bottom:-24px;margin:20px -28px -24px;padding:14px 28px;background:#fff;border-top:1px solid #dde6ef;z-index:2}
-html body>.initiative-dialog .ge-picker-pop-r11{z-index:2147482500}
+html body>.initiative-dialog .ge-picker-pop{z-index:2147482500}
 @media(max-width:720px){html body>.ge-portal-overlay{padding:8px}html body>.initiative-dialog .initiative-dialog-card{max-height:calc(100dvh - 16px);padding:20px 16px}html body>.initiative-dialog .formgrid{grid-template-columns:1fr}html body>.initiative-dialog .formgrid .span2{grid-column:auto}}
 
 /* Proper confirmation dialog: native top layer, compact content, no empty viewport. */
@@ -310,7 +310,7 @@ html body>.initiative-dialog .ge-picker-pop-r11{z-index:2147482500}
 #cleanPageOutlet .map-region-cards,#cleanPageOutlet .map-region-cards-v216{display:none}
 
 /* Shared table behavior. */
-#cleanPageOutlet .table-wrap,#cleanPageOutlet .table-scroll,#cleanPageOutlet .ge-table-wrap,#cleanPageOutlet .ge-initiative-list-r4,#cleanPageOutlet .ge-table-scroll-runtime{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+#cleanPageOutlet .table-wrap,#cleanPageOutlet .table-scroll,#cleanPageOutlet .ge-table-wrap,#cleanPageOutlet .ge-initiative-list,#cleanPageOutlet .ge-table-scroll-runtime{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
 #cleanPageOutlet .table-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;font-size:12px;color:var(--ui-muted)}
 #cleanPageOutlet .table-size-control,#cleanPageOutlet .table-page-control{display:flex;align-items:center;gap:8px}
 #cleanPageOutlet .table-size-control select{width:auto;min-width:68px;height:34px;min-height:34px;padding:0 30px 0 10px;font-size:12px}
@@ -403,13 +403,13 @@ html body #cleanPageOutlet .ge-bar-row>div{height:12px;overflow:hidden;border-ra
 html body #cleanPageOutlet .ge-bar-row i{display:block;height:100%;background:var(--ui-navy);border-radius:2px}
 html body #cleanPageOutlet .ge-submission-station-chart{margin-top:12px}
 
-html body .calendar-year-r30{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;background:transparent}
-html body .calendar-year-month-r30{min-height:118px;padding:14px;border:1px solid #d8e3ed;border-radius:10px;background:#fff;color:var(--ui-text);display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:6px;text-align:left;cursor:pointer}
-html body .calendar-year-month-r30 span{font-size:13px;font-weight:600}
-html body .calendar-year-month-r30 b{font-size:22px;justify-self:end;color:var(--ui-navy)}
-html body .calendar-year-month-r30 small{align-self:end;color:var(--ui-muted)}
-html body .calendar-year-month-r30 i{align-self:end;justify-self:end;color:var(--ui-muted);font-size:10px;font-style:normal}
-html body .calendar-year-month-r30:hover{border-color:var(--ui-navy);background:#f7faff}
+html body .calendar-year-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;background:transparent}
+html body .calendar-year-month{min-height:118px;padding:14px;border:1px solid #d8e3ed;border-radius:10px;background:#fff;color:var(--ui-text);display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:6px;text-align:left;cursor:pointer}
+html body .calendar-year-month span{font-size:13px;font-weight:600}
+html body .calendar-year-month b{font-size:22px;justify-self:end;color:var(--ui-navy)}
+html body .calendar-year-month small{align-self:end;color:var(--ui-muted)}
+html body .calendar-year-month i{align-self:end;justify-self:end;color:var(--ui-muted);font-size:10px;font-style:normal}
+html body .calendar-year-month:hover{border-color:var(--ui-navy);background:#f7faff}
 
 html body .ge-gantt-grid-r13 button.ge-gantt-label-r13,
 html body .ge-gantt-grid-r13 button.ge-gantt-deadline-r13{border-radius:0;border-top:0;border-left:0;border-bottom:1px solid var(--ge-gantt-line,#dce7ea);box-shadow:none}
@@ -419,7 +419,7 @@ html body .ge-gantt-grid-r13 .ge-gantt-track-r13{border-radius:0;border-bottom:1
 
 @media(max-width:900px){
  html body #cleanPageOutlet .ge-pie-wrap{grid-template-columns:1fr}
- html body .calendar-year-r30{grid-template-columns:repeat(2,minmax(0,1fr))}
+ html body .calendar-year-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  html body .ge-share-link-row{grid-template-columns:1fr}
 }
 

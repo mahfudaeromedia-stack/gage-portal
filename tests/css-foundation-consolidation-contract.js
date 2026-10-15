@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const app = fs.readFileSync('app.html', 'utf8');
 const css = fs.readFileSync('assets/global-ui-canonical.css', 'utf8');
 
-assert(app.includes('assets/global-ui-canonical.css?v=r1'), 'Canonical UI foundation stylesheet is missing.');
+assert(app.includes('assets/global-ui-canonical.css'), 'Canonical UI foundation stylesheet is missing.');
 assert.equal((css.match(/:root\s*\{/g) || []).length, 1, 'UI foundation must have one token source.');
 assert(css.includes('--ui-control-h:38px'), 'Standard control height must remain 38px.');
 assert(css.includes('--ui-compact-h:34px'), 'Compact control height must remain 34px.');
