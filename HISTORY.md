@@ -172,3 +172,47 @@ This is the single canonical work-history file for the portal. Entries are group
 ### Regression / Ownership
 - Master modal legacy CSS ownership was deleted rather than overridden.
 - Regression tests were updated to assert semantic canonical ownership (`planning-domains.js`, `global-ui-canonical.css`, direct shortlink routing) instead of preserving obsolete implementation names.
+
+## 2026-10-16 — Root-Cause Recovery: Planning, Network, Checklist, Initiative & Master Data
+
+### Planning Workspace / Service & Provider
+- Audited the shared Planning Workspace renderer instead of adding another page-specific patch.
+- Root cause of Add/Edit/Upload showing only a dim backdrop was conflicting overlay ownership under portal density mode. Planning forms, detail view and bulk import now use the single body-level `planning-dialog-layer` with a visible dialog card and live Close/Cancel/Save handlers.
+- Restored the Planning Workspace root category grid; the hub markup already existed but its canonical `.planning-hub-grid/.planning-hub-card` presentation rules were missing.
+- Planning record metadata now follows a vertical field hierarchy as requested instead of splitting values into competing columns.
+- Details/Grid visibility is explicitly controlled by the shared Planning Workspace owner.
+- Service & Provider category copy no longer inherits old padding that pushed labels/counts into the image area.
+- Space & Building uses category-specific imagery and contain-fit geometry instead of reusing an unrelated/cropped airport image.
+
+### Network & Map
+- Removed the obsolete four-tab station-detail renderer that competed with the six-tab implementation.
+- Canonical station detail retains: Service, Lounge, People, Facility, System and Contract.
+- Photo/gallery support remains an addition inside applicable record content and does not replace the six information categories.
+- Region filtering now normalizes case, spaces, underscores and hyphens before matching so valid station markers do not disappear due to label-format differences.
+- Photo persistence no longer attempts a second direct client write to `auditLogs`; the server mutation path remains the audit owner.
+
+### Monitoring & Assessment / Shared Checklist
+- Fixed short-link bootstrap at `/s/:code`: the route redirects to the canonical app URL and `app.html` resolves assets from the site root through `<base href="/">`.
+- Guarded page-registry access so a missing/late registry produces the normal page-resolution path instead of `Cannot read properties of undefined`.
+- Checklist required marks are rendered beside the question label rather than as a stray line below the question.
+- Rating/numeric-scale questions retain circular selectable choices.
+
+### Master Data & Partners
+- Removed direct client-side audit-log mutation from the Master Data save path; server-side mutation auditing remains authoritative.
+- Save errors expose the actual persistence error after the `Penyimpanan gagal:` prefix instead of hiding the root cause.
+- ID/Master tables display business-facing codes (IATA/ICAO, station code, currency code, reference code, etc.) while preserving the internal storage key separately for edit lookup.
+- Manually managed ID/reference codes remain editable; NPS/CSI-derived Touch Points remain locked.
+
+### Initiative & Improvement
+- Root cause of an initially empty All Journey state was stale shared Journey state surviving SPA route entry. Canonical initialization now defaults to All Journey unless the URL explicitly requests a valid Journey.
+- Initiative document/milestone action buttons use English action labels and are protected against clipping.
+- Removed the obsolete four-tab map regression contract rather than restoring obsolete runtime behavior.
+
+### Improvement Opportunity
+- Reinforced the page as a full-width responsive workspace so Opportunity Review, Source Intake, Create Opportunity and Integrity/Traceability panels do not collapse into narrow clipped columns.
+
+### Regression / Build Gates
+- Updated the Network & Map regression contract to require the six-tab canonical station detail and reject return of the obsolete four-tab owner.
+- Added guards for Planning root panels, Planning modal/card ownership, vertical Planning card fields, short-link bootstrap, checklist rating/required-mark presentation, and Master Data save feedback.
+- `npm test`: 59/59 regression contracts passed; UI integrity passed for 68 pages / 594 asset references.
+- `npm run build`: passed.

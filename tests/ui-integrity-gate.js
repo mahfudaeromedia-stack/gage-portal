@@ -23,10 +23,10 @@ const planning=read('assets/planning-domains.js');
 const portalCss=read('assets/portal.css');
 const sharedCss=read('assets/global-ui-canonical.css');
 const registry=read('assets/clean-page-registry.js');
-assert.ok(planning.includes("shell.className='planning-overlay'"),'Planning overlay must use the canonical shared overlay');
+assert.ok(planning.includes("shell.className='planning-dialog-layer'"),'Planning overlay must use the canonical shared top-layer owner');
 assert.ok(planning.includes('document.body.appendChild(shell)'),'Planning modal must be promoted outside page stacking contexts');
 assert.ok(planning.includes("shell.querySelectorAll('[data-close]')")&&planning.includes("shell.querySelector('[data-save]')"),'Modal Close/Cancel/Save handlers must be bound to the live overlay');
-assert.ok(sharedCss.includes('.planning-overlay{position:fixed')&&sharedCss.includes('z-index:2147483600'),'Canonical Planning overlay must cover the portal shell and remain interactive');
+assert.ok(sharedCss.includes('.planning-dialog-layer{position:fixed')&&sharedCss.includes('z-index:2147483000'),'Canonical Planning overlay must cover the portal shell and remain interactive');
 assert.ok(planning.includes('stationEntries('),'Planning workspace must materialize one visible row or card per station');
 assert.ok(planning.includes('await GEStore.flush()'),'Record changes must persist before confirmation');
 assert.ok(sharedCss.includes('background:rgba(8,31,57,.64)'),'Canonical planning overlay requires a dedicated backdrop');
@@ -34,6 +34,21 @@ assert.ok(portalCss.includes('.ge-master-tabs-panel{min-height:0'),'Master Data 
 assert.ok(registry.includes('ge-panel ge-master-tabs-panel'),'Master Data tab group must have a semantic compact class');
 assert.ok(sharedCss.includes('--ui-control-h:42px;')&&sharedCss.includes('--ui-button-weight:600;'),'Shared button geometry must have one central token set');
 assert.ok(!portalCss.includes('.planning-dialog-body-level .planning-modal'),'Old Planning modal rules must be removed, not layered');
+assert.ok(sharedCss.includes('.planning-hub-grid{display:grid'),'Planning Workspace root must retain its canonical panel grid.');
+assert.ok(sharedCss.includes('.planning-record-fields{display:grid;grid-template-columns:1fr'),'Planning cards must use the requested vertical field hierarchy.');
+assert.ok(sharedCss.includes('.planning-category-copy span,#cleanPageOutlet .planning-category-copy b{padding:0'),'Service & Provider category copy must not inherit overlay padding over category images.');
+assert.ok(planning.includes("shell.className='planning-dialog-layer'")&&planning.includes('planning-dialog-body'),'Planning Add/Edit/Upload must render a visible card inside the shared overlay.');
+const runtime=read('assets/edition1-business-runtime.js');
+assert.ok(runtime.includes("['service','Service'],['lounge','Lounge'],['people','People'],['facility','Facility'],['system','System'],['contract','Contract']"),'Network & Map station detail must retain all six information categories.');
+assert.ok(!runtime.includes("['service','Service'],['facility','Facility'],['system','System'],['contract','Contract']"),'Four-tab Network & Map implementation must not return.');
+const app=read('app.html'),redirects=read('_redirects');
+assert.ok(app.includes('<base href="/">')&&redirects.includes('/s/:code /app.html?page=monitoring-checklist&share=:code 302!'),'Checklist short links must bootstrap the canonical app from root assets.');
+const formManagement=read('assets/form-management.js');
+assert.ok(formManagement.includes('ge-question-label')&&formManagement.includes('ge-rating-scale'),'Checklist questions must keep required marks separate from controls and ratings must use circular choices.');
+const masterReference=read('assets/master-reference.js');
+assert.ok(masterReference.includes("const commit")||masterReference.includes('function commit'),'Master Data must retain a single save path.');
+assert.ok(masterReference.includes("'Penyimpanan gagal:'")||masterReference.includes('Penyimpanan gagal:'),'Master Data save failures must expose their actual persistence error.');
+
 
 // Canonical replacement cleanup guard: runtime assets and current behavior must not regress to patch/version identities.
 const runtimeFiles=fs.readdirSync(path.join(root,'assets')).filter(name=>/\.(?:js|css|html)$/i.test(name));

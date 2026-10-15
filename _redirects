@@ -1,2 +1,2 @@
-/s/* /app.html?page=monitoring-checklist&share=:splat 200!
+/s/:code /app.html?page=monitoring-checklist&share=:code 302!
 / /login.html 200
