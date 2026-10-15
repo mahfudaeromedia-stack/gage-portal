@@ -1,1 +1,2 @@
 / /login.html 200
+/s/:code /app.html?page=monitoring-checklist&share=:code 302!

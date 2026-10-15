@@ -422,3 +422,11 @@ html body .ge-gantt-grid-r13 .ge-gantt-track-r13{border-radius:0;border-bottom:1
  html body .calendar-year-r30{grid-template-columns:repeat(2,minmax(0,1fr))}
  html body .ge-share-link-row{grid-template-columns:1fr}
 }
+
+/* Shared action spacing / generated link rows */
+html body .initiative-actions-v224,html body .initiative-card-actions-v246,html body .timeline-card-v224>div:last-child,html body .v2554-calendar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+html body .ge-share-link-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+html body .ge-checklist-share-result{display:grid;gap:12px}
+@media(max-width:620px){html body .ge-share-link-row{grid-template-columns:1fr}html body .ge-share-link-row .ge-btn{width:100%}}
+
+html body .timeline-card-head-v224>div:last-child{display:flex;align-items:center;gap:10px;flex-wrap:wrap}

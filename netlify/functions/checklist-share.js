@@ -11,6 +11,7 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
 function ref(db, collection, id) { return db.collection('portalData').doc(collection).collection('records').doc(id); }
 function hashToken(token) { return crypto.createHash('sha256').update(String(token)).digest('hex'); }
 function token() { return crypto.randomBytes(32).toString('base64url'); }
+function shortCode() { return crypto.randomBytes(8).toString('base64url').replace(/[-_]/g,'').slice(0,10); }
 function id() { return crypto.randomUUID(); }
 function clean(v, n = 240) { const s = String(v ?? '').trim(); return s.length > n ? s.slice(0, n) : s; }
 function active(profile) { return String(profile?.status || 'Active').toLowerCase() !== 'inactive'; }
@@ -68,8 +69,10 @@ function evaluate(template, answers) {
 }
 
 async function publicShare(db, rawToken) {
-  const h = hashToken(rawToken);
-  const snap = await db.collection('portalData').doc(SHARES).collection('records').where('tokenHash', '==', h).limit(1).get();
+  const source = String(rawToken || '').trim();
+  const h = hashToken(source);
+  let snap = await db.collection('portalData').doc(SHARES).collection('records').where('tokenHash', '==', h).limit(1).get();
+  if (snap.empty && source) snap = await db.collection('portalData').doc(SHARES).collection('records').where('shortCode', '==', source).limit(1).get();
   if (snap.empty) throw Object.assign(new Error('Share link is invalid or expired.'), { statusCode: 404, code: 'SHARE_NOT_FOUND' });
   const share = snap.docs[0].data();
   if (share.revokedAt) throw Object.assign(new Error('This share link has been revoked.'), { statusCode: 410, code: 'SHARE_REVOKED' });
@@ -149,10 +152,10 @@ exports.handler = async event => {
       if (!workSnap.exists) return bad(404, 'WORK_NOT_FOUND', 'Monitoring Work not found.');
       const work = workSnap.data();
       const accessType = String(body.accessType || 'GUEST').toUpperCase(); if (!['USER','USER_GUEST','GUEST'].includes(accessType)) return bad(400, 'INVALID_ACCESS_TYPE', 'Share access type is invalid.');
-      const raw = token(), shareId = id();
+      const raw = token(), shareId = id(), short = shortCode();
       const expiresAt = body.expiresAt ? new Date(body.expiresAt).toISOString() : '';
-      await ref(db, SHARES, shareId).set({ id: shareId, workId, accessType, tokenHash: hashToken(raw), createdAt: new Date().toISOString(), createdBy: profile.uid, createdByName: profile.name || profile.displayName || profile.email || '', expiresAt, revokedAt: '' });
-      return ok({ ok: true, shareId, token: raw, accessType, expiresAt, work: { id: workSnap.id, title: work.title || '', stationCode: work.stationCode || '', dueDate: work.dueDate || '' } });
+      await ref(db, SHARES, shareId).set({ id: shareId, workId, accessType, tokenHash: hashToken(raw), shortCode: short, createdAt: new Date().toISOString(), createdBy: profile.uid, createdByName: profile.name || profile.displayName || profile.email || '', expiresAt, revokedAt: '' });
+      return ok({ ok: true, shareId, token: raw, shortCode: short, accessType, expiresAt, work: { id: workSnap.id, title: work.title || '', stationCode: work.stationCode || '', dueDate: work.dueDate || '' } });
     }
 
     return bad(405, 'METHOD_NOT_ALLOWED', 'Method not allowed.');

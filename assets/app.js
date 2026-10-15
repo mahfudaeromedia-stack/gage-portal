@@ -8409,34 +8409,22 @@ function geCalEnsureProjectFieldsV2535(){
 
   form.insertAdjacentHTML('beforeend',`
     <div id="geCalProjectFieldsV2535" class="span2 ge-cal-project-fields-v2533">
-      <label>Jenis Kegiatan
-        <select id="geCalActivityTypeV2535">
-          <option value="standalone">Standalone Activity</option>
-          <option value="initiative">Terkait Initiative</option>
-        </select>
-      </label>
-
-      <label>Initiative Terkait
-        <select id="geCalInitiativeV2535">
-          <option value="">Tidak terkait Initiative</option>
-        </select>
-      </label>
-
-      <label>Journey Scope
-        <select id="geCalJourneyEditV2535" multiple size="7">
-          <option>Tidak Terkait Journey</option>
-          <option>Pre-Journey</option>
-          <option>Pre-Flight</option>
-          <option>Post-Flight</option>
-          <option>Post-Journey</option>
-          <option>Cross-Journey / End-to-End</option>
-          <option>Supporting / Enabler</option>
-        </select>
-      </label>
-
-      <label>Touch Point
-        <select id="geCalTouchEditV2535" multiple size="6"></select>
-      </label>
+      <label>Jenis Kegiatan<select id="geCalActivityTypeV2535"><option value="standalone">Standalone Activity</option><option value="initiative">Terkait Initiative</option></select></label>
+      <label>Initiative Terkait<select id="geCalInitiativeV2535"><option value="">Tidak terkait Initiative</option></select></label>
+      <label>Journey Scope (bisa lebih dari satu)<select id="geCalJourneyEditV2535" multiple size="7"><option>Tidak Terkait Journey</option><option>Pre-Journey</option><option>Pre-Flight</option><option>Post-Flight</option><option>Post-Journey</option><option>Cross-Journey / End-to-End</option><option>Supporting / Enabler</option></select></label>
+      <label>Touch Point (bisa lebih dari satu)<select id="geCalTouchEditV2535" multiple size="6"></select></label>
+      <label>Start Date<input id="geCalStartDateV2535" type="date"></label>
+      <label>End / Target Date<input id="geCalEndDateV2535" type="date"></label>
+      <label>Due Date<input id="geCalDueDateV2535" type="date"></label>
+      <label>Actual Date<input id="geCalActualDateV2535" type="date"></label>
+      <label>Target (%)<input id="geCalPlanV2535" type="number" min="0" max="100" step="0.01"></label>
+      <label>Realisasi (%)<input id="geCalRealV2535" type="number" min="0" max="100" step="0.01"></label>
+      <label>Estimasi Biaya<input id="geCalEstimatedCostV2535" type="number" min="0" step="1000"></label>
+      <label>Anggaran<input id="geCalBudgetV2535" type="number" min="0" step="1000"></label>
+      <label>Realisasi Biaya<input id="geCalActualCostV2535" type="number" min="0" step="1000"></label>
+      <label>Status<select id="geCalStatusV2535"><option>Not Started</option><option>On Progress</option><option>Completed</option><option>Hold</option></select></label>
+      <label class="span2">Target / Output<textarea id="geCalOutputV2535" rows="3"></textarea></label>
+      <label class="span2">Realisasi / Achievement<textarea id="geCalAchievementV2535" rows="3"></textarea></label>
     </div>`);
 }
 
@@ -8468,6 +8456,8 @@ function geCalPopulateActivitySelectorsV2535(e){
 
   const typeSel=geCalElV2535('geCalActivityTypeV2535');
   if(typeSel)typeSel.value=e?.activityType||'standalone';
+  const set=(id,value)=>{const el=geCalElV2535(id);if(el)el.value=value??''};
+  set('geCalStartDateV2535',e?.startDate||e?.date||'');set('geCalEndDateV2535',e?.endDate||e?.date||'');set('geCalDueDateV2535',e?.dueDate||e?.date||'');set('geCalActualDateV2535',e?.actualDate||'');set('geCalPlanV2535',e?.plan??0);set('geCalRealV2535',e?.real??0);set('geCalEstimatedCostV2535',e?.estimatedCost??'');set('geCalBudgetV2535',e?.budget??'');set('geCalActualCostV2535',e?.actualCost??'');set('geCalStatusV2535',e?.status||'Not Started');set('geCalOutputV2535',e?.targetText||'');set('geCalAchievementV2535',e?.achievementText||'');
 }
 
 function geCalOpenActivityV2535(id=null){
@@ -8546,6 +8536,18 @@ function geCalSaveActivityV2535(){
     activityType:val('geCalActivityTypeV2535')||'standalone',
     initiativeId:val('geCalInitiativeV2535')||'',
     journeyScopes:scopes,
+    startDate:val('geCalStartDateV2535')||date,
+    endDate:val('geCalEndDateV2535')||date,
+    dueDate:val('geCalDueDateV2535')||date,
+    actualDate:val('geCalActualDateV2535'),
+    plan:Number(val('geCalPlanV2535')||0),
+    real:Number(val('geCalRealV2535')||0),
+    estimatedCost:Number(val('geCalEstimatedCostV2535')||0),
+    budget:Number(val('geCalBudgetV2535')||0),
+    actualCost:Number(val('geCalActualCostV2535')||0),
+    status:val('geCalStatusV2535')||'Not Started',
+    targetText:val('geCalOutputV2535').trim(),
+    achievementText:val('geCalAchievementV2535').trim(),
     source:'Manual'
   };
 

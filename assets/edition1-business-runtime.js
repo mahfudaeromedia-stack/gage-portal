@@ -8121,7 +8121,7 @@ function geCalMoveV2533(n){
   geCalRenderV2533();
 }
 window.geCalendarOpenMonthR30=function(month){window.geV251CalDate=new Date((window.geV251CalDate||new Date()).getFullYear(),Number(month)||0,1);window.GE_CAL_VIEW_R2='month';document.querySelectorAll('[data-cal-view]').forEach(x=>x.classList.toggle('active',x.dataset.calView==='month'));geCalRenderV2533()};
-function geEnsureCalendarYearViewR30(){const group=document.querySelector('[data-cal-view]')?.parentElement;if(!group||group.querySelector('[data-cal-view="year"]'))return;const b=document.createElement('button');b.type='button';b.dataset.calView='year';b.textContent='Year';b.onclick=()=>geCalSetViewV2533('year',b);group.appendChild(b)}
+function geEnsureCalendarYearViewR30(){const group=document.querySelector('[data-cal-view]')?.parentElement;if(!group||group.querySelector('[data-cal-view="year"]'))return;const b=document.createElement('button');b.type='button';b.dataset.calView='year';b.className='btn secondary compact-btn';b.textContent='Year';b.onclick=()=>geCalSetViewV2533('year',b);group.appendChild(b)}
 function geCalTodayV2533(){window.geV251CalDate=new Date();geCalRenderV2533()}
 
 /* self-contained add/update activity modal — avoids dependency on older calendar wrappers */
@@ -8464,34 +8464,22 @@ function geCalEnsureProjectFieldsV2535(){
 
   form.insertAdjacentHTML('beforeend',`
     <div id="geCalProjectFieldsV2535" class="span2 ge-cal-project-fields-v2533">
-      <label>Jenis Kegiatan
-        <select id="geCalActivityTypeV2535">
-          <option value="standalone">Standalone Activity</option>
-          <option value="initiative">Terkait Initiative</option>
-        </select>
-      </label>
-
-      <label>Initiative Terkait
-        <select id="geCalInitiativeV2535">
-          <option value="">Tidak terkait Initiative</option>
-        </select>
-      </label>
-
-      <label>Journey Scope
-        <select id="geCalJourneyEditV2535" multiple size="7">
-          <option>Tidak Terkait Journey</option>
-          <option>Pre-Journey</option>
-          <option>Pre-Flight</option>
-          <option>Post-Flight</option>
-          <option>Post-Journey</option>
-          <option>Cross-Journey / End-to-End</option>
-          <option>Supporting / Enabler</option>
-        </select>
-      </label>
-
-      <label>Touch Point
-        <select id="geCalTouchEditV2535" multiple size="6"></select>
-      </label>
+      <label>Jenis Kegiatan<select id="geCalActivityTypeV2535"><option value="standalone">Standalone Activity</option><option value="initiative">Terkait Initiative</option></select></label>
+      <label>Initiative Terkait<select id="geCalInitiativeV2535"><option value="">Tidak terkait Initiative</option></select></label>
+      <label>Journey Scope (bisa lebih dari satu)<select id="geCalJourneyEditV2535" multiple size="7"><option>Tidak Terkait Journey</option><option>Pre-Journey</option><option>Pre-Flight</option><option>Post-Flight</option><option>Post-Journey</option><option>Cross-Journey / End-to-End</option><option>Supporting / Enabler</option></select></label>
+      <label>Touch Point (bisa lebih dari satu)<select id="geCalTouchEditV2535" multiple size="6"></select></label>
+      <label>Start Date<input id="geCalStartDateV2535" type="date"></label>
+      <label>End / Target Date<input id="geCalEndDateV2535" type="date"></label>
+      <label>Due Date<input id="geCalDueDateV2535" type="date"></label>
+      <label>Actual Date<input id="geCalActualDateV2535" type="date"></label>
+      <label>Target (%)<input id="geCalPlanV2535" type="number" min="0" max="100" step="0.01"></label>
+      <label>Realisasi (%)<input id="geCalRealV2535" type="number" min="0" max="100" step="0.01"></label>
+      <label>Estimasi Biaya<input id="geCalEstimatedCostV2535" type="number" min="0" step="1000"></label>
+      <label>Anggaran<input id="geCalBudgetV2535" type="number" min="0" step="1000"></label>
+      <label>Realisasi Biaya<input id="geCalActualCostV2535" type="number" min="0" step="1000"></label>
+      <label>Status<select id="geCalStatusV2535"><option>Not Started</option><option>On Progress</option><option>Completed</option><option>Hold</option></select></label>
+      <label class="span2">Target / Output<textarea id="geCalOutputV2535" rows="3"></textarea></label>
+      <label class="span2">Realisasi / Achievement<textarea id="geCalAchievementV2535" rows="3"></textarea></label>
     </div>`);
 }
 
@@ -8523,6 +8511,8 @@ function geCalPopulateActivitySelectorsV2535(e){
 
   const typeSel=geCalElV2535('geCalActivityTypeV2535');
   if(typeSel)typeSel.value=e?.activityType||'standalone';
+  const set=(id,value)=>{const el=geCalElV2535(id);if(el)el.value=value??''};
+  set('geCalStartDateV2535',e?.startDate||e?.date||'');set('geCalEndDateV2535',e?.endDate||e?.date||'');set('geCalDueDateV2535',e?.dueDate||e?.date||'');set('geCalActualDateV2535',e?.actualDate||'');set('geCalPlanV2535',e?.plan??0);set('geCalRealV2535',e?.real??0);set('geCalEstimatedCostV2535',e?.estimatedCost??'');set('geCalBudgetV2535',e?.budget??'');set('geCalActualCostV2535',e?.actualCost??'');set('geCalStatusV2535',e?.status||'Not Started');set('geCalOutputV2535',e?.targetText||'');set('geCalAchievementV2535',e?.achievementText||'');
 }
 
 function geCalOpenActivityV2535(id=null){
@@ -8601,6 +8591,18 @@ function geCalSaveActivityV2535(){
     activityType:val('geCalActivityTypeV2535')||'standalone',
     initiativeId:val('geCalInitiativeV2535')||'',
     journeyScopes:scopes,
+    startDate:val('geCalStartDateV2535')||date,
+    endDate:val('geCalEndDateV2535')||date,
+    dueDate:val('geCalDueDateV2535')||date,
+    actualDate:val('geCalActualDateV2535'),
+    plan:Number(val('geCalPlanV2535')||0),
+    real:Number(val('geCalRealV2535')||0),
+    estimatedCost:Number(val('geCalEstimatedCostV2535')||0),
+    budget:Number(val('geCalBudgetV2535')||0),
+    actualCost:Number(val('geCalActualCostV2535')||0),
+    status:val('geCalStatusV2535')||'Not Started',
+    targetText:val('geCalOutputV2535').trim(),
+    achievementText:val('geCalAchievementV2535').trim(),
     source:'Manual'
   };
 
@@ -9924,7 +9926,36 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 /* Final canonical Initiative Grid/List view. This wrapper is intentionally last so legacy exports cannot overwrite it. */
 const initRender=window.renderInitiatives;
-if(initRender)window.renderInitiatives=function(){const out=initRender.apply(this,arguments),view=window.GE_INITIATIVE_VIEW_R4||document.getElementById('geInitiativeViewSelectR6')?.value||'grid';if(view!=='list')return out;let rows=[];try{rows=typeof currentInitiativeRows==='function'?currentInitiativeRows().filter(typeof geInitiativeScopedV224==='function'?geInitiativeScopedV224:()=>true):(store().initiatives||[])}catch(e){rows=store().initiatives||[]}const host=document.getElementById('initRows');if(host){host.innerHTML=`<div class="ge-initiative-list-r4"><table data-initiative-list-r26><thead><tr><th data-sort="0">Initiative ↕</th><th data-sort="1">Journey ↕</th><th data-sort="2">Touch Point ↕</th><th data-sort="3">Station ↕</th><th data-sort="4">PIC ↕</th><th data-sort="5">Due ↕</th><th data-sort="6">Progress ↕</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc((x.journeyScopes||[x.journey]).filter(Boolean).join(', '))}</td><td>${esc((x.touchpoints||[x.tp||x.touchpoint]).filter(Boolean).join(', '))}</td><td>${esc((x.stations||[x.airport]).filter(Boolean).join(', '))}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):''}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;window.geEnhanceAllTables?.();const t=host.querySelector('table[data-initiative-list-r26]');t?.querySelectorAll('th[data-sort]').forEach(th=>{th.style.cursor='pointer';th.onclick=()=>{const i=Number(th.dataset.sort),body=t.tBodies[0],dir=th.dataset.dir==='asc'?-1:1;[...body.rows].sort((a,b)=>a.cells[i].innerText.localeCompare(b.cells[i].innerText,'id',{numeric:true})*dir).forEach(r=>body.appendChild(r));th.dataset.dir=dir===1?'asc':'desc'}})}return out};
+function geInitiativeArrayR31(value){if(Array.isArray(value))return value.map(v=>String(v||'').trim()).filter(Boolean);return String(value||'').split(/[|,;]/).map(v=>v.trim()).filter(Boolean)}
+function geInitiativeFilterValueR31(id){const el=document.getElementById(id);return String(el?.value||'').trim()}
+function geInitiativeFilteredRowsR31(){
+  const d=store(),q=geInitiativeFilterValueR31('q').toLowerCase(),tp=geInitiativeFilterValueR31('ft'),ach=geInitiativeFilterValueR31('fs'),priority=geInitiativeFilterValueR31('geV2554Priority');
+  return (d.initiatives||[]).filter(x=>{
+    if(typeof geInitiativeScopedV224==='function'&&!geInitiativeScopedV224(x))return false;
+    const tps=geInitiativeArrayR31(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint));
+    const journeys=geInitiativeArrayR31(x.journeyScopes?.length?x.journeyScopes:x.journey);
+    const stations=geInitiativeArrayR31(x.stations?.length?x.stations:x.airport);
+    const hay=[x.name,x.pic,x.remark,x.status,x.priority,...tps,...journeys,...stations].join(' ').toLowerCase();
+    if(q&&!hay.includes(q))return false;
+    if(tp&&!tps.some(v=>v.toLowerCase()===tp.toLowerCase()))return false;
+    if(ach&&typeof achievement==='function'&&achievement(x.plan,x.real)!==ach)return false;
+    if(priority&&String(x.priority||'Normal')!==priority)return false;
+    if(typeof activeJourney!=='undefined'&&activeJourney&&!journeys.includes(activeJourney))return false;
+    return true;
+  });
+}
+if(initRender)window.renderInitiatives=function(){
+  const rows=geInitiativeFilteredRowsR31(),view=window.GE_INITIATIVE_VIEW_R4||document.getElementById('geInitiativeViewSelectR6')?.value||'grid',host=document.getElementById('initRows');
+  if(!host)return initRender.apply(this,arguments);
+  if(view!=='list'){
+    host.innerHTML=rows.length&&typeof geInitiativeCardV251==='function'?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';
+    if(typeof renderInitiativeCharts==='function')renderInitiativeCharts(rows);
+    return;
+  }
+  host.innerHTML=`<div class="ge-initiative-list-r4"><table data-initiative-list-r31><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th data-table-no-sort>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc(geInitiativeArrayR31(x.journeyScopes?.length?x.journeyScopes:x.journey).join(', ')||'-')}</td><td>${esc(geInitiativeArrayR31(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint)).join(', ')||'-')}</td><td>${esc(geInitiativeArrayR31(x.stations?.length?x.stations:x.airport).join(', ')||'-')}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):''}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;
+  if(typeof renderInitiativeCharts==='function')renderInitiativeCharts(rows);
+  setTimeout(()=>window.geEnhanceAllTables?.(),0);
+};
 window.geSetInitiativeViewR20=function(v){window.GE_INITIATIVE_VIEW_R4=v;document.querySelectorAll('#geInitiativeViewToggleR4 [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));window.renderInitiatives?.()};
 setTimeout(()=>{document.querySelectorAll('#geInitiativeViewToggleR4 [data-view]').forEach(b=>b.onclick=()=>window.geSetInitiativeViewR20(b.dataset.view));const s=document.getElementById('geInitiativeViewSelectR6');if(s)s.onchange=()=>window.geSetInitiativeViewR20(s.value)},0);
 

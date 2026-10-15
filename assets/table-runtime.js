@@ -13,8 +13,11 @@ function geComparable(text){
   }
   const idDate=normalized.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
   if(idDate)return {type:'number',value:new Date(+idDate[3],+idDate[2]-1,+idDate[1]).getTime()};
-  const iso=normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const iso=normalized.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/);
   if(iso)return {type:'number',value:new Date(+iso[1],+iso[2]-1,+iso[3]).getTime()};
+  const monthNames={jan:0,feb:1,mar:2,apr:3,mei:4,may:4,jun:5,jul:6,agu:7,aug:7,sep:8,okt:9,oct:9,nov:10,des:11,dec:11};
+  const namedDate=normalized.toLowerCase().match(/^(\d{1,2})\s+([a-z]{3,9})\s+(\d{4})$/i);
+  if(namedDate){const key=namedDate[2].slice(0,3),month=monthNames[key];if(month!==undefined)return {type:'number',value:new Date(+namedDate[3],month,+namedDate[1]).getTime()};}
   const currency=normalized.match(/^(IDR|USD|SGD|AUD|JPY|CNY|SAR|MYR)\s*([\d.,]+)/i);
   if(currency)return {type:'number',value:Number(currency[2].replace(/[.,]/g,''))};
   return {type:'text',value:normalized.toLocaleLowerCase('id-ID')};
