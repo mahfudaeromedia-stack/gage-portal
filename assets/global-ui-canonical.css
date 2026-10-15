@@ -10,11 +10,11 @@
   --ui-soft:#f5f8fb;
   --ui-danger:#b42318;
   --ui-danger-hover:#8f1d14;
-  --ui-control-h:38px;
+  --ui-control-h:42px;
   --ui-compact-h:34px;
-  --ui-radius:8px;
+  --ui-radius:9px;
   --ui-button-font:13px;
-  --ui-button-weight:500;
+  --ui-button-weight:600;
   --ui-shadow:0 14px 28px rgba(6,43,89,.14);
   --ui-focus:0 0 0 2px rgba(8,43,89,.12);
   --ge-control-h:var(--ui-control-h);
@@ -121,6 +121,10 @@ html body .btn.danger:hover,html body .btn.btn-danger:hover,html body .ge-btn.da
 html body .btn:disabled,html body .ge-btn:disabled,
 html body .btn[aria-disabled="true"],html body .ge-btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;transform:none}
 html body .btn:focus-visible,html body .ge-btn:focus-visible{outline:2px solid rgba(8,43,89,.22);outline-offset:2px}
+/* Production shell used smaller legacy button typography. Override its geometry here, once. */
+html body.final-v257.final-shell-r5 .ge-btn{height:var(--ui-control-h);min-height:var(--ui-control-h);font-family:inherit;font-size:var(--ui-button-font);font-weight:var(--ui-button-weight);line-height:1.2}
+html body.final-v257.final-shell-r5 .ge-btn.compact{height:var(--ui-compact-h);min-height:var(--ui-compact-h);font-size:12.5px;font-weight:500}
+
 html body .btn.compact,html body .ge-btn.compact,
 html body .row-actions .btn,html body .row-actions .ge-btn,
 html body td .btn,html body td .ge-btn{min-height:var(--ui-compact-h);height:var(--ui-compact-h);padding:0 11px;font-size:12.5px;font-weight:500;border-radius:7px}
@@ -225,8 +229,6 @@ html body .lounge-filter-grid-ref>label{display:grid;grid-template-rows:auto var
 html body .lounge-filter-grid-ref>button{width:auto}
 html body .lounge-card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 html body .planning-domain-form{display:grid}
-html body .planning-dialog-body-level .ge-id-backdrop{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;padding:20px;background:rgba(7,30,56,.52)}
-html body .planning-dialog-body-level .planning-modal{width:min(820px,95vw);max-height:calc(100vh - 40px);overflow:auto;border-radius:10px;padding:20px;background:#fff;box-shadow:0 22px 60px rgba(0,0,0,.24);color:var(--ui-text)}
 
 /* Monitoring/submission presentation. */
 html body #cleanPageOutlet .ge-monitor-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}

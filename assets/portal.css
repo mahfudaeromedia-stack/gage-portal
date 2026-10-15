@@ -5542,7 +5542,7 @@ html body.final-v257.final-shell-r5.e1-page .ge-sidebar-toggle:hover{background:
 .r70-station-summary{margin-top:16px;padding:20px}.r70-station-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.r70-station-grid article{display:grid;gap:8px;padding:16px;border:1px solid #dbe5ef;border-radius:12px}.r70-station-grid span,.r70-station-grid small{line-height:1.5}
 .ge-planning-family .ge-planning-child,.ge-planning-portfolio-counts button{font:inherit;color:inherit;cursor:pointer;background:#fff;border:1px solid #d9e5ef;border-radius:10px;padding:10px 14px;text-align:left}.ge-planning-family .ge-planning-child:hover,.ge-planning-family .ge-planning-child[aria-pressed=true],.ge-planning-portfolio-counts button:hover{background:#e9f2fb;border-color:#8bb5d8}.ge-planning-portfolio-counts button{display:grid;gap:4px}
 /* R72 Planning: concise landing and distinct data-domain pages. */
-.planning-domain-page{padding:8px 2px 28px}.planning-domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;margin:24px 0}.planning-domain-card{display:flex;flex-direction:column;gap:14px;min-height:205px;padding:24px;border:1px solid #d8e2ee;border-radius:17px;background:#fff;text-decoration:none;color:#0c2b52;box-shadow:0 5px 16px rgba(0,31,74,.05)}.planning-domain-card:hover{border-color:#719bc4;box-shadow:0 9px 22px rgba(0,31,74,.11);transform:translateY(-1px)}.planning-domain-card h2{font-size:1.2rem;margin:0}.planning-domain-card p{margin:0;color:#526985;line-height:1.55;flex:1}.planning-domain-card div{display:flex;gap:9px;flex-wrap:wrap}.planning-domain-card div span,.planning-domain-intro span{padding:5px 10px;border-radius:20px;background:#eef3fa;color:#173a66}.planning-domain-card>b{font-size:.87rem}.planning-domain-intro{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:20px 0}.planning-category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0 24px}.planning-category-grid>a,.planning-category-grid>button{display:flex;justify-content:space-between;align-items:center;text-align:left;gap:12px;padding:18px;border:1px solid #d5e1ed;border-radius:12px;background:#fff;color:#11365e;text-decoration:none;font:inherit;cursor:pointer}.planning-category-grid>[aria-pressed=true],.planning-category-grid>*:hover{border-color:#4b79ab;background:#eef3fa}.planning-category-grid b{font-size:1.15rem}.planning-domain-list{padding:24px}.planning-domain-list p{color:#526985}.planning-domain-list input{width:min(100%,500px);margin:12px 0 18px}.planning-domain-list td small{display:block;color:#687d93}.planning-modal{max-width:850px;max-height:90vh;overflow:auto}.planning-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.planning-detail-grid>div{padding:12px;border:1px solid #e1e9f2;border-radius:10px;overflow-wrap:anywhere}.planning-detail-grid small{display:block;color:#617994;text-transform:capitalize}.planning-detail-grid b{font-weight:600}@media(max-width:700px){.planning-domain-grid,.planning-category-grid{grid-template-columns:1fr}.planning-domain-list{padding:16px}}
+.planning-domain-page{padding:8px 2px 28px}.planning-domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;margin:24px 0}.planning-domain-card{display:flex;flex-direction:column;gap:14px;min-height:205px;padding:24px;border:1px solid #d8e2ee;border-radius:17px;background:#fff;text-decoration:none;color:#0c2b52;box-shadow:0 5px 16px rgba(0,31,74,.05)}.planning-domain-card:hover{border-color:#719bc4;box-shadow:0 9px 22px rgba(0,31,74,.11);transform:translateY(-1px)}.planning-domain-card h2{font-size:1.2rem;margin:0}.planning-domain-card p{margin:0;color:#526985;line-height:1.55;flex:1}.planning-domain-card div{display:flex;gap:9px;flex-wrap:wrap}.planning-domain-card div span,.planning-domain-intro span{padding:5px 10px;border-radius:20px;background:#eef3fa;color:#173a66}.planning-domain-card>b{font-size:.87rem}.planning-domain-intro{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:20px 0}.planning-category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0 24px}.planning-category-grid>a,.planning-category-grid>button{display:flex;justify-content:space-between;align-items:center;text-align:left;gap:12px;padding:18px;border:1px solid #d5e1ed;border-radius:12px;background:#fff;color:#11365e;text-decoration:none;font:inherit;cursor:pointer}.planning-category-grid>[aria-pressed=true],.planning-category-grid>*:hover{border-color:#4b79ab;background:#eef3fa}.planning-category-grid b{font-size:1.15rem}.planning-domain-list{padding:24px}.planning-domain-list p{color:#526985}.planning-domain-list input{width:min(100%,500px);margin:12px 0 18px}.planning-domain-list td small{display:block;color:#687d93}.planning-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.planning-detail-grid>div{padding:12px;border:1px solid #e1e9f2;border-radius:10px;overflow-wrap:anywhere}.planning-detail-grid small{display:block;color:#617994;text-transform:capitalize}.planning-detail-grid b{font-weight:600}@media(max-width:700px){.planning-domain-grid,.planning-category-grid{grid-template-columns:1fr}.planning-domain-list{padding:16px}}
 .ge-inbox-thread{margin:18px 0;padding:18px;border:1px solid #dbe5ef;border-radius:12px}.ge-inbox-thread article{padding:12px 0;border-bottom:1px solid #e5ebf2}.ge-inbox-thread article small{display:block;color:#657b91}.ge-inbox-thread textarea{display:block;width:100%;min-height:90px;margin:8px 0 12px;padding:12px;border:1px solid #c8d7e7;border-radius:8px}.ge-notify-error{padding:10px;color:#963b31;background:#fff2ef;border-radius:8px}
 .planning-price-period{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr)) auto;gap:8px;margin:8px 0}.planning-price-period input{width:100%;padding:8px;border:1px solid #ccd9e7;border-radius:8px}@media(max-width:700px){.planning-price-period{grid-template-columns:1fr 1fr}}
 
@@ -5564,17 +5564,13 @@ html body.final-v257.final-shell-r5.e1-page .ge-sidebar-toggle:hover{background:
 .planning-domain-page th{background:#f4f7fb;white-space:nowrap}
 .planning-sort{background:transparent;border:0;color:#102d52;font:inherit;font-weight:700;padding:3px;cursor:pointer;text-align:left}
 .planning-sort:hover,.planning-sort:focus-visible{color:#062a63;text-decoration:underline;outline:2px solid #91a9c7;outline-offset:2px}
-.planning-domain-page .ge-btn,.ge-id-catalog .ge-btn,.ge-ref-tabs button,.ge-panel .ge-ref-toolbar .ge-btn{background:#fff;color:#082b59;border:1px solid #a9bfd9;border-radius:8px;min-height:38px;padding:8px 13px;cursor:pointer}
-.planning-domain-page .ge-btn:hover,.planning-domain-page .ge-btn:focus-visible,.ge-id-catalog .ge-btn:hover,.ge-id-catalog .ge-btn:focus-visible,.ge-ref-tabs button:hover,.ge-ref-tabs button:focus-visible,.ge-panel .ge-ref-toolbar .ge-btn:hover,.ge-panel .ge-ref-toolbar .ge-btn:focus-visible,.ge-ref-tabs button.active,.planning-domain-page .ge-btn[aria-pressed="true"]{background:#082b59;color:#fff;border-color:#082b59}
-.planning-domain-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.planning-domain-form label{display:grid;gap:6px;min-width:0;font-weight:600;color:#183b62}
-.planning-domain-form input,.planning-domain-form select{width:100%;box-sizing:border-box;min-height:40px;padding:8px 11px}
-.planning-periods{grid-column:1/-1}
+.ge-ref-tabs button{background:#fff;color:#082b59;border:1px solid #a9bfd9;border-radius:8px;min-height:40px;padding:0 14px;cursor:pointer}
+.ge-ref-tabs button:hover,.ge-ref-tabs button:focus-visible,.ge-ref-tabs button.active{background:#082b59;color:#fff;border-color:#082b59}
 .ge-id-catalog[hidden],.ge-panel > [hidden],#planningDialog[hidden]{display:none}
 .ge-id-catalog{margin-top:12px;border-top:1px solid #dce5ef;padding-top:16px}
 .ge-id-catalog .ge-ref-toolbar{justify-content:flex-start}
 .ge-id-catalog .ge-ref-toolbar button{flex:0 0 auto}
-@media(max-width:760px){.planning-list-head{align-items:stretch}.planning-toolbar{width:100%}.planning-toolbar .ge-btn{flex:1 1 145px}.planning-domain-form{grid-template-columns:1fr}.planning-domain-page .planning-domain-list{padding:16px}}
+@media(max-width:760px){.planning-list-head{align-items:stretch}.planning-toolbar{width:100%}.planning-toolbar .ge-btn{flex:1 1 145px}.planning-domain-page .planning-domain-list{padding:16px}}
 .planning-service-return-r74{display:flex;justify-content:flex-start;margin:0 0 14px}
 .planning-service-return-r74 .ge-btn{background:#fff;color:#082b59;border:1px solid #a9bfd9;border-radius:8px;text-decoration:none;padding:9px 14px}
 .planning-service-return-r74 .ge-btn:hover,.planning-service-return-r74 .ge-btn:focus-visible{background:#082b59;color:#fff;border-color:#082b59}
@@ -5598,8 +5594,6 @@ html body.final-v257.final-shell-r5.e1-page .ge-sidebar-toggle:hover{background:
 .lounge-master-pager-v237[hidden],.lounge-master-grid-v237[hidden],.lounge-table-fallback-v237[hidden]{display:none}
 @media(max-width:1050px){.planning-domain-grid-view{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.planning-domain-grid-view{grid-template-columns:1fr}.planning-domain-list .planning-toolbar{justify-content:flex-start}}
-/* P83 canonical modal typography: one readable treatment for Lounge and Planning dialogs. */
-.lounge-add-modal-v221 h2, .planning-dialog-body-level .planning-modal h2{font-size:20px;line-height:1.3;margin:0 0 8px;font-weight:700}
 
 body.lounge-reference-v237 .lounge-expiry-warning,
 body.lounge-reference-v237 .lounge-expiry-warning.compact{
@@ -5700,8 +5694,6 @@ body.lounge-reference-v237 .lounge-expiry-warning b{color:#855c17}
 #loungeFilterGridR4>.ge-btn:hover,#loungeFilterGridR4>.ge-btn:focus-visible{background:#082b59;color:#fff}
 .lounge-master-page-head .ge-page-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .lounge-master-page-head .bulk-action-group{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.lounge-master-page-head .ge-page-actions :is(.btn,.ge-btn){box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:42px;height:42px;padding:0 16px;border:1px solid #082b59;border-radius:9px;background:#fff;color:#082b59;font-family:inherit;font-size:14px;font-weight:600;line-height:1.25;text-decoration:none;white-space:nowrap;cursor:pointer}
-.lounge-master-page-head .ge-page-actions :is(.btn,.ge-btn):hover,.lounge-master-page-head .ge-page-actions :is(.btn,.ge-btn):focus-visible, .lounge-master-page-head #loungeAddAction{background:#082b59;color:#fff}
 .lounge-master-page-head #loungeAddAction:hover{background:#164780}
 .lounge-master-page-head .ge-page-actions>a[href*="service-provider"]{order:2;margin-left:auto}
 .lounge-master-page-head .bulk-action-group{order:1}
@@ -5713,11 +5705,7 @@ body.lounge-reference-v237 .lounge-expiry-warning b{color:#855c17}
 /* Canonical Lounge/Tenant directory — compact controls and reference card proportions. */
 .lounge-master-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
 .lounge-master-page-head .lounge-navigation{margin-left:auto;flex-shrink:0}
-.lounge-master-page-head .lounge-navigation .ge-btn{height:36px;min-height:36px;padding:0 14px;font-size:12px;font-weight:600;border:1px solid #0b2e60;border-radius:9px;background:#fff;color:#0b2e60}
-.lounge-master-page-head .lounge-navigation .ge-btn:hover{background:#0b2e60;color:#fff}
 .lounge-directory-actions{display:flex;gap:9px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin:0 0 16px}
-.lounge-directory-actions .ge-btn{height:36px;min-height:36px;padding:0 14px;font:600 12px/1.2 inherit;border:1px solid #0b2e60;border-radius:9px;white-space:nowrap;background:#fff;color:#0b2e60}
-.lounge-directory-actions .ge-btn.primary, .lounge-directory-actions .ge-btn:hover{background:#0b2e60;color:#fff}
 #loungeFilterGridR4{grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:10px}
 #loungeFilterGridR4>select,#loungeFilterGridR4>.ge-lounge-station-field>.ge-station-multi-r12>.ge-station-trigger-r12,#loungeFilterGridR4>.ge-btn{height:38px;min-height:38px;font-size:13px;padding:0 11px}
 #loungeFilterGridR4 .ge-station-menu-r12{z-index:500;width:300px;max-width:min(340px,calc(100vw - 40px))}
@@ -5765,32 +5753,39 @@ body.lounge-reference-v237 .lounge-expiry-warning b{color:#855c17}
 .ge-initiative-list th {position:relative;resize:horizontal;overflow:auto;min-width:100px}
 #initRows:has(.ge-initiative-list){width:100%;max-width:100%}
 
-/* Planning Workspace and Master Data: canonical component ownership for these pages. */
-#planningDialog.planning-dialog-body-level{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:24px;overflow:auto;font-family:inherit}
-#planningDialog[hidden]{display:none}
-#planningDialog .ge-id-backdrop{position:fixed;inset:0;display:grid;place-items:center;padding:24px;background:rgba(7,27,58,.68);backdrop-filter:blur(3px);overflow:auto}
-#planningDialog .planning-modal{position:relative;box-sizing:border-box;width:min(1050px,100%);max-width:1050px;max-height:calc(100dvh - 48px);overflow:auto;padding:30px 32px;border:1px solid #d7e3f0;border-radius:18px;background:#fff;box-shadow:0 24px 70px rgba(4,23,48,.24);font-family:inherit;color:#193955}
-#planningDialog .planning-modal-header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:20px}
-#planningDialog .planning-modal-header h2{font-size:23px;line-height:1.3;margin:0}
+/* Planning service dialogs: a single native top-layer layout, independent of shell z-indices. */
+#planningDialog.planning-dialog{box-sizing:border-box;inset:0;width:min(1040px,calc(100vw - 40px));max-width:1040px;max-height:calc(100dvh - 40px);height:auto;margin:auto;padding:0;border:1px solid #d6e2ef;border-radius:16px;background:#fff;color:#18364f;box-shadow:0 26px 76px rgba(2,17,42,.35);overflow:hidden;font-family:inherit;font-size:14px;line-height:1.45}
+#planningDialog.planning-dialog::backdrop{background:rgba(6,24,51,.64);backdrop-filter:blur(3px)}
+#planningDialog.planning-dialog:not([open]){display:none}
+#planningDialog .planning-modal{display:flex;flex-direction:column;position:static;width:100%;max-width:none;max-height:calc(100dvh - 40px);margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:#fff;overflow:hidden;font:inherit}
+#planningDialog .planning-modal-header{display:flex;flex:0 0 auto;justify-content:space-between;align-items:flex-start;gap:20px;padding:24px 28px 18px;border-bottom:1px solid #e0e8f1;margin:0}
+#planningDialog .planning-modal-header h2{font-family:inherit;font-weight:700;font-size:23px;line-height:1.3;margin:0 0 4px;color:#173851}
+#planningDialog .planning-modal-header p{margin:0;font-size:13px;color:#7b90a5}
+#planningDialog .planning-modal-content{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:22px 28px}
 #planningDialog .planning-domain-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;align-items:start}
-#planningDialog .planning-domain-form>label{display:flex;flex-direction:column;gap:7px;font:600 14px/1.4 inherit;color:#304c68;margin:0}
-#planningDialog .planning-domain-form :is(input,select,textarea){box-sizing:border-box;width:100%;min-width:0;height:48px;margin:0;padding:0 15px;border:1px solid #c9d9eb;border-radius:11px;background:#fff;color:#112f53;font:400 14px/1.4 inherit}
-#planningDialog .planning-revision-fields{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;padding:16px 0;border-top:1px solid #e5edf5;border-bottom:1px solid #e5edf5}
-#planningDialog .planning-revision-fields h3,#planningDialog .planning-revision-fields p{grid-column:1/-1;margin:0}
-#planningDialog .planning-revision-fields h3{font-size:16px}
-#planningDialog .planning-revision-fields label{display:grid;gap:7px;font-size:14px;font-weight:600}
-#planningDialog .planning-revision-fields p{font-size:12px;color:#688099}
-#planningDialog .planning-periods{grid-column:1/-1}
-#planningDialog .ge-id-actions{position:sticky;bottom:-30px;display:flex;justify-content:flex-end;gap:12px;margin:20px -32px -30px;padding:16px 32px;background:#fff;border-top:1px solid #e4ebf4}
-#planningDialog .ge-btn,.planning-provider-workspace .ge-btn,.lounge-master-page-head .ge-btn,.lounge-directory-actions .ge-btn{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;height:auto;padding:9px 16px;border:1px solid #0b2e60;border-radius:10px;background:#fff;color:#0b2e60;font-family:inherit;font-size:13px;font-weight:600;line-height:1.35;cursor:pointer}
-#planningDialog .ge-btn:hover,.planning-provider-workspace .ge-btn:hover,.lounge-master-page-head .ge-btn:hover,.lounge-directory-actions .ge-btn:hover,#planningDialog .ge-btn.primary,.planning-provider-workspace .ge-btn.primary,.lounge-directory-actions .ge-btn.primary{background:#0b2e60;color:#fff}
-#planningDialog .planning-modal-close{width:44px;height:44px;flex:0 0 44px;font-size:22px}
-#planningDialog .ge-btn:disabled,.planning-provider-workspace .ge-btn:disabled{opacity:.45;cursor:not-allowed}
-#geMasterCatalogHost,.ge-id-catalog{min-height:0;height:auto}
-#geMasterCatalogHost:empty{display:none}
-.ge-id-catalog .ge-master-guidance{margin:0 0 14px}
-.ge-id-catalog .ge-master-guidance p{margin:0 0 6px}
-.ge-id-catalog .ge-master-subsection{min-height:0}
-.ge-id-catalog .ge-ref-toolbar{align-items:end;gap:12px;flex-wrap:wrap}
-.ge-id-catalog .ge-ref-toolbar :is(input,select,button){min-height:42px;font-family:inherit;font-size:13px}
-@media(max-width:720px){#planningDialog,#planningDialog .ge-id-backdrop{padding:10px}#planningDialog .planning-modal{padding:20px;max-height:calc(100dvh - 20px)}#planningDialog .planning-domain-form,#planningDialog .planning-revision-fields{grid-template-columns:1fr}#planningDialog .ge-id-actions{margin:20px -20px -20px;padding:14px 20px}}
+#planningDialog .planning-domain-form>label,#planningDialog .planning-revision-grid>label{box-sizing:border-box;display:flex;flex-direction:column;gap:7px;min-width:0;margin:0;color:#3f5971;font-family:inherit;font-size:13px;font-weight:600;line-height:1.4}
+#planningDialog .planning-domain-form :is(input:not([type=checkbox]):not([type=radio]),select,textarea){box-sizing:border-box;width:100%;min-width:0;height:44px;min-height:44px;max-width:none;margin:0;padding:0 12px;border:1px solid #cbd9e8;border-radius:9px;background-color:#fff;color:#153658;font-family:inherit;font-weight:400;font-size:14px;line-height:1.35}
+#planningDialog .planning-domain-form :is(input,select,textarea):focus{outline:2px solid rgba(15,65,115,.15);outline-offset:0;border-color:#0b376d}
+#planningDialog .planning-domain-form .planning-revision-fields,#planningDialog .planning-domain-form .planning-periods{grid-column:1/-1;min-width:0}
+#planningDialog .planning-revision-fields{border:1px solid #dbe5ef;border-radius:10px;padding:13px 16px;background:#f7f9fc}
+#planningDialog .planning-revision-fields summary{font-size:14px;font-weight:600;color:#244666;cursor:pointer}
+#planningDialog .planning-revision-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0 8px}
+#planningDialog .planning-revision-fields p{color:#6b8298;font-size:12px;margin:10px 0 0}
+#planningDialog .planning-periods{padding:12px 0;border-top:1px solid #e3eaf2}
+#planningDialog .planning-periods h3{font-size:14px;margin:0 0 10px}
+#planningDialog .planning-error{flex:0 0 auto;color:#b42318;font-size:13px;margin:0;padding:0 28px}
+#planningDialog .planning-error:not(:empty){padding:12px 28px;background:#fff4f2}
+#planningDialog .ge-id-actions{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;gap:10px;margin:0;padding:16px 28px;border-top:1px solid #e0e8f1;background:#fff}
+#planningDialog .planning-modal-close{width:40px;height:40px;min-width:40px;flex:0 0 40px;padding:0;font-size:22px}
+/* Master Data: no inherited dashboard-sized empty panel. */
+html body.final-v257.final-shell-r5 #cleanPageOutlet .ge-master-tabs-panel{min-height:0;height:auto;padding:14px 16px;margin:0 0 12px}
+#cleanPageOutlet .ge-master-tabs-panel .ge-ref-tabs{display:flex;flex-wrap:wrap;gap:12px;margin:0;align-items:center}
+#cleanPageOutlet .ge-master-tabs-panel .ge-ref-tabs button{box-sizing:border-box;min-height:40px;padding:0 15px;font-family:inherit;font-weight:600;font-size:13px;line-height:1.2;border-radius:9px}
+html body.final-v257.final-shell-r5 #cleanPageOutlet .ge-master-catalog{min-height:0;height:auto}
+html body.final-v257.final-shell-r5 #cleanPageOutlet .ge-master-primary[hidden],html body.final-v257.final-shell-r5 #cleanPageOutlet .ge-master-catalog[hidden]{display:none}
+.ge-master-catalog .ge-master-guidance{margin:0 0 12px}
+.ge-master-catalog .ge-master-guidance p{margin:0 0 5px}
+.ge-master-catalog .ge-master-subsection{min-height:0}
+.ge-master-catalog .ge-ref-toolbar{align-items:end;display:flex;gap:10px;flex-wrap:wrap}
+.ge-master-catalog .ge-ref-toolbar :is(input,select,button){box-sizing:border-box;min-height:40px;font-family:inherit;font-size:13px}
+@media(max-width:720px){#planningDialog.planning-dialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}#planningDialog .planning-modal{max-height:calc(100dvh - 16px)}#planningDialog .planning-modal-header,#planningDialog .planning-modal-content{padding:16px}#planningDialog .planning-domain-form,#planningDialog .planning-revision-grid{grid-template-columns:1fr}#planningDialog .ge-id-actions{padding:12px 16px}}
