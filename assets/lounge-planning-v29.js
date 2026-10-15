@@ -707,7 +707,7 @@
     setupTypeFilter();
     const addAction=document.getElementById('loungeAddAction');
     if(addAction){addAction.onclick=e=>{e.preventDefault();window.openLoungeAddModalV230()};}
-    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template|Download CSV Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template';}
+    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template|Download CSV Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download Template';templateBtn.title='Download Template';}
     ['loungeRegionFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{loungeCardPage=1;renderLounges()})});
     try{if(typeof fillAirportSelects==='function')fillAirportSelects()}catch(e){}
     populateStationFilterOptions();

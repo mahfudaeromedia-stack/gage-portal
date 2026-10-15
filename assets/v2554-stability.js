@@ -18,7 +18,7 @@ function installInitiativeControls(){
  if(title&&!$('geV2554UploadInitiative')){
    const add=title.querySelector('button[onclick*="openInitiativeModalV224"]');
    const wrap=document.createElement('div');wrap.className='v2554-initiative-actions';
-   wrap.innerHTML=`<a class="ge-btn secondary compact-btn" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Template Excel</a><button class="ge-btn secondary compact-btn" type="button" id="geV2554UploadInitiative">Upload CSV/Excel</button>`;
+   wrap.innerHTML=`<a class="ge-btn secondary compact-btn" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Template Excel</a><button class="ge-btn secondary compact-btn" type="button" id="geV2554UploadInitiative">Upload Data</button>`;
    if(add){add.parentNode.insertBefore(wrap,add);wrap.appendChild(add)}
    else title.appendChild(wrap);
    $('geV2554UploadInitiative').onclick=openBulk;

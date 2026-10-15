@@ -165,6 +165,7 @@
         try{
           const local=await readManifestCache();
           if(local&&Date.now()-Number(local.checkedAt||0)<60000)return;
+          if(local&&Date.now()-Number(local.checkedAt||0)<300000)return;
           const remote=await apiManifest();
           if(local && Number(local.version||0)===Number(remote.version||0)){await writeManifestCache(remote);return}
           const result=await apiGet(requested);

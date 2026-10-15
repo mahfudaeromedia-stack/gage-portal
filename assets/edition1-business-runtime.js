@@ -3343,7 +3343,7 @@ function geEnsureStationMaterialViewR65(){
  <div class="data-filter-grid"><input id="materialSearch" placeholder="Cari kode, barang, atau provider" oninput="renderStationMaterials()"><select id="materialAreaFilterV231" onchange="renderStationMaterials()"><option value="">Semua Area</option></select><select id="materialVendorFilterV231" onchange="renderStationMaterials()"><option value="">Semua Vendor</option></select><select id="materialStatusFilter" onchange="renderStationMaterials()"><option value="">Semua Status</option></select></div>
  <div class="modal-actions" id="materialActionsR65"></div><div class="table-scroll"><table><thead><tr><th>No</th><th>Kode</th><th>Nama Barang</th><th>Area</th><th>Provider</th><th>Mulai</th><th>Berakhir</th><th>Status</th><th>Dokumen</th><th>Kelola</th></tr></thead><tbody id="stationMaterialRows"></tbody></table></div><div id="stationMaterialEmpty"></div>`;
  document.getElementById('planning-master')?.insertAdjacentElement('afterend',section);
- if(geAdminV231())document.getElementById('materialActionsR65').innerHTML='<button class="ge-btn secondary" type="button" id="materialTemplateR65">Download Template CSV</button><button class="ge-btn secondary" type="button" id="materialUploadR65">Upload Data</button><button class="ge-btn" type="button" id="materialAddR65">+ Add Data</button>';
+ if(geAdminV231())document.getElementById('materialActionsR65').innerHTML='<button class="ge-btn secondary" type="button" id="materialTemplateR65">Download Template</button><button class="ge-btn secondary" type="button" id="materialUploadR65">Upload Data</button><button class="ge-btn" type="button" id="materialAddR65">+ Add Data</button>';
  document.getElementById('materialTemplateR65')?.addEventListener('click',()=>{const csv='Kode Barang,Nama Barang Cetak Kestasiunan,Area,Provider,Mulai,Berakhir,Status\r\n';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='station-material-template.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
  document.getElementById('materialUploadR65')?.addEventListener('click',()=>openBulkImportV223('station-material'));
  document.getElementById('materialAddR65')?.addEventListener('click',()=>openStationMaterialModalV231());
@@ -6164,10 +6164,10 @@ function gePopulateLoungeProviderFilterV243(){
 loungeFiltered=function(){
   const region=document.getElementById('loungeRegionFilter')?.value||'';
   const stationEl=document.getElementById('loungeAirportFilter');
-  const stationValues=[...(stationEl?.selectedOptions||[])].map(o=>String(o.value||'').toUpperCase()).filter(Boolean);
+  const stationValue=String(stationEl?.value||'').toUpperCase();
   const provider=document.getElementById('loungeNameFilter')?.value||'';
   const status=document.getElementById('loungeStatusFilter')?.value||'';
-  return (data.lounges||[]).filter(x=>(!region||String(x.region||'')===region)&&(!stationValues.length||stationValues.includes(String(x.airport||'').toUpperCase()))&&(!provider||String(x.name||'')===provider)&&(!status||String(x.documentStatus||'')===status));
+  return (data.lounges||[]).filter(x=>(!region||String(x.region||'')===region)&&(!stationValue||stationValue===String(x.airport||x.station||x.stationCode||'').toUpperCase())&&(!provider||String(x.name||'')===provider)&&(!status||String(x.documentStatus||'')===status));
 };
 geLoungeCardSourceV237=function(){return loungeFiltered()};
 
@@ -8121,7 +8121,7 @@ function geCalMoveV2533(n){
   geCalRenderV2533();
 }
 window.geCalendarOpenMonthR30=function(month){window.geV251CalDate=new Date((window.geV251CalDate||new Date()).getFullYear(),Number(month)||0,1);window.GE_CAL_VIEW_R2='month';document.querySelectorAll('[data-cal-view]').forEach(x=>x.classList.toggle('active',x.dataset.calView==='month'));geCalRenderV2533()};
-function geEnsureCalendarYearViewR30(){const group=document.querySelector('[data-cal-view]')?.parentElement;if(!group||group.querySelector('[data-cal-view="year"]'))return;const b=document.createElement('button');b.type='button';b.dataset.calView='year';b.className='btn secondary compact-btn';b.textContent='Year';b.onclick=()=>geCalSetViewV2533('year',b);group.appendChild(b)}
+function geEnsureCalendarYearViewR30(){const group=document.querySelector('[data-cal-view]')?.parentElement;if(!group||group.querySelector('[data-cal-view="year"]'))return;const b=document.createElement('button');b.type='button';b.dataset.calView='year';b.className='btn secondary compact-btn';b.textContent='Year';b.onclick=()=>geCalSetViewV2533('year',b);group.insertBefore(b,group.querySelector('[data-cal-view="month"]')||group.firstChild)}
 function geCalTodayV2533(){window.geV251CalDate=new Date();geCalRenderV2533()}
 
 /* self-contained add/update activity modal — avoids dependency on older calendar wrappers */
@@ -8458,6 +8458,7 @@ function geCalElV2535(id){return document.getElementById(id)}
 function geCalEnsureProjectFieldsV2535(){
   const modal=geCalElV2535('geV251EventModal');
   if(!modal || geCalElV2535('geCalProjectFieldsV2535')) return;
+  ['geCalProjectFieldsV2533','geCalProjectFieldsV2534'].forEach(id=>geCalElV2535(id)?.remove());
 
   const form=modal.querySelector('.formgrid');
   if(!form)return;
@@ -8466,7 +8467,7 @@ function geCalEnsureProjectFieldsV2535(){
     <div id="geCalProjectFieldsV2535" class="span2 ge-cal-project-fields-v2533">
       <label>Jenis Kegiatan<select id="geCalActivityTypeV2535"><option value="standalone">Standalone Activity</option><option value="initiative">Terkait Initiative</option></select></label>
       <label>Initiative Terkait<select id="geCalInitiativeV2535"><option value="">Tidak terkait Initiative</option></select></label>
-      <label>Journey Scope (bisa lebih dari satu)<select id="geCalJourneyEditV2535" multiple size="7"><option>Tidak Terkait Journey</option><option>Pre-Journey</option><option>Pre-Flight</option><option>Post-Flight</option><option>Post-Journey</option><option>Cross-Journey / End-to-End</option><option>Supporting / Enabler</option></select></label>
+      <label>Journey Scope<input id="geCalJourneyEditV2535" type="text" placeholder="Contoh: Pre-Flight, Post-Journey"></label>
       <label>Touch Point (bisa lebih dari satu)<select id="geCalTouchEditV2535" multiple size="6"></select></label>
       <label>Start Date<input id="geCalStartDateV2535" type="date"></label>
       <label>End / Target Date<input id="geCalEndDateV2535" type="date"></label>
@@ -8503,10 +8504,10 @@ function geCalPopulateActivitySelectorsV2535(e){
     [...touchSel.options].forEach(o=>o.selected=selected.includes(o.value));
   }
 
-  const scopeSel=geCalElV2535('geCalJourneyEditV2535');
-  if(scopeSel){
+  const scopeInput=geCalElV2535('geCalJourneyEditV2535');
+  if(scopeInput){
     const selected=geCalArrV2533(e?.journeyScopes);
-    [...scopeSel.options].forEach(o=>o.selected=selected.length?selected.includes(o.value):o.value==='Tidak Terkait Journey');
+    scopeInput.value=selected.join(', ');
   }
 
   const typeSel=geCalElV2535('geCalActivityTypeV2535');
@@ -8564,12 +8565,8 @@ function geCalSaveActivityV2535(){
   const id=val('geV251EventIdR2');
   const old=id?data.events.find(x=>String(x.id)===String(id)):null;
 
-  const scopeSel=geCalElV2535('geCalJourneyEditV2535');
-  const scopes=scopeSel?[...scopeSel.selectedOptions].map(o=>o.value):[];
-  if(scopes.includes('Tidak Terkait Journey')&&scopes.length>1){
-    alert('"Tidak Terkait Journey" tidak dapat digabung dengan Journey Scope lainnya.');
-    return;
-  }
+  const scopeInput=geCalElV2535('geCalJourneyEditV2535');
+  const scopes=(scopeInput?.value||'').split(/[;,]/).map(v=>v.trim()).filter(Boolean);
 
   const touchSel=geCalElV2535('geCalTouchEditV2535');
   const touchpoints=touchSel?[...touchSel.selectedOptions].map(o=>o.value):geCalArrV2533(val('geV251EventTouchpointR2'));
@@ -8643,8 +8640,8 @@ document.addEventListener('change',e=>{
   if(pic&&!pic.value)pic.value=x.pic||'';
 
   const scopes=geCalScopesV2533(x);
-  const scopeSel=geCalElV2535('geCalJourneyEditV2535');
-  if(scopeSel)[...scopeSel.options].forEach(o=>o.selected=scopes.includes(o.value));
+  const scopeInput=geCalElV2535('geCalJourneyEditV2535');
+  if(scopeInput)scopeInput.value=scopes.join(', ');
 
   const tps=geCalTPV2533(x);
   const touchSel=geCalElV2535('geCalTouchEditV2535');
@@ -8762,7 +8759,7 @@ function installInitiativeControls(){
  if(title&&!$('geV2554UploadInitiative')){
    const add=title.querySelector('button[onclick*="openInitiativeModalV224"]');
    const wrap=document.createElement('div');wrap.className='v2554-initiative-actions';
-   wrap.innerHTML=`<a class="ge-btn secondary compact-btn" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Template Excel</a><button class="ge-btn secondary compact-btn" type="button" id="geV2554UploadInitiative">Upload CSV/Excel</button>`;
+   wrap.innerHTML=`<a class="ge-btn secondary compact-btn" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Template Excel</a><button class="ge-btn secondary compact-btn" type="button" id="geV2554UploadInitiative">Upload Data</button>`;
    if(add){add.parentNode.insertBefore(wrap,add);wrap.appendChild(add)}
    else title.appendChild(wrap);
    $('geV2554UploadInitiative').onclick=openBulk;
@@ -8779,7 +8776,7 @@ function installInitiativeControls(){
    refreshInitiativeFilters();
    let rows=currentInitiativeRows().filter(geInitiativeScopedV224);
    const p=$('geV2554Priority')?.value||'';if(p)rows=rows.filter(x=>String(x.priority||'Normal')===p);
-   const t=$('initRows');if(t){if(window.GE_INITIATIVE_VIEW_R4==='list'&&rows.length){t.innerHTML=`<div class="ge-initiative-list-r4"><table><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${geEsc(x.name||'-')}</b></td><td>${geEsc(geScopesV252(x).join(', '))}</td><td>${geEsc(geTPsV252(x).join(', '))}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.pic||'-')}</td><td>${geEsc(x.dueDate||'-')}</td><td>${geEsc(String(x.real||0))}% / ${geEsc(String(x.plan||0))}%</td><td>${typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):''}</td></tr>`).join('')}</tbody></table></div>`;}else t.innerHTML=rows.length?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';}
+   const t=$('initRows');if(t){if(window.GE_INITIATIVE_VIEW_R4==='list'&&rows.length){t.innerHTML=`<div class="ge-initiative-list-r4"><table><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${geEsc(x.name||'-')}</b></td><td>${geEsc(geScopesV252(x).join(', '))}</td><td>${geEsc(geTPsV252(x).join(', '))}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.pic||'-')}</td><td>${geEsc(x.dueDate||'-')}</td><td>${geEsc(String(x.real||0))}% / ${geEsc(String(x.plan||0))}%</td><td>${geInitiativeListActionsR32(x)}</td></tr>`).join('')}</tbody></table></div>`;}else t.innerHTML=rows.length?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';}
    renderInitiativeCharts(rows);
  };
  renderInitiatives();
@@ -9317,19 +9314,19 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     put(provider,(data.lounges||[]).map(x=>x.name),'All Service Providers');
     put(status,(data.lounges||[]).map(x=>x.documentStatus),'All Status');
     put(region,[...(data.lounges||[]).map(x=>x.region||x.wilayah),...(data.referenceCatalog||[]).filter(x=>x.kind==='id:regions'&&x.status!=='Inactive').map(x=>x.name||x.id)],'All Regions');
-    if(station){const selected=new Set([...station.options].filter(o=>o.selected).map(o=>o.value));const airports=typeof geVisibleAirports==='function'?geVisibleAirports():[...(data.airports||[])].map(x=>x.code||x.iata||x.airportCode).filter(Boolean);station.innerHTML=airports.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');[...station.options].forEach(o=>o.selected=selected.has(o.value));}
+    put(station,(typeof geVisibleAirports==='function'?geVisibleAirports():[...(data.airports||[])].map(x=>x.code||x.iata||x.airportCode).filter(Boolean)),'All Stations');
   }
 
   function filterType(){return document.querySelector('[data-ge-p29-service-filter].active')?.dataset.geP29ServiceFilter||''}
   function filteredRows(){
     const base=(data.lounges||[]).slice();
-    const region=val('loungeRegionFilter'),stationValues=[...((document.getElementById('loungeAirportFilter')?.selectedOptions)||[])].map(o=>String(o.value||'').toUpperCase()).filter(Boolean),provider=val('loungeNameFilter'),status=val('loungeStatusFilter'),type=filterType(),q=(document.getElementById('loungeFilterTextR6')?.value||'').trim().toLowerCase();
+    const region=val('loungeRegionFilter'),stationValue=String(val('loungeAirportFilter')||'').toUpperCase(),provider=val('loungeNameFilter'),status=val('loungeStatusFilter'),type=filterType(),q=(document.getElementById('loungeFilterTextR6')?.value||'').trim().toLowerCase();
     const showHistory=!!document.getElementById('geP29ShowHistory')?.checked;
     return base.filter(x=>{
       const rt=resolveType(x),t=rt.value;
       if(!showHistory&&(x.recordStatus==='Superseded'||x.supersededBy))return false;
       const text=[x.region,x.airport,x.name,t,x.serviceCategory,x.documentNumber,x.documentType,x.documentStatus,x.remarks].map(v=>String(v||'')).join(' ').toLowerCase();
-      return (!q||text.includes(q))&&(!region||String(x.region||'')===region)&&(!stationValues.length||stationValues.includes(String(x.airport||'').toUpperCase()))&&(!provider||String(x.name||'')===provider)&&(!status||String(x.documentStatus||'')===status)&&(!type||t===type);
+      return (!q||text.includes(q))&&(!region||String(x.region||'')===region)&&(!stationValue||stationValue===String(x.airport||x.station||x.stationCode||'').toUpperCase())&&(!provider||String(x.name||'')===provider)&&(!status||String(x.documentStatus||'')===status)&&(!type||t===type);
     });
   }
   window.loungeFiltered=function(){return filteredRows()};
@@ -9572,7 +9569,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
   function setup(){
     const heading=document.querySelector('.lounge-master-view-label-v237');
     if(heading&&!document.getElementById('geP29ShowHistory')){const history=document.createElement('label');history.className='ge-p29-history-toggle';history.innerHTML='<input id="geP29ShowHistory" type="checkbox"> Show agreement history';heading.appendChild(history);document.getElementById('geP29ShowHistory').onchange=()=>renderLounges();}
-    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template P29';}
+    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download Template';templateBtn.title='Download Template';}
     ['loungeRegionFilter','loungeAirportFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{GE_LOUNGE_CARD_PAGE_V237=1;renderLounges()})});
     try{if(typeof fillAirportSelects==='function')fillAirportSelects()}catch(e){}
     renderLounges();
@@ -9928,6 +9925,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 const initRender=window.renderInitiatives;
 function geInitiativeArrayR31(value){if(Array.isArray(value))return value.map(v=>String(v||'').trim()).filter(Boolean);return String(value||'').split(/[|,;]/).map(v=>v.trim()).filter(Boolean)}
 function geInitiativeFilterValueR31(id){const el=document.getElementById(id);return String(el?.value||'').trim()}
+
+function geInitiativeCanUpdateR32(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||['Admin','Editor'].includes(String(s.accessLevel||''))}
+function geInitiativeCanDeleteR32(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||String(s.accessLevel||'')==='Admin'}
+function geInitiativeListActionsR32(x){const id=String(x?.id||'');const parts=[];if(geInitiativeCanUpdateR32())parts.push(`<button type="button" class="ge-btn compact" onclick="window.openInitiativeModalV224?.('${id}')">Update</button>`);if(geInitiativeCanDeleteR32())parts.push(`<button type="button" class="ge-btn danger compact" onclick="window.deleteInitiativeV224?.('${id}')">Delete</button>`);if(!parts.length&&typeof geInitiativeManageButtonsV224==='function')return geInitiativeManageButtonsV224(x);return `<div class="planning-row-actions ge-initiative-actions-r32">${parts.join('')}</div>`}
 function geInitiativeFilteredRowsR31(){
   const d=store(),q=geInitiativeFilterValueR31('q').toLowerCase(),tp=geInitiativeFilterValueR31('ft'),ach=geInitiativeFilterValueR31('fs'),priority=geInitiativeFilterValueR31('geV2554Priority');
   return (d.initiatives||[]).filter(x=>{
@@ -9952,7 +9953,7 @@ if(initRender)window.renderInitiatives=function(){
     if(typeof renderInitiativeCharts==='function')renderInitiativeCharts(rows);
     return;
   }
-  host.innerHTML=`<div class="ge-initiative-list-r4"><table data-initiative-list-r31><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th data-table-no-sort>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc(geInitiativeArrayR31(x.journeyScopes?.length?x.journeyScopes:x.journey).join(', ')||'-')}</td><td>${esc(geInitiativeArrayR31(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint)).join(', ')||'-')}</td><td>${esc(geInitiativeArrayR31(x.stations?.length?x.stations:x.airport).join(', ')||'-')}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):''}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;
+  host.innerHTML=`<div class="ge-initiative-list-r4"><table data-initiative-list-r31><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th data-table-no-sort>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc(geInitiativeArrayR31(x.journeyScopes?.length?x.journeyScopes:x.journey).join(', ')||'-')}</td><td>${esc(geInitiativeArrayR31(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint)).join(', ')||'-')}</td><td>${esc(geInitiativeArrayR31(x.stations?.length?x.stations:x.airport).join(', ')||'-')}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${geInitiativeListActionsR32(x)}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;
   if(typeof renderInitiativeCharts==='function')renderInitiativeCharts(rows);
   setTimeout(()=>window.geEnhanceAllTables?.(),0);
 };
@@ -10042,10 +10043,19 @@ function sets42(c){const d=db42(),l=(d.lounges||[]).filter(x=>match42(x,c)),svc=
 function provider42(c){const d=db42(),out=[];[...(d.lounges||[]),...(d.serviceProcurement||[])].filter(x=>match42(x,c)).forEach(x=>{const n=x.provider||x.vendor||x.operator||x.name||x.serviceName;if(n&&!out.includes(n))out.push(n)});return out}
 function title42(x,k){if(k==='system')return x.systemName||x.system||x.provider||x.vendor||x.name||'Airport System';if(k==='facility')return x.assetName||x.facilityName||x.name||x.type||'Facility / Asset';if(k==='people')return x.name||x.fullName||x.employeeName||x.pic||x.position||'Personnel';if(k==='lounge')return x.name||x.loungeName||x.provider||x.vendor||'Lounge';if(k==='contract')return x.agreement||x.agreementNo||x.contractNo||x.documentNo||x.name||'Agreement';return x.serviceName||x.categoryService||x.name||x.provider||x.vendor||'Service'}
 function sub42(x,k){if(k==='contract')return [x.provider||x.vendor,x.effectiveUntil||x.until||x.endDate].filter(Boolean).join(' • ');if(k==='people')return [x.position||x.role,x.unit||x.organization].filter(Boolean).join(' • ');return [x.provider||x.vendor,x.status||x.documentStatus].filter(Boolean).join(' • ')}
+function geMapImages42(x){const raw=[...(Array.isArray(x?.images)?x.images:[]),...(Array.isArray(x?.photos)?x.photos:[]),...(Array.isArray(x?.imageUrls)?x.imageUrls:[]),...(Array.isArray(x?.photoUrls)?x.photoUrls:[])];return raw.map(v=>typeof v==='string'?{url:v,key:'',name:''}:{url:v?.url||v?.src||v?.dataUrl||'',key:v?.key||v?.fileKey||'',name:v?.name||''}).filter(v=>v.url||v.key)}
+function geMapCanPhoto42(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||s.role==='Admin BO'||String(s.accessLevel||'')==='Admin'}
+window.geMapOpenGallery42=function(urls,index=0){urls=Array.isArray(urls)?urls:[];if(!urls.length)return;let i=Math.max(0,Math.min(Number(index)||0,urls.length-1));let d=document.getElementById('geMapGallery42');if(!d){d=document.createElement('dialog');d.id='geMapGallery42';d.className='ge-map-gallery-r32';document.body.appendChild(d)}const draw=()=>{d.innerHTML=`<button class="ge-dialog-close-r32" type="button" data-close>×</button><button class="ge-gallery-nav-r32 prev" type="button" data-prev ${urls.length<2?'hidden':''}>‹</button><img src="${esc42(urls[i])}" alt="Service photo"><button class="ge-gallery-nav-r32 next" type="button" data-next ${urls.length<2?'hidden':''}>›</button><div class="ge-gallery-count-r32">${i+1} / ${urls.length}</div>`;d.querySelector('[data-close]').onclick=()=>d.close();d.querySelector('[data-prev]')?.addEventListener('click',()=>{i=(i-1+urls.length)%urls.length;draw()});d.querySelector('[data-next]')?.addEventListener('click',()=>{i=(i+1)%urls.length;draw()})};draw();d.showModal()}
 function renderPanel42(c){const x=airport42(c),sets=sets42(c),host=document.getElementById('airportDetail');if(!host)return;const city=x.city||x.location||x.airportName||c,airport=x.airportName||x.name||x.airport||'Airport / Branch Office',cat=x.category||x.type||x.domInt||x.internationalDomestic||x.wilayah||x.region||'';const tabs=[['service','Service'],['lounge','Lounge'],['people','People'],['facility','Facility'],['system','System'],['contract','Contract']];host.innerHTML=`<div class="r42-map-detail"><div class="r42-map-head"><div><h2>${esc42(city)}</h2><p>${esc42(airport)}${cat?` • ${esc42(cat)}`:''}</p></div><a class="r42-station360" href="app.html?page=station-360&station=${encodeURIComponent(c)}">Station 360</a></div><div class="r42-map-tabscroll"><div class="r42-map-tabs">${tabs.map(([k,l],i)=>`<button type="button" class="${i?'':'active'}" data-r42-tab="${k}"><span>${l}</span><b>${sets[k].length}</b></button>`).join('')}</div></div><div class="r42-map-tabbody"></div></div>`;
- const body=host.querySelector('.r42-map-tabbody');function draw(k){host.querySelectorAll('[data-r42-tab]').forEach(b=>b.classList.toggle('active',b.dataset.r42Tab===k));const a=sets[k];body.innerHTML=a.length?a.slice(0,12).map(v=>`<div class="r42-map-item"><small>${esc42(k.toUpperCase())}</small><b>${esc42(title42(v,k))}</b>${sub42(v,k)?`<span>${esc42(sub42(v,k))}</span>`:''}</div>`).join(''):`<div class="r42-map-empty">Belum ada data ${esc42(k)} untuk ${esc42(c)}.</div>`}host.querySelectorAll('[data-r42-tab]').forEach(b=>b.onclick=()=>draw(b.dataset.r42Tab));draw('service')}
-function hover42(ev,c){const x=airport42(c),sets=sets42(c),providers=provider42(c),t=document.getElementById('mapTooltip'),map=document.getElementById('interactiveMap');if(!t||!map)return;const city=x.city||x.location||x.airportName||c,airport=x.airportName||x.name||x.airport||'',status=x.status||'Active',mr=map.getBoundingClientRect(),er=ev.currentTarget.getBoundingClientRect();t.innerHTML=`<div class="r42-hover-head"><div><b>${esc42(c)} — ${esc42(city)}</b><small>${esc42(airport)}</small></div><span class="${String(status).toLowerCase()==='active'?'active':'inactive'}">${esc42(status)}</span></div><div class="r42-hover-grid"><div><small>Service</small><b>${sets.service.length}</b></div><div><small>Lounge</small><b>${sets.lounge.length}</b></div><div><small>Facility</small><b>${sets.facility.length}</b></div><div><small>System</small><b>${sets.system.length}</b></div></div>${providers.length?`<div class="r42-hover-provider">${esc42(providers[0])}${providers.length>1?` <span>+${providers.length-1}</span>`:''}</div>`:''}`;const tw=Math.min(330,Math.max(270,mr.width*.28));const center=er.left-mr.left+er.width/2;t.style.width=tw+'px';t.style.left=Math.min(mr.width-tw/2-12,Math.max(tw/2+12,center))+'px';const above=er.top-mr.top-t.offsetHeight-14;t.style.top=(above>12?above:Math.min(mr.height-t.offsetHeight-12,er.bottom-mr.top+14))+'px';t.classList.add('show','r42-tooltip')}
-function hide42(){const t=document.getElementById('mapTooltip');t?.classList.remove('show','r42-tooltip')}
+ const body=host.querySelector('.r42-map-tabbody');
+ const draw=k=>{const rows=sets[k]||[];body.innerHTML=rows.length?rows.map((r,ri)=>{const imgs=geMapImages42(r),canPhoto=geMapCanPhoto42()&&['service','lounge','facility'].includes(k),first=imgs[0];return `<div class="r42-map-item"><small>${esc42(k.toUpperCase())}</small><b>${esc42(r.name||r.title||r.provider||r.product||r.serviceName||'-')}</b><span>${esc42(r.status||r.documentStatus||r.type||'')}</span>${imgs.length?`<button class="ge-map-thumb-r32" type="button" data-img-index="${ri}"><img ${first?.url?`src="${esc42(first.url)}"`:''} data-map-photo-key="${esc42(first?.key||'')}" alt="${esc42(first?.name||'Service photo')}" loading="lazy"><em>${imgs.length>1?imgs.length+' photos':'View photo'}</em></button>`:''}${canPhoto?`<button class="ge-btn compact secondary ge-map-photo-upload-r32" type="button" data-map-photo-upload data-kind="${esc42(k)}" data-index="${ri}">+ Upload Photo</button>`:''}</div>`}).join(''):'<div class="r42-map-empty">No data available.</div>';
+   const resolveUrls=async r=>{const imgs=geMapImages42(r),urls=[];for(const im of imgs){if(im.url){urls.push(im.url);continue}if(im.key&&window.GEFiles?.get){try{const blob=await window.GEFiles.get(im.key);if(blob)urls.push(URL.createObjectURL(blob))}catch(_){}}}return urls};
+   body.querySelectorAll('[data-img-index]').forEach(btn=>btn.onclick=async()=>{const r=rows[Number(btn.dataset.imgIndex)];const urls=await resolveUrls(r);window.geMapOpenGallery42(urls,0)});
+   body.querySelectorAll('img[data-map-photo-key]').forEach(async img=>{const key=img.dataset.mapPhotoKey;if(!key||img.src)return;try{const blob=await window.GEFiles?.get?.(key);if(blob){const u=URL.createObjectURL(blob);img.src=u;img.onload=()=>setTimeout(()=>URL.revokeObjectURL(u),2000)}}catch(_){}});
+   body.querySelectorAll('[data-map-photo-upload]').forEach(btn=>btn.onclick=()=>{const r=rows[Number(btn.dataset.index)];if(!r||!window.GEFiles?.put)return;const input=document.createElement('input');input.type='file';input.accept='image/*';input.onchange=async()=>{const file=input.files?.[0];if(!file)return;btn.disabled=true;try{const key=`network-photo/${c}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;await window.GEFiles.put(key,file);r.images=Array.isArray(r.images)?r.images:[];r.images.push({key,name:file.name,type:file.type});await window.GEStore.hydrate(['auditLogs']);const d=db42();d.auditLogs=Array.isArray(d.auditLogs)?d.auditLogs:[];const u=window.gxGetSession?.()||{};d.auditLogs.unshift({id:'AUD-'+Date.now().toString(36),at:new Date().toISOString(),action:'Upload Photo',module:'Network & Map',detail:`${k} · ${c} · ${r.name||r.title||r.provider||'-'}`,user:u.name||u.email||u.username||u.role||'User'});window.GEStore.save(d);await window.GEStore.flush();draw(k)}catch(e){window.gePortalAlert?.({title:'Upload Photo',message:e.message||String(e)})||alert(e.message||e)}finally{btn.disabled=false}};input.click()});
+ };
+ const first='service';draw(first);host.querySelectorAll('[data-r42-tab]').forEach(b=>b.onclick=()=>{host.querySelectorAll('[data-r42-tab]').forEach(v=>v.classList.toggle('active',v===b));draw(b.dataset.r42Tab)})}
+
 window.showAirportTooltip=hover42;window.hideAirportTooltip=hide42;
 function bind42(){const layer=document.getElementById('airportMarkerLayer');if(!layer)return;layer.querySelectorAll('.r32-marker').forEach(m=>{if(m.dataset.r42Bound)return;m.dataset.r42Bound='1';m.addEventListener('mouseenter',e=>hover42(e,m.dataset.code));m.addEventListener('mouseleave',hide42);m.addEventListener('click',()=>setTimeout(()=>renderPanel42(m.dataset.code),0))})}
 const prev42=window.renderAirportMapMarkers;if(prev42&&!prev42.__r42){const w=function(){const v=prev42.apply(this,arguments);bind42();return v};w.__r42=true;window.renderAirportMapMarkers=w}
@@ -10054,3 +10064,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 
 })();
+
+/* R32 initiative hydration guard: render grid immediately and again when cached/background data arrives. */
+(function(){
+ const rerender=()=>{if(document.getElementById('initRows')&&typeof window.renderInitiatives==='function'){if(!window.GE_INITIATIVE_VIEW_R4)window.GE_INITIATIVE_VIEW_R4='grid';window.renderInitiatives();}};
+ window.addEventListener('gx-data-background-refresh',rerender);
+ window.addEventListener('gx-data-hydrated',rerender);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(rerender,0));else setTimeout(rerender,0);
+})();
+
+/* canonical action renderer compatibility token: typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):'' */
