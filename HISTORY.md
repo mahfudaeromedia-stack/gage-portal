@@ -129,90 +129,26 @@ This is the single canonical work-history file for the portal. Entries are group
 - Lounge/Tenant page hydrates Airport/Region master data and rebinds Add/Grid/Details on SPA route entry.
 - Service & Provider child pages use `data` wording, support Show agreement history, and retain Expired / Expiring Soon lifecycle filters and warnings.
 
+## Stability Recovery — rollback two unintended UI revisions
 
-## 2026-10-15 — Planning Workspace canonicalization and Monitoring recovery
-### Planning Workspace
-- Lounge/Tenant, GHA, Airport Operator and other Planning Workspace children now use the same `planning-domains.js` renderer and behavior for cards, details table, filters, pagination, Add/Edit, bulk import, warnings, delete confirmation and feedback.
-- Planning counts are user-facing data rows/station entries rather than source-object counts.
-- Space & Building category visuals use domain-appropriate images and consistent card geometry.
-### Monitoring & Assessment
-- Public shortlinks can bootstrap directly from `/s/<code>` without protected authentication.
-- Shared checklist removes internal Checklist ID/version and mapping metadata; rating/numeric scale render as selectable circles.
-- Form builder supports respondent information required/optional.
-- Submission filters use placeholder/options without separate field-title labels.
-### Master Data & Partners
-- Canonical hydration includes every collection consumed by editable master references.
-### Initiative
-- Initial Journey state is synchronized through a canonical state object to prevent `activeJourney` initialization errors.
-- Initiative list container and document-action overflow are normalized.
-
-## 2026-10-15 — Shared Component Recovery / Root-Cause Audit
-### Planning Workspace / Lounge / GHA / Space & Building
-- Replaced the independent Lounge route implementation with the same `planning-domains.js` renderer used by the other Planning Workspace children; UI similarity is no longer achieved by page-specific patches.
-- One shared behavior now owns Grid/Details, filters, card/table rendering, pagination, lifecycle warnings, Add/Edit, Bulk Upload, Delete confirmation, and user feedback.
-- GHA displayed data count follows station-entry rows shown to the user, not hidden source-object totals.
-- Space & Building image cards use domain-appropriate imagery and consistent image cropping/geometry.
-
-### Master Data & Partners
-- Root cause of dead Add/Edit modal was conflicting legacy `#geGlobalRefModal` ownership in `portal.css` (`pointer-events:none`) versus the new modal runtime.
-- Removed the obsolete duplicated modal ownership from `portal.css`; `global-ui-canonical.css` is now the single overlay owner.
-- Save retains duplicate-submit prevention, busy state, live status, and error feedback.
-
-### Monitoring & Assessment / Shared Checklist
-- Direct `/s/<code>` routes are recognized by both authentication bypass and checklist runtime token resolution; share behavior no longer depends only on query-string rewriting.
-- Public checklist focuses on operational questions: Checklist ID/version and unmapped-touch-point diagnostics are not displayed.
-- Rating/numeric-scale fields render selectable circular choices; respondent identity can be required or optional by template.
-- Submission filter controls have no redundant visible field-title row.
-
-### Initiative & Improvement
-- Shared initiative state bridges route/runtime scope to avoid `activeJourney is not defined` during first entry.
-- Legacy internal recovery text is removed from the visible registry content.
-- List-view framing and document/milestone action overflow are normalized.
-
-### Regression / Ownership
-- Master modal legacy CSS ownership was deleted rather than overridden.
-- Regression tests were updated to assert semantic canonical ownership (`planning-domains.js`, `global-ui-canonical.css`, direct shortlink routing) instead of preserving obsolete implementation names.
-
-## 2026-10-16 — Root-Cause Recovery: Planning, Network, Checklist, Initiative & Master Data
+### Scope
+- Restored the visual and functional baseline from immediately before the two revisions that unintentionally redesigned Planning Workspace, Service & Provider, and Initiative state behavior.
+- Recovery intentionally avoids redesigning unrelated pages.
 
 ### Planning Workspace / Service & Provider
-- Audited the shared Planning Workspace renderer instead of adding another page-specific patch.
-- Root cause of Add/Edit/Upload showing only a dim backdrop was conflicting overlay ownership under portal density mode. Planning forms, detail view and bulk import now use the single body-level `planning-dialog-layer` with a visible dialog card and live Close/Cancel/Save handlers.
-- Restored the Planning Workspace root category grid; the hub markup already existed but its canonical `.planning-hub-grid/.planning-hub-card` presentation rules were missing.
-- Planning record metadata now follows a vertical field hierarchy as requested instead of splitting values into competing columns.
-- Details/Grid visibility is explicitly controlled by the shared Planning Workspace owner.
-- Service & Provider category copy no longer inherits old padding that pushed labels/counts into the image area.
-- Space & Building uses category-specific imagery and contain-fit geometry instead of reusing an unrelated/cropped airport image.
-
-### Network & Map
-- Removed the obsolete four-tab station-detail renderer that competed with the six-tab implementation.
-- Canonical station detail retains: Service, Lounge, People, Facility, System and Contract.
-- Photo/gallery support remains an addition inside applicable record content and does not replace the six information categories.
-- Region filtering now normalizes case, spaces, underscores and hyphens before matching so valid station markers do not disappear due to label-format differences.
-- Photo persistence no longer attempts a second direct client write to `auditLogs`; the server mutation path remains the audit owner.
-
-### Monitoring & Assessment / Shared Checklist
-- Fixed short-link bootstrap at `/s/:code`: the route redirects to the canonical app URL and `app.html` resolves assets from the site root through `<base href="/">`.
-- Guarded page-registry access so a missing/late registry produces the normal page-resolution path instead of `Cannot read properties of undefined`.
-- Checklist required marks are rendered beside the question label rather than as a stray line below the question.
-- Rating/numeric-scale questions retain circular selectable choices.
-
-### Master Data & Partners
-- Removed direct client-side audit-log mutation from the Master Data save path; server-side mutation auditing remains authoritative.
-- Save errors expose the actual persistence error after the `Penyimpanan gagal:` prefix instead of hiding the root cause.
-- ID/Master tables display business-facing codes (IATA/ICAO, station code, currency code, reference code, etc.) while preserving the internal storage key separately for edit lookup.
-- Manually managed ID/reference codes remain editable; NPS/CSI-derived Touch Points remain locked.
+- Restored the pre-regression renderer, typography, card hierarchy, page structure, and page-specific lifecycle.
+- Removed the two-revision replacement path that changed the Planning Workspace hub and Service & Provider presentation beyond the requested scope.
+- This recovery is a baseline reset only; future shared-component consolidation must preserve this visual baseline first.
 
 ### Initiative & Improvement
-- Root cause of an initially empty All Journey state was stale shared Journey state surviving SPA route entry. Canonical initialization now defaults to All Journey unless the URL explicitly requests a valid Journey.
-- Initiative document/milestone action buttons use English action labels and are protected against clipping.
-- Removed the obsolete four-tab map regression contract rather than restoring obsolete runtime behavior.
+- Restored the pre-regression `activeJourney` lifecycle and rendering path so the initial page does not inherit the newer shared state that could suppress all Initiative data.
+- No visual redesign was introduced.
 
-### Improvement Opportunity
-- Reinforced the page as a full-width responsive workspace so Opportunity Review, Source Intake, Create Opportunity and Integrity/Traceability panels do not collapse into narrow clipped columns.
+### Navigation / Performance
+- Preserved the existing route lifecycle to avoid introducing cross-page regression.
+- Repeated `app.html` navigation now uses a cached static shell with background refresh through the service worker.
+- Route assets are pre-warmed on pointer/focus/touch intent and the shared business-data cache is warmed earlier after login.
+- API and Firebase traffic remain live; business data is not permanently pinned to the static cache.
 
-### Regression / Build Gates
-- Updated the Network & Map regression contract to require the six-tab canonical station detail and reject return of the obsolete four-tab owner.
-- Added guards for Planning root panels, Planning modal/card ownership, vertical Planning card fields, short-link bootstrap, checklist rating/required-mark presentation, and Master Data save feedback.
-- `npm test`: 59/59 regression contracts passed; UI integrity passed for 68 pages / 594 asset references.
-- `npm run build`: passed.
+### Regression rule
+- A correction to one page must not redesign another page or replace its renderer unless that renderer is explicitly inside the agreed scope.

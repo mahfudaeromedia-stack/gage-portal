@@ -5151,6 +5151,9 @@ button[onclick^="openInitiativeStepV224"]{min-height:36px;padding:8px 14px;borde
 
 
 /* R22 — global overlay, usable list tables, resizable/sortable tables and BO table polish */
+#geGlobalRefModal{position:fixed;inset:0;z-index:2147483000;pointer-events:none}
+#geGlobalRefModal>.ge-ref-backdrop{position:absolute;inset:0;z-index:2147483001;pointer-events:auto;display:grid;place-items:center;padding:24px}
+#geGlobalRefModal .ge-ref-modal{position:relative;z-index:2147483002;max-height:calc(100vh - 48px);overflow:auto}
 .ge-initiative-list{width:100%;max-width:100%;overflow:auto}
 .ge-initiative-list table{width:max-content;min-width:100%;table-layout:auto}
 .ge-initiative-list th,.ge-initiative-list td{min-width:130px;max-width:320px;white-space:normal;vertical-align:top}
@@ -5160,6 +5163,9 @@ button[onclick^="openInitiativeStepV224"]{min-height:36px;padding:8px 14px;borde
 .ge-bo-manage-r20{min-width:88px;max-width:none;width:auto;white-space:nowrap;padding:0 14px}
 .bo-service-table td,.bo-service-table th{vertical-align:top}
 n/* R23 cumulative UI standardization */
+#geGlobalRefModal{position:fixed;inset:0;z-index:2147483000;pointer-events:none}
+#geGlobalRefModal>.ge-ref-backdrop{position:fixed;inset:0;z-index:2147483001;pointer-events:auto;display:grid;place-items:center;padding:24px}
+#geGlobalRefModal .ge-ref-modal{z-index:2147483002}
 .ge-ref-combo{position:relative;margin-top:5px}.ge-ref-combo>input{margin-top:0;padding-right:42px}.ge-ref-combo-toggle{position:absolute;right:1px;top:1px;width:40px;height:38px;border:0;border-left:1px solid #e0e7ef;background:#fff;color:#173b54;border-radius:0 8px 8px 0;font-size:18px;cursor:pointer}.ge-ref-combo-pop{display:none;position:absolute;z-index:2147483005;left:0;right:0;top:44px;max-height:220px;overflow:auto;background:#fff;border:1px solid #ccd6e0;border-radius:10px;box-shadow:0 16px 36px rgba(6,43,99,.16);padding:6px}.ge-ref-combo-pop.show{display:block}.ge-ref-combo-pop button{display:block;width:100%;min-height:36px;border:0;border-radius:7px;background:#fff;color:#173b54;text-align:left;padding:7px 10px;font:500 13px/1.3 inherit;cursor:pointer}.ge-ref-combo-pop button:hover{background:#eef3f8}
 .ge-ahan-editor{margin-top:6px;border:1px solid #d5e0ea;border-radius:10px;padding:10px}.ge-ahan-head,.ge-ahan-row{display:grid;grid-template-columns:1.5fr .7fr 1fr 1fr 38px;gap:7px;align-items:center}.ge-ahan-head{font-size:11px;color:#71869a;padding:0 3px 5px}.ge-ahan-row input{margin:0;height:36px}.ge-ahan-row{margin-bottom:7px}.ge-ahan-row button{height:36px;min-width:36px;padding:0}.ge-ahan-add{margin-top:3px}
 #initRows:has(.ge-initiative-list){display:block;width:100%;max-width:none}.ge-initiative-list{width:100%}.ge-initiative-list table{min-width:1180px;width:100%}

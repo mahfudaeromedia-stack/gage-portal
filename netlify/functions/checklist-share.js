@@ -107,7 +107,7 @@ async function handleSubmit(db, event, payload) {
   }
   const result = evaluate(template, answers);
   const guest = payload.guest && typeof payload.guest === 'object' ? payload.guest : {};
-  if (!isUser && template.respondentRequired && (!String(guest.name||'').trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(guest.email || '').trim()))) throw Object.assign(new Error('Guest name and a valid email are required for this checklist.'), { statusCode: 400, code: 'GUEST_IDENTITY_REQUIRED' });
+  if (!isUser && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(guest.email || '').trim())) throw Object.assign(new Error('Guest email is required and must be valid.'), { statusCode: 400, code: 'GUEST_EMAIL_INVALID' });
   const submissionId = id();
   const normalizedAnswers = { ...answers };
   for (const field of (template.sections || []).flatMap(s => s.fields || [])) {
