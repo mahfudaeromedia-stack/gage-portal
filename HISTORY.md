@@ -152,3 +152,11 @@ This is the single canonical work-history file for the portal. Entries are group
 
 ### Regression rule
 - A correction to one page must not redesign another page or replace its renderer unless that renderer is explicitly inside the agreed scope.
+
+
+## Stability Recovery — Planning data, modal visibility, Initiative state, navigation latency
+- Root cause: canonical UI applied `position:fixed` to every `[role=dialog]` / `[aria-modal=true]`, which could detach a dialog card from its overlay layout and leave only the dark overlay visible. Fixed the global rule and gave the Planning modal card a dedicated canonical class.
+- Root cause: cached empty planning/initiative collections could remain on the critical render path until the background manifest refresh. Added an explicit `GEStore.refresh()` path and a one-time fresh recovery when critical collections are unexpectedly empty.
+- Root cause: the consolidated Initiative interaction layer referenced the lexical `activeJourney` variable from a different IIFE, producing `activeJourney is not defined`. The canonical interaction layer now owns `window.GE_ACTIVE_JOURNEY` and derives state from the active Journey tab.
+- Service & Provider category panels now reuse the existing Planning Workspace hub card/panel pattern instead of introducing another category-card design.
+- Navigation latency: Firebase profile validation is reused for up to five minutes for the same authenticated UID; business collection cache already uses a five-minute manifest interval. This removes repeated profile reads without making business data permanently stale.

@@ -9782,7 +9782,7 @@ window.geFocusInitiativeR65=function(id,milestone){
  const typedId=typeof row.id==='number'?Number(row.id):row.id;window.openInitiativeTimelineV224?.(typedId);
  if(milestone!==null&&milestone!==undefined&&milestone!==''){const index=Number(milestone),step=row.workflow?.[index],cards=document.querySelectorAll('#initiativeTimelineModalV224 .timeline-card-v224');if(!step||!cards[index]){notice.textContent='Milestone yang dituju tidak tersedia dalam Initiative ini.';return}cards[index].style.outline='3px solid #287db5';cards[index].scrollIntoView({block:'center'})}
 };
-window.geInitInitiativeCanonical=function(){if(typeof activeJourney==='undefined'||activeJourney==null)activeJourney='';const selected=document.querySelector('.journey-tab.active[data-journey]');activeJourney=selected?String(selected.dataset.journey||''):'';document.querySelectorAll('.journey-tab[data-journey]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.journey||'')===activeJourney));window.renderInitiatives?.();queueMicrotask(()=>window.renderInitiatives?.())};
+window.geInitInitiativeCanonical=function(){const selected=document.querySelector('.journey-tab.active[data-journey]');window.GE_ACTIVE_JOURNEY=selected?String(selected.dataset.journey||''):'';document.querySelectorAll('.journey-tab[data-journey]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.journey||'')===window.GE_ACTIVE_JOURNEY));window.renderInitiatives?.();queueMicrotask(()=>window.renderInitiatives?.())};
 window.geFilterInitiativeTouchpoint=tp=>{location.href='app.html?page=calendar&view=gantt&touchpoint='+encodeURIComponent(tp||'')};
 
 let geGanttSortStateR13={key:'title',dir:1};
@@ -9939,7 +9939,8 @@ function geInitiativeCanUpdate(){const s=window.gxGetSession?.()||{};return s.ro
 function geInitiativeCanDelete(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||String(s.accessLevel||'')==='Admin'}
 function geInitiativeListActions(x){const id=String(x?.id||'');const parts=[];if(geInitiativeCanUpdate())parts.push(`<button type="button" class="ge-btn compact" onclick="window.openInitiativeModalV224?.('${id}')">Update</button>`);if(geInitiativeCanDelete())parts.push(`<button type="button" class="ge-btn danger compact" onclick="window.deleteInitiativeV224?.('${id}')">Delete</button>`);if(!parts.length&&typeof geInitiativeManageButtonsV224==='function')return geInitiativeManageButtonsV224(x);return `<div class="planning-row-actions ge-initiative-actions">${parts.join('')}</div>`}
 function geInitiativeJourney(){
-  const raw=String(typeof activeJourney==='undefined'?'':activeJourney||'').trim();
+  const active=document.querySelector('.journey-tab.active[data-journey]');
+  const raw=String(active?.dataset?.journey||window.GE_ACTIVE_JOURNEY||'').trim();
   return /^(semua|all)(\s+journey)?$/i.test(raw)?'':raw;
 }
 function geInitiativeFilteredRows(){
@@ -9973,8 +9974,10 @@ if(initRender)window.renderInitiatives=function(){
 
 window.geResetInitiativeJourneyState=function(){
   const valid=['','Pre-Journey','Pre-Flight','Post-Flight','Post-Journey'];
-  if(typeof activeJourney!=='undefined'&&!valid.includes(String(activeJourney||'')))activeJourney='';
-  document.querySelectorAll('.journey-tab').forEach(b=>b.classList.toggle('active',String(b.dataset.journey||'')===String(activeJourney||'')));
+  let current=String(document.querySelector('.journey-tab.active[data-journey]')?.dataset?.journey||window.GE_ACTIVE_JOURNEY||'');
+  if(!valid.includes(current))current='';
+  window.GE_ACTIVE_JOURNEY=current;
+  document.querySelectorAll('.journey-tab').forEach(b=>b.classList.toggle('active',String(b.dataset.journey||'')===current));
   if(!window.GE_INITIATIVE_VIEW)window.GE_INITIATIVE_VIEW='grid';
 };
 window.geSetInitiativeView=function(v){window.GE_INITIATIVE_VIEW=v;document.querySelectorAll('#geInitiativeViewToggle [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));window.renderInitiatives?.()};

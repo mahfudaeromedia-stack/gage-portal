@@ -67,7 +67,10 @@ async function boot(){
   await waitFirebase();
   if(!hasAccess()){const target=typeof gxDefaultPage==='function'?gxDefaultPage():'app.html?page=index';if(new URL(target,location.href).href!==location.href)location.replace(target);return}
   showStatus('Mengambil data dari Firebase / Firestore…');
-  await store.hydrate(page==='admin'&&session().role!=='Super Admin'?cfg.collections.filter(x=>x!=='auditLogs'):cfg.collections);
+  const hydrateKeys=page==='admin'&&session().role!=='Super Admin'?cfg.collections.filter(x=>x!=='auditLogs'):cfg.collections;
+  await store.hydrate(hydrateKeys);
+  if(page==='inisiatif'&&!Array.isArray(store.get().initiatives)||page==='inisiatif'&&store.get().initiatives.length===0){if(typeof store.refresh==='function')await store.refresh(['initiatives']);}
+  if(page==='lounge-list'&&Array.isArray(store.get().lounges)&&store.get().lounges.length===0&&typeof store.refresh==='function')await store.refresh(['lounges','airports','referenceCatalog']);
   if(page==='inisiatif'&&(session().role==='Super Admin'||session().role==='Admin'||String(session().accessLevel||'')==='Admin')) await store.hydrate(['users']);
   rerender();
   window.dispatchEvent(new Event('gx-inbox-ready'));

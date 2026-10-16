@@ -81,10 +81,12 @@ async function gxBootstrapProtectedPage(){
     if(!authUser){gxAuthDiagnostic('SESSION_AUTH_MISSING',{stage:'firebase-current-user'});gxClearSession();const next=gxRememberReturnTo();location.replace(`login.html${next?`?next=${encodeURIComponent(next)}`:''}`);return}
     gxAuthDiagnostic('SESSION_AUTH_SUCCESS',{uid:String(authUser.uid),emailPresent:!!authUser.email});
     let profile=null;
-    try{profile=await GXFirebase.currentProfile();gxAuthDiagnostic('SESSION_PROFILE_SUCCESS',{uid:String(authUser.uid),profileFound:!!profile,rawRole:profile?.role??null,normalizedRole:profile?.role??null,rawAccessLevel:profile?.accessLevel??null,normalizedAccessLevel:profile?.accessLevel??null,scopeType:profile?.scopeType??null});}catch(profileError){gxAuthDiagnostic('SESSION_PROFILE_FAILED',{uid:String(authUser.uid),errorCode:profileError?.code||profileError?.message||null,errorName:profileError?.name||'Error',errorMessage:profileError?.authMessage||profileError?.message||'',errorStack:profileError?.stack||''});console.warn('Firebase profile read failed; using cached authenticated session',profileError)}
     const cached=gxGetSession();
+    const validatedAt=Number(cached?.profileValidatedAt||0),cachedFresh=String(cached?.uid||'')===String(authUser.uid)&&validatedAt>0&&(Date.now()-validatedAt)<300000;
+    if(cachedFresh){profile={...cached};gxAuthDiagnostic('SESSION_PROFILE_CACHE_HIT',{uid:String(authUser.uid),ageMs:Date.now()-validatedAt});}
+    else try{profile=await GXFirebase.currentProfile();gxAuthDiagnostic('SESSION_PROFILE_SUCCESS',{uid:String(authUser.uid),profileFound:!!profile,rawRole:profile?.role??null,normalizedRole:profile?.role??null,rawAccessLevel:profile?.accessLevel??null,normalizedAccessLevel:profile?.accessLevel??null,scopeType:profile?.scopeType??null});}catch(profileError){gxAuthDiagnostic('SESSION_PROFILE_FAILED',{uid:String(authUser.uid),errorCode:profileError?.code||profileError?.message||null,errorName:profileError?.name||'Error',errorMessage:profileError?.authMessage||profileError?.message||'',errorStack:profileError?.stack||''});console.warn('Firebase profile read failed; using cached authenticated session',profileError)}
     if(profile){
-      gxSetSession({...profile,uid:authUser.uid,email:profile.email||authUser.email||'',authProvider:'firebase'});
+      gxSetSession({...profile,uid:authUser.uid,email:profile.email||authUser.email||'',authProvider:'firebase',profileValidatedAt:cachedFresh?validatedAt:Date.now()});
     }else if(cached&&String(cached.uid||'')===String(authUser.uid)){
       gxSetSession({...cached,uid:authUser.uid,email:cached.email||authUser.email||'',authProvider:'firebase'});
     }else{

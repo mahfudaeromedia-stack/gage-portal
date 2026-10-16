@@ -140,6 +140,20 @@
     const previous=pending.catch(()=>undefined); pending=previous.then(()=>persistSnapshot(snapshot)).catch(err=>{console.error('[Edition1 Firebase Store]',err);window.dispatchEvent(new CustomEvent('gx-data-save-error',{detail:err}));throw err});
     return next;
   }
+  async function refresh(keys){
+    const requested=[...new Set((keys||[]).map(String).filter(Boolean))];
+    if(!requested.length)return state;
+    const fresh=await apiGet(requested);
+    for(const key of requested){
+      const apiKey=collKey(key),rows=normalizeCollection(key,fresh[apiKey]||[]);
+      if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)}
+      if(cacheAllowed())await writeCache(key,fresh[apiKey]||[]);
+    }
+    if(cacheAllowed())await writeManifestCache(await apiManifest().catch(()=>({version:Date.now()})));
+    hydrated=true;
+    window.dispatchEvent(new CustomEvent('gx-data-hydrated',{detail:{collections:requested,fresh:true}}));
+    return state;
+  }
   async function hydrate(keys){
     const requested=[...new Set(keys)];
     // Non-Super Admin pages use a persistent per-user/per-scope cache. This makes page-to-page
@@ -175,6 +189,7 @@
           window.dispatchEvent(new CustomEvent('gx-data-background-refresh',{detail:{collections:requested}}));
         }catch(e){console.warn('[Edition1 cache] background refresh unavailable; cached data remains active',e)}
       });
+      window.dispatchEvent(new CustomEvent('gx-data-hydrated',{detail:{collections:requested,cached:true}}));
       return state;
     }
     const result=await apiGet(requested);
@@ -185,6 +200,7 @@
     }
     if(cacheAllowed())try{await writeManifestCache(await apiManifest())}catch{}
     hydrated=true;
+    window.dispatchEvent(new CustomEvent('gx-data-hydrated',{detail:{collections:requested,cached:false}}));
     return state;
   }
   async function waitAuth(){
@@ -207,6 +223,6 @@
   }
   async function loadInboxThread(id){const t=await token(),r=await fetchWithTimeout('/api/edition1-data?thread='+encodeURIComponent(id),{headers:{Authorization:'Bearer '+t},cache:'no-store'}),p=await r.json();if(!r.ok)throw Error(p.message||'Conversation could not be loaded.');return p.thread||[]}
   async function replyInbox(id,body){const result=await apiPost({collection:'inbox',action:'CREATE',id:globalThis.crypto?.randomUUID?.()||String(Date.now()),data:{replyToId:String(id),body:String(body||'').trim()}});await clearManifestCache();return result}
-  window.data=state; window.GEStore={get:()=>state,save,hydrate,waitAuth,markInboxRead,loadInboxThread,replyInbox,isHydrated:()=>hydrated,flush:()=>pending,source:'Firestore',projectId:window.GX_FIREBASE_CONFIG?.projectId||''};
+  window.data=state; window.GEStore={get:()=>state,save,hydrate,refresh,waitAuth,markInboxRead,loadInboxThread,replyInbox,isHydrated:()=>hydrated,flush:()=>pending,source:'Firestore',projectId:window.GX_FIREBASE_CONFIG?.projectId||''};
   window.addEventListener('gx-data-save-error',e=>{if(e.detail?.message)console.error('Firestore save failed:',e.detail.message)});
 })();
