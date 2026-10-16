@@ -382,8 +382,12 @@ html body .ge-checklist-share-dialog>header p{margin:0;color:var(--ui-muted);fon
 html body .ge-checklist-share-x{width:40px;min-width:40px;padding:0;font-size:21px}
 html body .ge-checklist-share-body{display:grid;gap:12px;padding:20px 24px}
 html body .ge-checklist-share-body label{display:grid;gap:6px}
-html body .ge-checklist-share-result{padding:12px;border:1px solid #dbe4ee;border-radius:10px;background:#f8fafc}
+html body .ge-checklist-share-result{display:grid;gap:14px;padding:14px;border:1px solid #dbe4ee;border-radius:10px;background:#f8fafc}
 html body .ge-share-link-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+html body .ge-share-short-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+html body .ge-share-qr{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;padding-top:4px}
+html body .ge-share-qr svg{display:block;width:148px;height:148px;border:1px solid #dbe4ee;border-radius:8px;background:#fff}
+html body .ge-share-qr p{margin:4px 0 10px}
 html body .ge-share-feedback{min-height:18px;margin:0;color:#536b7b;font-size:12px}
 html body .ge-checklist-share-dialog>footer{display:flex;justify-content:flex-end;padding:16px 24px;border-top:1px solid #dbe4ee;background:#fbfcfe}
 
@@ -422,14 +426,12 @@ html body .ge-gantt-grid-r13 .ge-gantt-track-r13{border-radius:0;border-bottom:1
 @media(max-width:900px){
  html body #cleanPageOutlet .ge-pie-wrap{grid-template-columns:1fr}
  html body .calendar-year-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- html body .ge-share-link-row{grid-template-columns:1fr}
+ html body .ge-share-link-row,html body .ge-share-short-grid,html body .ge-share-qr{grid-template-columns:1fr}
+ html body .ge-share-qr svg{width:132px;height:132px}
 }
 
 /* Shared action spacing / generated link rows */
 html body .initiative-actions-v224,html body .initiative-card-actions-v246,html body .timeline-card-v224>div:last-child,html body .v2554-calendar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-html body .ge-share-link-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
-html body .ge-checklist-share-result{display:grid;gap:12px}
-@media(max-width:620px){html body .ge-share-link-row{grid-template-columns:1fr}html body .ge-share-link-row .ge-btn{width:100%}}
 
 html body .timeline-card-head-v224>div:last-child{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 

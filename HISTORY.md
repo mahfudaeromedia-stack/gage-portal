@@ -179,3 +179,10 @@ This is the single canonical work-history file for the portal. Entries are group
 ### Regression protection
 - Updated the regression contracts so Lounge/Tenant is required to use the shared Planning Workspace controls instead of the retired legacy Lounge-specific markup.
 - Validation: 59 regression contracts passed; UI integrity gate passed for 68 pages / 594 asset references; local build passed.
+
+## Monitoring & Assessment — submission recovery, share link and QR
+- Submission filter toolbar uses placeholder/select content only; redundant field titles removed and control height/spacing aligned.
+- Monitoring data recovery now revalidates `formTemplates`, `monitoringWorks`, and `formSubmissions` only when cached data is unexpectedly empty, with a 5-minute session guard to avoid repeated reads on every page entry.
+- Share Checklist now separates the full working URL from the short code. A custom short URL is shown only when `GE_SHORT_LINK_ORIGIN` is configured; the portal no longer pretends a long Deploy Preview hostname is a short URL.
+- Added locally rendered QR code for the working `/s/<code>` route. QR generation is bundled locally so internal share URLs are not sent to a third-party QR service.
+- Share dialog keeps Copy Link, Copy Code, optional Copy Short Link, and Copy QR Link actions in one workflow.
