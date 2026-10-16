@@ -20,9 +20,13 @@
     return 'app.html?'+params.toString();
   }
   document.addEventListener('click',function(e){
-    var a=e.target.closest('a[href]'); if(!a) return;
-    var h=a.getAttribute('href'); if(!h || /^(https?:|mailto:|tel:|#)/i.test(h)) return;
-    var n=toClean(h); if(n!==h){e.preventDefault(); location.href=n;}
+    if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
+    var a=e.target.closest('a[href]'); if(!a||a.hasAttribute('download')||a.target&&a.target!=='_self') return;
+    var h=a.getAttribute('href'); if(!h || /^(https?:|mailto:|tel:|#|javascript:)/i.test(h)) return;
+    var n=toClean(h);
+    if(/^app\.html\?/i.test(n)&&typeof window.gePortalNavigate==='function'){
+      e.preventDefault(); window.gePortalNavigate(n);
+    }else if(n!==h){e.preventDefault(); location.href=n;}
   },true);
   window.p40CleanRoute=toClean;
 })();

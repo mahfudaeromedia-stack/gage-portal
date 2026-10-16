@@ -228,3 +228,11 @@ This is the single canonical work-history file for the portal. Entries are group
 
 ### Validation
 - Added R112 regression protection for the recovery paths. Full regression gate and UI integrity gate must pass before package handoff.
+
+## Canonical route/data recovery — 2026-10-16
+- Planning Workspace Add/Edit re-aligned to the canonical Lounge/Tenant modal geometry and field hierarchy; page width no longer dictates modal width.
+- Planning domain modal rows retain the Lounge/Tenant two-column form, Price Schedule, Capacity Schedule, and attachment pattern with responsive collapse only at mobile breakpoints.
+- Portal collection hydration no longer treats an empty IndexedDB cache as authoritative. Empty collections fetch from Firestore/API on the critical path; populated caches render immediately and revalidate in the background so direct Firestore imports/copies become visible without a cache-manifest bump.
+- Internal page navigation now switches the canonical `app.html` outlet in place instead of hard-reloading the shell on every sidebar/card navigation. Header/sidebar state remains persistent; route-specific Planning runtime is disposed/reloaded safely.
+- Runtime HTML/JS/CSS service-worker strategy changed to network-first to prevent a newly deployed shell from mixing with stale page/runtime assets.
+- Station scope readers use `assignedStations[]` as the canonical user field with legacy `airports[]` only as compatibility fallback.
