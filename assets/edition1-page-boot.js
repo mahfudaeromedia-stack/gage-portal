@@ -69,7 +69,7 @@ async function boot(){
   showStatus('Mengambil data dari Firebase / Firestore…');
   const hydrateKeys=page==='admin'&&session().role!=='Super Admin'?cfg.collections.filter(x=>x!=='auditLogs'):cfg.collections;
   await store.hydrate(hydrateKeys);
-  if(page==='inisiatif'&&!Array.isArray(store.get().initiatives)||page==='inisiatif'&&store.get().initiatives.length===0){if(typeof store.refresh==='function')await store.refresh(['initiatives']);}
+  if(page==='inisiatif'&&typeof store.refresh==='function') await store.refresh(['initiatives','touchpoints','documents','inbox','airports']);
   if(page==='lounge-list'&&Array.isArray(store.get().lounges)&&store.get().lounges.length===0&&typeof store.refresh==='function')await store.refresh(['lounges','airports','referenceCatalog']);
   if(page==='inisiatif'&&(session().role==='Super Admin'||session().role==='Admin'||String(session().accessLevel||'')==='Admin')) await store.hydrate(['users']);
   rerender();

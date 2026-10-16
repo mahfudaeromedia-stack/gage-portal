@@ -13,7 +13,7 @@
     standardContent:{},portalManagerR2:{},attentionSettings:{},contactMessages:[],guestbook:[],monitoringTemplates:[],monitoringAssessments:[],formTemplates:[],monitoringWorks:[],formSubmissions:[],customerExperience:[],referenceCatalog:[],requirementMatrix:[],stationCapabilities:[]
   };
   const baseline={}; let hydrated=false; let pending=Promise.resolve(); let localRevision=0;
-  const CACHE_DB='GE_E1_CACHE_V30'; const CACHE_STORE='collections'; const CACHE_SCHEMA='31';
+  const CACHE_DB='GE_E1_CACHE_V30'; const CACHE_STORE='collections'; const CACHE_SCHEMA='32';
   function session(){return typeof window.gxGetSession==='function'?(window.gxGetSession()||{}):window.GX_CURRENT_USER||{}}
   function cacheAllowed(){return !!String(session().uid||session().id||session().email||'').trim()}
   function cacheIdentity(){const s=session();return String(s.uid||s.id||s.email||'anon')+'|'+String(s.scopeType||'')+'|'+(Array.isArray(s.assignedStations)?s.assignedStations.slice().sort().join(','):(Array.isArray(s.airports)?s.airports.slice().sort().join(','):''))}
