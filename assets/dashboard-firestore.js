@@ -3,7 +3,7 @@
 const E=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const N=n=>new Intl.NumberFormat('id-ID').format(Number(n||0));
 const S=()=>window.gxGetSession?.()||{},D=()=>window.GEStore?.get?.()||{},POV=s=>window.GXDashboardPOV?.(s)||'unresolved';
-const stations=s=>String(s.scopeType||'').toUpperCase()==='ALL'?[]:(Array.isArray(s.airports)?s.airports.map(x=>String(x).toUpperCase()):[]);
+const stations=s=>String(s.scopeType||'').toUpperCase()==='ALL'?[]:((Array.isArray(s.assignedStations)&&s.assignedStations.length?s.assignedStations:(Array.isArray(s.airports)?s.airports:[])).map(x=>String(x).toUpperCase()));
 const stationVals=x=>{const r=x?.stations??x?.stationCodes??x?.stationCode??x?.airportCode??x?.iata??x?.code??x?.airport??x?.station??x?.relatedAirport??[];return(Array.isArray(r)?r:String(r||'').split(/[,;]+/)).map(v=>String(v).trim().toUpperCase()).filter(Boolean)};
 const scoped=(a,s)=>{const q=stations(s);if(!q.length)return a||[];const set=new Set(q);return(a||[]).filter(x=>{const z=stationVals(x);return !z.length||z.some(v=>set.has(v))})};
 const stationOnly=(a,code)=>!code?(a||[]):(a||[]).filter(x=>stationVals(x).includes(String(code).toUpperCase()));
@@ -77,5 +77,5 @@ function bind(root){root.querySelectorAll('.ge-click-panel[data-href]').forEach(
 function render(){const root=document.getElementById('dashboardRoot');if(!root)return;const s=S(),p=POV(s),m=model(s);root.innerHTML=p==='superadmin'?superadmin(m):p==='admin'?admin(m,s):p==='management'?management(m):p==='branch'?branch(m,s):p==='ge-team'?branch(m,s):management(m);root.dataset.dashboardPov=p;bind(root)}
 async function boot(){const root=document.getElementById('dashboardRoot');try{await window.GEStore.waitAuth();const s=S(),p=POV(s),cols=['initiatives','projectEvents','airports','lounges','serviceProcurement','assets','facilities','stationMaterials','touchpointStandards','serviceAlignments','customerExperience','airportCosts','touchpoints','monitoringAssessments','formSubmissions','attentionSettings'];if(p==='superadmin')cols.push('users','auditLogs','monitoringTemplates','monitoringAssessments');await window.GEStore.hydrate(cols);try{await syncPublishedLocalImports();window.__geCXSyncError=false}catch(e){window.__geCXSyncError=true;console.warn('[CX published sync]',e)}render()}catch(e){if(root)root.innerHTML=`<section class="ge-dash-panel"><h2>Dashboard belum dapat dimuat</h2><p>${E(e?.message||e)}</p></section>`}}
 
-window.addEventListener('gx-data-background-refresh',render);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+window.geDashboardFirestoreBoot=boot;window.geDashboardFirestoreRender=render;if(!window.__geDashboardBgBound){window.__geDashboardBgBound=true;window.addEventListener('gx-data-background-refresh',()=>{if(document.getElementById('dashboardRoot'))render()})}
 })();

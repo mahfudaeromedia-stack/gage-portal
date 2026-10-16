@@ -21,9 +21,9 @@ const NAV_SVG={
  standard:'<path d="M4 5h12M4 10h12M4 15h12"/>'
 };
 function icon(x){const key=({'⌂':'home','◎':'cx','↔':'journey','✈':'network','⌾':'station','⚙':'initiative','✧':'opportunity','◇':'scenario','▦':'calendar','▣':'budget','◉':'budget','✓':'readiness','▤':'document','≡':'standard','⬡':'data','◫':'data','♙':'user','◷':'history','☎':'support','⇧':'data','◈':'station'})[x]||'standard';return `<span class="ni" aria-hidden="true"><svg viewBox="0 0 20 20">${NAV_SVG[key]}</svg></span>`;}
-const path=()=>{const file=(location.pathname.split('/').pop()||'app.html').toLowerCase();if(file==='login.html')return'login.html';if(file==='app.html'){const route=String(new URLSearchParams(location.search).get('page')||'index').trim().toLowerCase();const aliases=(window.P40_CLEAN_ALIASES||{});const canonical=(aliases[route]||route).split('?')[0];return `${canonical}.html`;}return file;};
-const cleanHref=(href)=>{const raw=String(href||'');const m=raw.match(/^([^?#]+)\.html(?:\?([^#]*))?/);if(!m||m[1]==='login'||m[1]==='change-password')return href;if(m[1]==='app'){const q=new URLSearchParams(m[2]||'');const requested=String(q.get('page')||'index').trim().toLowerCase();const aliases=(window.P40_CLEAN_ALIASES||{});const canonical=((aliases[requested]||requested).split('?')[0]||'index');q.set('page',canonical==='app'?'index':canonical);return 'app.html?'+q.toString();}const alias=(window.P40_CLEAN_ALIASES||{})[m[1]]||m[1];const parts=alias.split('?'),q=new URLSearchParams(parts[1]||'');new URLSearchParams(m[2]||'').forEach((v,k)=>q.set(k,v));q.set('page',parts[0]);return 'app.html?'+q.toString()};
-const item=(href,label,i,sub=false)=>{const target=cleanHref(href),u=new URL(target,location.href),targetPage=(u.searchParams.get('page')||href.replace(/\.html.*$/,'')).toLowerCase()+'.html';return `<a class="ge-nav-link ${sub?'ge-nav-sub':''} ${path()===targetPage?'active':''}" href="${target}" title="${label}">${icon(i)}<span>${label}</span></a>`};
+const path=()=>{const file=(location.pathname.split('/').pop()||'app.html').toLowerCase();if(file==='login.html')return'login.html';if(file==='app.html'){const route=String(new URLSearchParams(location.search).get('page')||'index').trim().toLowerCase();const aliases=(window.GE_ROUTE_ALIASES||{});const canonical=(aliases[route]||route).split('?')[0];return `${canonical}.html`;}return file;};
+const cleanHref=(href)=>{const raw=String(href||'');const m=raw.match(/^([^?#]+)\.html(?:\?([^#]*))?/);if(!m||m[1]==='login'||m[1]==='change-password')return href;if(m[1]==='app'){const q=new URLSearchParams(m[2]||'');const requested=String(q.get('page')||'index').trim().toLowerCase();const aliases=(window.GE_ROUTE_ALIASES||{});const canonical=((aliases[requested]||requested).split('?')[0]||'index');q.set('page',canonical==='app'?'index':canonical);return 'app.html?'+q.toString();}const alias=(window.GE_ROUTE_ALIASES||{})[m[1]]||m[1];const parts=alias.split('?'),q=new URLSearchParams(parts[1]||'');new URLSearchParams(m[2]||'').forEach((v,k)=>q.set(k,v));q.set('page',parts[0]);return 'app.html?'+q.toString()};
+const item=(href,label,i,sub=false)=>{const target=cleanHref(href==='index.html'?'app.html?page=index':href),u=new URL(target,location.href),targetPage=(u.searchParams.get('page')||href.replace(/\.html.*$/,'')).toLowerCase()+'.html';return `<a class="ge-nav-link ${sub?'ge-nav-sub':''} ${path()===targetPage?'active':''}" href="${target}" title="${label}">${icon(i)}<span>${label}</span></a>`};
 const airportChildren=()=>`<div class="ge-nav-section ge-airport-parent">AIRPORT EXPERIENCE NETWORK</div>${[
  item('airport-experience.html','Network & Map','✈',true),
  item('station-360.html','Station 360','⌾',true),
@@ -156,17 +156,17 @@ function ensureShell(){
 }
 function applyCollapsed(on){
  document.body.classList.toggle('sidebar-collapsed',!!on);document.documentElement.classList.remove('ge-precollapsed');
- try{localStorage.setItem('GE_V257_SIDEBAR_COLLAPSED',on?'1':'0')}catch(e){}
+ try{localStorage.setItem('GE_SIDEBAR_COLLAPSED',on?'1':'0')}catch(e){}
  const btn=document.querySelector('.ge-sidebar-toggle');
  if(btn){btn.setAttribute('aria-expanded',on?'false':'true');const a=btn.querySelector('.toggle-arrow');if(a)a.textContent=on?'»':'«'}
 }
 function sidebarToggle(){
  let btn=document.querySelector('.ge-sidebar-toggle');
  if(!btn){
-   btn=document.createElement('button');btn.type='button';btn.className='ge-sidebar-toggle';btn.innerHTML='<span class="toggle-arrow">«</span><span class="toggle-label">Collapse</span>';const side=document.querySelector('body > .shell > .side');if(side)side.appendChild(btn);
+   btn=document.createElement('button');btn.type='button';btn.className='ge-sidebar-toggle';btn.innerHTML='<span class="toggle-arrow">«</span><span class="toggle-label">collapse</span>';const side=document.querySelector('body > .shell > .side');if(side)side.appendChild(btn);
  }
  btn.onclick=()=>applyCollapsed(!document.body.classList.contains('sidebar-collapsed'));
- let saved=false;try{saved=localStorage.getItem('GE_V257_SIDEBAR_COLLAPSED')==='1'}catch(e){}
+ let saved=false;try{saved=(localStorage.getItem('GE_SIDEBAR_COLLAPSED') ?? localStorage.getItem('GE_V257_SIDEBAR_COLLAPSED'))==='1'}catch(e){}
  applyCollapsed(saved);
 }
 async function shell(){
@@ -177,13 +177,13 @@ async function shell(){
  }
  const refs=ensureShell();
  if(!refs)return;
- document.body.classList.add('final-v257','final-shell-r5');
+ document.body.classList.add('portal-ready','portal-shell-ready');
  const s=window.gxGetSession?gxGetSession():window.GX_CURRENT_USER||{};
  const pov=dashboardPOV(s);
  const initials=(s.name||s.username||'GE').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
  const roleLabel=pov==='branch'?(s.unit||'Branch Office'):(pov==='ge-team'?'Ground Experience Team':(s.role||'User'));
- const context={superadmin:'Dashboard',admin:'Dashboard',management:'Dashboard','ge-team':'Ground Experience Team / Head Office Dashboard',branch:'Dashboard',external:'Partner / External Collaboration',unresolved:'Dashboard — Role Not Mapped'}[pov]||'Dashboard';
- refs.top.innerHTML=`<button id="mobileNavTriggerV233" class="mobile-nav-trigger-v233 ge-iconbtn" type="button" aria-label="Menu">☰</button>
+ const context='Internal Service Experience';
+ refs.top.innerHTML=`<button id="mobileNavTrigger" class="mobile-nav-trigger ge-iconbtn" type="button" aria-label="Menu">☰</button>
  <div class="ge-brand-logos"><img class="garuda" src="assets/garuda-horizontal-white.png" alt="Garuda Indonesia"><img class="danantara" src="assets/danantara-white-user.png" alt="Danantara Indonesia"></div>
  <div class="ge-title"><strong>GROUND EXPERIENCE PORTAL</strong><span>${context}</span></div>
  <div class="ge-session"><label class="filter"><span>Period</span><select id="gePeriodSelect" aria-label="Period"></select></label><button class="ge-top-action ge-notify" id="geNotifyBtn" type="button" title="Notifications" aria-label="Notifications"><span class="bell-shape"></span><b class="ge-notify-badge" id="geNotifyBadge" hidden></b></button><a class="ge-top-action ge-help" href="kontak.html" title="Help" aria-label="Help">?</a><button class="ge-user-menu" id="geUserMenuBtn" type="button" aria-expanded="false" aria-haspopup="menu"><span class="avatar">${initials}</span><span class="who"><b>${s.name||s.username||'User'}</b><span>${roleLabel}</span></span></button><div class="ge-user-pop" id="geUserPop" role="menu"><a href="profile.html" role="menuitem">Profile</a><button type="button" id="geMenuNotifications" role="menuitem">Notifications</button><button type="button" id="geLogoutBtn" role="menuitem">Sign Out</button></div><div class="ge-notify-pop" id="geNotifyPop" role="dialog" aria-label="Notifications"><div class="ge-pop-head"><b>Notifications</b><button type="button" id="geNotifyClose" aria-label="Close">×</button></div><div id="geNotifyList" class="ge-notify-list"></div></div></div>`;
@@ -192,7 +192,7 @@ async function shell(){
  cleanNavigation();
  planningTabs();
  sidebarToggle();
- const mt=document.getElementById('mobileNavTriggerV233'); if(mt)mt.onclick=()=>document.body.classList.toggle('nav-open');
+ const mt=document.getElementById('mobileNavTrigger'); if(mt)mt.onclick=()=>document.body.classList.toggle('nav-open');
  setupAccountControls(s);
  setupPeriodControl();
 }
@@ -204,8 +204,8 @@ function setupAccountControls(s){
  const notice=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
  const notificationUnread=x=>(x.notificationStatus||x.status||'Unread')==='Unread';
  const notificationTarget=x=>{const ref=x.referenceId||x.relatedId||'';if(x.destination)return x.destination;if(x.relatedType==='contactMessages')return `app.html?page=admin&support=${encodeURIComponent(ref)}`;if(['Initiative','Milestone'].includes(x.referenceType))return `app.html?page=inisiatif&initiative=${encodeURIComponent(ref)}${x.milestoneIndex!==undefined&&x.milestoneIndex!==''?'&milestone='+encodeURIComponent(x.milestoneIndex):''}`;return `app.html?page=admin&inbox=${encodeURIComponent(x.id)}`};
- const renderNotifications=()=>{const rows=notifications(),unread=rows.filter(notificationUnread).length;if(badge){badge.textContent=unread>99?'99+':String(unread);badge.hidden=!unread}if(!list)return;list.style.maxHeight='60vh';list.style.overflowY='auto';list.innerHTML=rows.length?rows.map(x=>`<button type="button" class="ge-notify-item" data-notify-id="${notice(x.id)}" style="display:block;width:100%;text-align:left;border:0;cursor:pointer;${notificationUnread(x)?'font-weight:700;':''}"><b>${notice(x.subject||x.title||x.type||'Notification')}</b><span>${notice(x.message||x.detail||'')}</span></button>`).join(''):'<div class="ge-notify-empty">No notifications available.</div>';
- list.querySelectorAll('[data-notify-id]').forEach(b=>b.onclick=async()=>{const x=rows.find(v=>String(v.id)===b.dataset.notifyId);if(!x)return;const dest=notificationTarget(x);if(notificationUnread(x)){try{await window.GEStore.markInboxRead(x.id,'notification');renderNotifications()}catch(err){renderNotifications();const warning=document.createElement('p');warning.setAttribute('role','alert');warning.className='ge-notify-error';warning.textContent='Status notifikasi belum tersimpan: '+(err.message||err);list.prepend(warning);return}}location.assign(dest)})};
+ const renderNotifications=()=>{const rows=notifications(),unread=rows.filter(notificationUnread).length;if(nb)nb.hidden=!rows.length;if(document.getElementById('geMenuNotifications'))document.getElementById('geMenuNotifications').hidden=!rows.length;if(!rows.length)np?.classList.remove('open');if(badge){badge.textContent=unread>99?'99+':String(unread);badge.hidden=!unread}if(!list)return;list.style.maxHeight='60vh';list.style.overflowY='auto';list.innerHTML=rows.length?rows.map(x=>`<button type="button" class="ge-notify-item" data-notify-id="${notice(x.id)}"><b>${notice(x.subject||x.title||x.type||'Notification')}</b><span>${notice(x.message||x.detail||'')}</span></button>`).join(''):'<div class="ge-notify-empty">No notifications available.</div>';
+ list.querySelectorAll('[data-notify-id]').forEach(b=>b.onclick=async()=>{const x=rows.find(v=>String(v.id)===b.dataset.notifyId);if(!x)return;const dest=notificationTarget(x);if(notificationUnread(x)){try{await window.GEStore.markInboxRead(x.id,'notification');renderNotifications()}catch(err){renderNotifications();const warning=document.createElement('p');warning.setAttribute('role','alert');warning.className='ge-notify-error';warning.textContent='Status notifikasi belum tersimpan: '+(err.message||err);list.prepend(warning);return}}(window.gePortalNavigate?window.gePortalNavigate(dest):location.assign(dest))})};
  const closeAll=()=>{up?.classList.remove('open');np?.classList.remove('open');umb?.setAttribute('aria-expanded','false')};
  umb?.addEventListener('click',e=>{e.stopPropagation();np?.classList.remove('open');up?.classList.toggle('open');umb.setAttribute('aria-expanded',up.classList.contains('open')?'true':'false')});
  nb?.addEventListener('click',async e=>{e.stopPropagation();up?.classList.remove('open');np?.classList.toggle('open');try{await window.GEStore?.hydrate?.(['inbox'])}catch(err){console.warn('[Notifications]',err)}renderNotifications()});
@@ -217,14 +217,15 @@ function setupAccountControls(s){
  window.addEventListener('gx-inbox-ready',renderNotifications);
  renderNotifications();
 }
+window.gePortalRefreshShellState=function(){cleanNavigation();planningTabs();sidebarToggle();};
 function setupPeriodControl(){
  const sel=document.getElementById('gePeriodSelect');if(!sel)return;
  const years=new Set();
  try{const d=window.GEStore?.get?.()||{};[...(d.initiatives||[]),...(d.budgets||[]),...(d.actuals||[]),...(d.measurements||[])].forEach(x=>{const raw=x.periodStart||x.period||x.year||x.date||x.updatedAt||x.createdAt;const m=String(raw||'').match(/(20\d{2})/);if(m)years.add(m[1])})}catch(e){}
  if(!years.size)years.add(String(new Date().getFullYear()));
  const ordered=[...years].sort((a,b)=>Number(b)-Number(a));sel.innerHTML=ordered.map(y=>`<option value="${y}">${y}</option>`).join('');
- let saved='';try{saved=localStorage.getItem('GE_V257_DASHBOARD_PERIOD')||''}catch(e){};if(saved&&ordered.includes(saved))sel.value=saved;
- sel.addEventListener('change',()=>{try{localStorage.setItem('GE_V257_DASHBOARD_PERIOD',sel.value)}catch(e){};document.dispatchEvent(new CustomEvent('ge-dashboard-period-change',{detail:{year:sel.value}}))});
+ let saved='';try{saved=(localStorage.getItem('GE_DASHBOARD_PERIOD') ?? localStorage.getItem('GE_V257_DASHBOARD_PERIOD'))||''}catch(e){};if(saved&&ordered.includes(saved))sel.value=saved;
+ sel.addEventListener('change',()=>{try{localStorage.setItem('GE_DASHBOARD_PERIOD',sel.value)}catch(e){};document.dispatchEvent(new CustomEvent('ge-dashboard-period-change',{detail:{year:sel.value}}))});
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{shell()}, {once:true});else shell();
