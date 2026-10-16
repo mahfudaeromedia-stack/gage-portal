@@ -13,19 +13,19 @@
     standardContent:{},portalManagerR2:{},attentionSettings:{},contactMessages:[],guestbook:[],monitoringTemplates:[],monitoringAssessments:[],formTemplates:[],monitoringWorks:[],formSubmissions:[],customerExperience:[],referenceCatalog:[],requirementMatrix:[],stationCapabilities:[]
   };
   const baseline={}; let hydrated=false; let pending=Promise.resolve(); let localRevision=0;
-  const CACHE_DB='GE_E1_CACHE_V30'; const CACHE_STORE='collections';
+  const CACHE_DB='GE_E1_CACHE_V30'; const CACHE_STORE='collections'; const CACHE_SCHEMA='31';
   function session(){return typeof window.gxGetSession==='function'?(window.gxGetSession()||{}):window.GX_CURRENT_USER||{}}
   function cacheAllowed(){return !!String(session().uid||session().id||session().email||'').trim()}
   function cacheIdentity(){const s=session();return String(s.uid||s.id||s.email||'anon')+'|'+String(s.scopeType||'')+'|'+(Array.isArray(s.assignedStations)?s.assignedStations.slice().sort().join(','):(Array.isArray(s.airports)?s.airports.slice().sort().join(','):''))}
-  function cacheKey(k){return cacheIdentity()+':'+collKey(k)}
+  function cacheKey(k){return CACHE_SCHEMA+'|'+cacheIdentity()+':'+collKey(k)}
   function openCache(){return new Promise((resolve,reject)=>{if(!window.indexedDB)return reject(new Error('IndexedDB unavailable'));const q=indexedDB.open(CACHE_DB,1);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains(CACHE_STORE))q.result.createObjectStore(CACHE_STORE)};q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)})}
   async function cacheGet(key){try{const db=await openCache();return await new Promise((resolve,reject)=>{const tx=db.transaction(CACHE_STORE,'readonly'),q=tx.objectStore(CACHE_STORE).get(key);q.onsuccess=()=>resolve(q.result??null);q.onerror=()=>reject(q.error)})}catch{return null}}
   async function cachePut(key,value){if(!cacheAllowed())return;try{const db=await openCache();await new Promise((resolve,reject)=>{const tx=db.transaction(CACHE_STORE,'readwrite');tx.objectStore(CACHE_STORE).put(value,key);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch{}}
   async function readCache(k){const x=await cacheGet(cacheKey(k));return Array.isArray(x?.rows)?x.rows:null}
   async function writeCache(k,rows){return cachePut(cacheKey(k),{rows,at:Date.now()})}
-  async function readManifestCache(){return cacheGet(cacheIdentity()+':__manifest__')}
-  async function writeManifestCache(x){return cachePut(cacheIdentity()+':__manifest__',{...x,checkedAt:Date.now()})}
-  async function clearManifestCache(){try{const db=await openCache();await new Promise((resolve,reject)=>{const tx=db.transaction(CACHE_STORE,'readwrite');tx.objectStore(CACHE_STORE).delete(cacheIdentity()+':__manifest__');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch{}}
+  async function readManifestCache(){return cacheGet(CACHE_SCHEMA+'|'+cacheIdentity()+':__manifest__')}
+  async function writeManifestCache(x){return cachePut(CACHE_SCHEMA+'|'+cacheIdentity()+':__manifest__',{...x,checkedAt:Date.now()})}
+  async function clearManifestCache(){try{const db=await openCache();await new Promise((resolve,reject)=>{const tx=db.transaction(CACHE_STORE,'readwrite');tx.objectStore(CACHE_STORE).delete(CACHE_SCHEMA+'|'+cacheIdentity()+':__manifest__');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch{}}
   function fetchWithTimeout(url,options={},timeoutMs=20000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);return fetch(url,{...options,signal:controller.signal}).finally(()=>clearTimeout(timer)).catch(e=>{if(e?.name==='AbortError')throw new Error('Permintaan data timeout setelah 20 detik.');throw e})}
   const MAP={events:'projectEvents',projectEvents:'projectEvents'};
   const clone=x=>x===undefined?undefined:JSON.parse(JSON.stringify(x));

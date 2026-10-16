@@ -186,3 +186,24 @@ This is the single canonical work-history file for the portal. Entries are group
 - Share Checklist now separates the full working URL from the short code. A custom short URL is shown only when `GE_SHORT_LINK_ORIGIN` is configured; the portal no longer pretends a long Deploy Preview hostname is a short URL.
 - Added locally rendered QR code for the working `/s/<code>` route. QR generation is bundled locally so internal share URLs are not sent to a third-party QR service.
 - Share dialog keeps Copy Link, Copy Code, optional Copy Short Link, and Copy QR Link actions in one workflow.
+
+
+## 2026-10-16 — Runtime ownership and stale-data recovery
+
+### Global runtime
+- Removed the obsolete visual scaffold flash by keeping the route outlet hidden until the canonical page owner finishes initialization.
+- Rotated the static service-worker cache and IndexedDB business-data cache once to discard stale UI/data produced by failed revisions; subsequent page opens continue to reuse the new cache.
+- Planning modal ownership is corrected in the shared overlay manager: the full `.planning-dialog-layer` is promoted to `document.body`; the dialog card is no longer detached from its overlay and pushed into page flow.
+
+### Planning Workspace
+- Removed `Lounge/Tenant Planning` from the top-level Planning Workspace hub; Lounge remains a child of Service & Provider.
+- Planning pages hydrate only the collections needed by the current page, then perform a direct fresh read when all critical collections are unexpectedly empty.
+- Existing Expired / Expiring Soon lifecycle filters remain part of the shared Planning Workspace renderer.
+
+### Monitoring & Assessment
+- Registry-level legacy Monitoring/Checklist markup was removed; `form-management.js` is now the visible owner from first paint.
+- When both Monitoring Forms and Monitoring Works are unexpectedly empty, a canonical fresh read is performed immediately rather than waiting on a stale empty cache.
+
+### Initiative & Improvement
+- Removed the internal “Proven V224…” implementation note from the user interface.
+- Late journey-state access uses the canonical `GE_ACTIVE_JOURNEY` state instead of an out-of-scope lexical variable.

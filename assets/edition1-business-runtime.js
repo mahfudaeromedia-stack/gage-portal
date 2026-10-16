@@ -3364,7 +3364,7 @@ window.addEventListener('DOMContentLoaded',()=>{gxApplyNavigationV220();geRender
 function openInitiativeModalV221(){
   if(!(typeof gxCanManage==='function'&&gxCanManage()))return;
   const hidden=document.getElementById('journeyPageValue');
-  const journey=(hidden?.value||window.activeJourney||'Pre-Flight');
+  const journey=(hidden?.value||window.GE_ACTIVE_JOURNEY||window.activeJourney||'Pre-Flight');
   initiativeJourneyV221.value=journey||'Pre-Flight';
   initiativeNameV221.value='';initiativeTouchpointV221.value='';initiativeActivityV221.value='';
   initiativePlanV221.value='';initiativeRealV221.value='';initiativeRemarkV221.value='';
@@ -7522,7 +7522,7 @@ currentInitiativeRows=function(){
  const focused=window.GE_INITIATIVE_FOCUS_ID_R65;
  if(focused)return (data.initiatives||[]).filter(x=>String(x.id)===String(focused));
  let rows=(data.initiatives||[]).slice();
- const page=document.getElementById('journeyPageValue')?.value||activeJourney||'';
+ const page=document.getElementById('journeyPageValue')?.value||window.GE_ACTIVE_JOURNEY||'';
  if(page)rows=rows.filter(x=>geMatchesJourneyV252(x,page));
  const q=(document.getElementById('q')?.value||'').toLowerCase();
  const ft=document.getElementById('ft')?.value||'', fs=document.getElementById('fs')?.value||'', fp=document.getElementById('fp')?.value||'';
