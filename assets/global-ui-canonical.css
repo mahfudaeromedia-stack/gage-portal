@@ -546,3 +546,13 @@ html body #cleanPageOutlet select option{text-align:left}
 .planning-dialog-layer>.planning-dialog-card{position:relative;display:flex;flex-direction:column;width:min(1040px,calc(100% - 48px));max-height:calc(100% - 48px);margin:auto;background:#fff;border:1px solid #d6e2ef;border-radius:16px;box-shadow:0 26px 76px rgba(2,17,42,.35);overflow:hidden;z-index:2147483001}
 .planning-dialog-layer>.planning-dialog-card .planning-modal-content{overflow:auto;min-height:0}
 @media(max-width:760px){.planning-dialog-layer>.planning-dialog-card{width:calc(100% - 16px);max-height:calc(100% - 16px)}}
+
+/* Canonical multi-select field: field appearance, left-aligned text, checkbox menu. */
+html body .ge-picker-r11{position:relative;width:100%;}
+html body .ge-picker-field{box-sizing:border-box;width:100%;min-height:48px;padding:0 42px 0 14px;border:1px solid #c8d7e4;border-radius:10px;background:#fff;color:#173b54;display:flex;align-items:center;justify-content:flex-start;text-align:left;font:inherit;font-weight:400;cursor:pointer;position:relative;box-shadow:none;}
+html body .ge-picker-field:focus{outline:none;border-color:#6f8eaa;box-shadow:0 0 0 3px rgba(6,43,99,.08);}
+html body .ge-picker-field>span:first-child{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
+html body .ge-picker-caret{position:absolute;right:14px;top:50%;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #173b54;transform:translateY(-35%);}
+html body .ge-picker-options label{justify-content:flex-start;text-align:left;font-weight:400;}
+html body .ge-picker-options label span{text-align:left;font-weight:400;}
+html body .ge-picker-options input[type="checkbox"]{flex:0 0 16px;}

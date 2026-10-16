@@ -4173,7 +4173,7 @@ window.addEventListener('DOMContentLoaded',()=>{geApplyBulkVisitorUIV223()});
    V2.24 — Initiative Governance, Due Date Warning & Timeline
    ============================================================== */
 function geInitiativeUserV224(){return typeof gxGetSession==='function'?(gxGetSession()||{}):{}}
-function geInitiativeAdminV224(){const u=geInitiativeUserV224();return u.role==='Super Admin'||(!['External User','External','Collaborator'].includes(u.role)&&(u.role==='Admin'||String(u.accessLevel||'')==='Admin'))}
+function geInitiativeAdminV224(){const u=geInitiativeUserV224(),role=String(u.role||'');return /^(Super Admin|Super Administrator)$/i.test(role)||(!['External User','External','Collaborator'].includes(role)&&(role==='Admin'||String(u.accessLevel||'')==='Admin'))}
 function geInitiativeCanProgressV224(){const u=geInitiativeUserV224();return geInitiativeAdminV224()||(!['External User','External','Collaborator'].includes(u.role)&&String(u.accessLevel||'')==='Editor')}
 function geInitiativeProgressAllowedV224(x){const u=geInitiativeUserV224();return geInitiativeCanProgressV224()&&geInitiativeScopedV224(x)&&(geInitiativeAdminV224()||String(x.createdByAccessLevel||'').toLowerCase()!=='admin'&&String(x.createdByRole||'')!=='Super Admin')}
 
@@ -9733,13 +9733,14 @@ function picker(id,items,selected=[]){
  const list=[...new Set((items||[]).map(x=>String(x).trim()).filter(Boolean))];
  const labels=()=>{try{return JSON.parse(root.dataset.values||'[]')}catch{return[]}};
  const summary=()=>{const vals=labels(),max=3;if(!vals.length)return 'Select';const shown=vals.slice(0,max);return shown.join(', ')+(vals.length>max?` +${vals.length-max}`:'')};
- root.innerHTML=`<button type="button" class="ge-picker-trigger"><span>${esc(summary())}</span><i>⌄</i></button><div class="ge-picker-pop"><input class="ge-picker-search" placeholder="Search..." autocomplete="off"><div class="ge-picker-options"><label data-all-option="1"><input type="checkbox" value="${allKey}"><span>All</span></label>${list.map(v=>`<label data-label="${esc(v.toLowerCase())}"><input type="checkbox" value="${esc(v)}" ${chosen.has(v)?'checked':''}><span>${esc(v)}</span></label>`).join('')||'<div class="ge-picker-empty">No matching data found.</div>'}</div><div class="ge-picker-actions"><button type="button" data-picker-clear>Clear</button><button type="button" data-picker-cancel>Cancel</button><button type="button" class="primary" data-picker-ok>Apply</button></div></div>`;
- const trigger=root.querySelector('.ge-picker-trigger'),pop=root.querySelector('.ge-picker-pop'),search=root.querySelector('.ge-picker-search'),all=root.querySelector('[data-all-option] input');
+ root.innerHTML=`<div class="ge-picker-field" role="combobox" aria-haspopup="listbox" aria-expanded="false" tabindex="0"><span>${esc(summary())}</span><span class="ge-picker-caret" aria-hidden="true"></span></div><div class="ge-picker-pop"><input class="ge-picker-search" placeholder="Search..." autocomplete="off"><div class="ge-picker-options"><label data-all-option="1"><input type="checkbox" value="${allKey}"><span>All</span></label>${list.map(v=>`<label data-label="${esc(v.toLowerCase())}"><input type="checkbox" value="${esc(v)}" ${chosen.has(v)?'checked':''}><span>${esc(v)}</span></label>`).join('')||'<div class="ge-picker-empty">No matching data found.</div>'}</div><div class="ge-picker-actions"><button type="button" data-picker-clear>Clear</button><button type="button" data-picker-cancel>Cancel</button><button type="button" class="primary" data-picker-ok>Apply</button></div></div>`;
+ const trigger=root.querySelector('.ge-picker-field'),pop=root.querySelector('.ge-picker-pop'),search=root.querySelector('.ge-picker-search'),all=root.querySelector('[data-all-option] input');
  const optionInputs=()=>[...root.querySelectorAll('.ge-picker-options input[type="checkbox"]')].filter(x=>x.value!==allKey);
  const syncAll=()=>{const opts=optionInputs(),checked=opts.filter(x=>x.checked).length;all.checked=opts.length>0&&checked===opts.length;all.indeterminate=checked>0&&checked<opts.length};
  const renderSummary=()=>{trigger.querySelector('span').textContent=summary();syncAll()};
- const close=()=>{pop.classList.remove('show');search.value='';root.querySelectorAll('.ge-picker-options label').forEach(l=>l.hidden=false)};
- trigger.onclick=()=>{document.querySelectorAll('.ge-picker-pop.show').forEach(x=>x!==pop&&x.classList.remove('show'));pop.classList.toggle('show');if(pop.classList.contains('show')){syncAll();setTimeout(()=>search.focus(),0)}};
+ const close=()=>{pop.classList.remove('show');trigger.setAttribute('aria-expanded','false');search.value='';root.querySelectorAll('.ge-picker-options label').forEach(l=>l.hidden=false)};
+ const toggle=()=>{document.querySelectorAll('.ge-picker-pop.show').forEach(x=>x!==pop&&x.classList.remove('show'));pop.classList.toggle('show');trigger.setAttribute('aria-expanded',pop.classList.contains('show')?'true':'false');if(pop.classList.contains('show')){syncAll();setTimeout(()=>search.focus(),0)}};
+ trigger.onclick=toggle;trigger.onkeydown=e=>{if(e.key==='Enter'||e.key===' '||e.key==='ArrowDown'){e.preventDefault();toggle()}else if(e.key==='Escape')close()};
  search.oninput=()=>{const q=search.value.trim().toLowerCase();root.querySelectorAll('.ge-picker-options label').forEach(l=>{if(l.hasAttribute('data-all-option')){l.hidden=false;return}l.hidden=!!q&&!l.dataset.label.includes(q)})};
  all.onchange=()=>{const check=all.checked;optionInputs().forEach(x=>x.checked=check);syncAll()};
  root.querySelector('[data-picker-clear]').onclick=()=>{optionInputs().forEach(x=>x.checked=false);all.checked=false;all.indeterminate=false};
@@ -9782,7 +9783,7 @@ window.geFocusInitiativeR65=function(id,milestone){
  const typedId=typeof row.id==='number'?Number(row.id):row.id;window.openInitiativeTimelineV224?.(typedId);
  if(milestone!==null&&milestone!==undefined&&milestone!==''){const index=Number(milestone),step=row.workflow?.[index],cards=document.querySelectorAll('#initiativeTimelineModalV224 .timeline-card-v224');if(!step||!cards[index]){notice.textContent='Milestone yang dituju tidak tersedia dalam Initiative ini.';return}cards[index].style.outline='3px solid #287db5';cards[index].scrollIntoView({block:'center'})}
 };
-window.geInitInitiativeCanonical=function(){const selected=document.querySelector('.journey-tab.active[data-journey]');window.GE_ACTIVE_JOURNEY=selected?String(selected.dataset.journey||''):'';document.querySelectorAll('.journey-tab[data-journey]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.journey||'')===window.GE_ACTIVE_JOURNEY));window.renderInitiatives?.();queueMicrotask(()=>window.renderInitiatives?.())};
+window.geInitInitiativeCanonical=function(){const params=new URLSearchParams(location.search),explicit=String(params.get('journey')||'').trim();window.GE_ACTIVE_JOURNEY=explicit;document.querySelectorAll('.journey-tab[data-journey]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.journey||'')===explicit));window.renderInitiatives?.();queueMicrotask(()=>window.renderInitiatives?.())};window.setJourneyFilter=function(journey){window.GE_ACTIVE_JOURNEY=String(journey||'');document.querySelectorAll('.journey-tab[data-journey]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.journey||'')===window.GE_ACTIVE_JOURNEY));window.renderInitiatives?.()};
 window.geFilterInitiativeTouchpoint=tp=>{location.href='app.html?page=calendar&view=gantt&touchpoint='+encodeURIComponent(tp||'')};
 
 let geGanttSortStateR13={key:'title',dir:1};
@@ -9935,8 +9936,8 @@ const initRender=window.renderInitiatives;
 function geInitiativeArray(value){if(Array.isArray(value))return value.map(v=>String(v||'').trim()).filter(Boolean);return String(value||'').split(/[|,;]/).map(v=>v.trim()).filter(Boolean)}
 function geInitiativeFilterValue(id){const el=document.getElementById(id);return String(el?.value||'').trim()}
 
-function geInitiativeCanUpdate(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||['Admin','Editor'].includes(String(s.accessLevel||''))}
-function geInitiativeCanDelete(){const s=window.gxGetSession?.()||{};return s.role==='Super Admin'||String(s.accessLevel||'')==='Admin'}
+function geInitiativeCanUpdate(){const s=window.gxGetSession?.()||{},role=String(s.role||'');return /^(Super Admin|Super Administrator)$/i.test(role)||['Admin','Editor'].includes(String(s.accessLevel||''))}
+function geInitiativeCanDelete(){const s=window.gxGetSession?.()||{},role=String(s.role||'');return /^(Super Admin|Super Administrator)$/i.test(role)||String(s.accessLevel||'')==='Admin'}
 function geInitiativeListActions(x){const id=String(x?.id||'');const parts=[];if(geInitiativeCanUpdate())parts.push(`<button type="button" class="ge-btn compact" onclick="window.openInitiativeModalV224?.('${id}')">Update</button>`);if(geInitiativeCanDelete())parts.push(`<button type="button" class="ge-btn danger compact" onclick="window.deleteInitiativeV224?.('${id}')">Delete</button>`);if(!parts.length&&typeof geInitiativeManageButtonsV224==='function')return geInitiativeManageButtonsV224(x);return `<div class="planning-row-actions ge-initiative-actions">${parts.join('')}</div>`}
 function geInitiativeJourney(){
   const active=document.querySelector('.journey-tab.active[data-journey]');

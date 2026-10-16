@@ -160,3 +160,22 @@ This is the single canonical work-history file for the portal. Entries are group
 - Root cause: the consolidated Initiative interaction layer referenced the lexical `activeJourney` variable from a different IIFE, producing `activeJourney is not defined`. The canonical interaction layer now owns `window.GE_ACTIVE_JOURNEY` and derives state from the active Journey tab.
 - Service & Provider category panels now reuse the existing Planning Workspace hub card/panel pattern instead of introducing another category-card design.
 - Navigation latency: Firebase profile validation is reused for up to five minutes for the same authenticated UID; business collection cache already uses a five-minute manifest interval. This removes repeated profile reads without making business data permanently stale.
+
+## Planning Workspace / Initiative Recovery — 2026-10-16
+
+### Planning Workspace — Lounge/Tenant canonicalization
+- Root cause: `lounge-list` still loaded the legacy Lounge/Tenant renderer and handlers, while GHA/Airport Operator used `planning-domains.js`. Visual alignment therefore did not create shared behavior; Add/Edit, filters, Grid/Details and navigation continued to diverge.
+- Replaced the Lounge/Tenant route with the same `planning-domains.js` renderer used by the other Planning Workspace Service & Provider categories.
+- Added Lounge/Tenant as a forced `LOUNGE` category in the shared Planning Workspace domain configuration, with the same back-navigation, filter, Grid/Details, pagination, Add/Edit/Delete and dialog owner.
+- Added Lounge/Tenant-specific field mapping to the shared form without restoring the legacy Lounge-specific runtime path.
+- Improved legacy `serviceProcurement` category inference so existing Airport Operator/GHA/Lounge-labelled records are classified into the shared Service & Provider view when `planningCategoryId` is absent.
+
+### Initiative & Improvement
+- Root cause: the canonical picker rendered as a button-like trigger with a visible glyph, creating an inconsistent multi-select appearance.
+- Replaced the picker trigger with a field-style combobox surface while retaining checkbox multi-select behavior, keyboard access and left-aligned text.
+- Normalized the Super Administrator/Super Admin role alias in Initiative scope/edit/delete checks.
+- Main Initiative page now initializes deterministically to All Journey unless an explicit `journey` query is supplied; Journey switching uses the canonical window state.
+
+### Regression protection
+- Updated the regression contracts so Lounge/Tenant is required to use the shared Planning Workspace controls instead of the retired legacy Lounge-specific markup.
+- Validation: 59 regression contracts passed; UI integrity gate passed for 68 pages / 594 asset references; local build passed.
