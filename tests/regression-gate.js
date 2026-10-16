@@ -14,4 +14,5 @@ for(const test of tests){
 if(failed){process.exitCode=1;}else console.log(`CBNR_REGRESSION_GATE_PASS TESTS=${tests.length}`);
 
 // Independent runtime-asset and UI-stack integrity gate.
+if(!failed)require('./r112-portal-pr-recovery-contract.js');
 if(!failed)require('./ui-integrity-gate.js');

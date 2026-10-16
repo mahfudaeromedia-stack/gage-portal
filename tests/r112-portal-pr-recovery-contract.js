@@ -1,0 +1,18 @@
+'use strict';
+const fs=require('fs'),assert=require('assert');
+const planning=fs.readFileSync('assets/planning-domains.js','utf8');
+const auth=fs.readFileSync('assets/auth.js','utf8');
+const api=fs.readFileSync('netlify/functions/edition1-data.js','utf8');
+const master=fs.readFileSync('assets/master-reference.js','utf8');
+const boot=fs.readFileSync('assets/edition1-page-boot.js','utf8');
+const store=fs.readFileSync('assets/edition1-store.js','utf8');
+for(const x of ['Valid','Pending','Invalid','Expired','Expiring Soon'])assert(planning.includes(`'${x}'`),`Planning status baseline missing ${x}`);
+for(const x of ['Nama Layanan / Provider','Record / Agreement Action','Price Schedule','Capacity Schedule','Lampiran Dokumen'])assert(planning.includes(x),`Planning canonical Lounge/Tenant field missing: ${x}`);
+assert(!planning.includes('class=\"planning-category-visual\"'),'Planning category hubs must use one shared card behavior.');
+assert(planning.includes("return 'UNASSIGNED'"),'Legacy planning records without category metadata must remain visible.');
+assert(auth.includes('s.assignedStations')&&api.includes('actor.assignedStations'),'Station scope must honor canonical assignedStations.');
+assert(!master.includes("GEStore.hydrate(['auditLogs'])"),'Master Data must not require privileged auditLogs to initialize.');
+assert(!master.includes('state.auditLogs.unshift'),'Master Data saves must not push client audit records.');
+assert(boot.includes("store.refresh(['initiatives','touchpoints','documents','inbox','airports'])"),'Initiative route must revalidate canonical Firestore collections.');
+assert(store.includes("CACHE_SCHEMA='32'"),'Stale pre-recovery collection cache must be invalidated once.');
+console.log('R112_PORTAL_PR_RECOVERY_CONTRACT_PASS');

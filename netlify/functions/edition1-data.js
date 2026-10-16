@@ -83,7 +83,7 @@ function canWrite(actor,c){
 }
 function allowedStations(actor){
   if (actor.role==='Super Admin' || (['Head Office','GE Team','Ground Experience Team'].includes(actor.role) && String(actor.accessLevel||'')==='Admin') || String(actor.scopeType||'').toUpperCase()==='ALL') return null;
-  const a=Array.isArray(actor.airports)?actor.airports:[];
+  const a=Array.isArray(actor.assignedStations)&&actor.assignedStations.length?actor.assignedStations:(Array.isArray(actor.airports)?actor.airports:[]);
   return new Set(a.map(x=>String(x).trim().toUpperCase()).filter(Boolean));
 }
 function stationsOf(x){
@@ -115,6 +115,8 @@ async function actorFor(event){
   if(!snap.exists) throw Object.assign(new Error('User profile not found.'),{statusCode:403,code:'PROFILE_NOT_FOUND'});
   // The authenticated UID is authoritative; a legacy profile's `id` must not override it.
   const actor={...snap.data(),id:decoded.uid};
+  if((!Array.isArray(actor.airports)||!actor.airports.length)&&Array.isArray(actor.assignedStations)) actor.airports=actor.assignedStations;
+  if((!Array.isArray(actor.loungeIds)||!actor.loungeIds.length)&&Array.isArray(actor.assignedLounges)) actor.loungeIds=actor.assignedLounges;
   if(!active(actor)) throw Object.assign(new Error('Account inactive.'),{statusCode:403,code:'ACCOUNT_INACTIVE'});
   return {db,actor};
 }

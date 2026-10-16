@@ -207,3 +207,24 @@ This is the single canonical work-history file for the portal. Entries are group
 ### Initiative & Improvement
 - Removed the internal “Proven V224…” implementation note from the user interface.
 - Late journey-state access uses the canonical `GE_ACTIVE_JOURNEY` state instead of an out-of-scope lexical variable.
+
+
+## 2026-10-16 — Planning / Initiative / Master Data PR recovery
+
+### Planning Workspace
+- Add/Edit now uses the Lounge/Tenant canonical agreement form structure across Planning Workspace pages: Region, Station, service/provider identity, service type, PIC, agreement action/replacement, agreement dates, single price/currency, document identity/type/status, remarks, Price Schedule, Capacity Schedule, and document attachment. Collection-specific fields remain available under Additional Details so existing domain data is not discarded.
+- Category hub cards now use the same `planning-workspace-card` behavior and photo geometry for Service & Provider, Space & Building, Station Material / Tools / Equipment, Airport Systems, Planning Documents, and Standards / Reference. The separate `planning-category-visual` rendering path is no longer used.
+- Status filter no longer collapses to only Expired / Expiring Soon when records fail to hydrate. Stable baseline values include Valid, Pending, Invalid, Active, Draft, Inactive, Superseded, Expired, and Expiring Soon; record-specific values are appended.
+- Legacy/copied Planning records without `planningCategoryId` remain visible in All Records through category inference and an Unassigned compatibility state instead of being silently filtered out.
+- Planning routes now perform a direct canonical refresh of their required collections after cache hydration. Cache schema rotated once to remove stale empty collection snapshots.
+- Client-side Planning audit injection was retired; successful mutations are audited by the canonical server adapter.
+
+### Initiative & Improvement / scope
+- Initiative route now revalidates initiatives and its dependent collections on entry, so Firestore data copied outside the portal is not hidden behind a previously cached empty collection.
+- Station scoping now recognizes canonical `assignedStations[]` (with legacy `airports[]` fallback) in both browser and server adapters; lounge scope likewise recognizes `assignedLounges[]`.
+
+### Master Data
+- Removed the privileged `auditLogs` hydrate dependency from Master Data initialization and removed client-side audit-log writes from Add/Edit save. This prevents Admin/Editor saves from failing because Audit Log is Super Admin-only while retaining server-side mutation audit.
+
+### Validation
+- Added R112 regression protection for the recovery paths. Full regression gate and UI integrity gate must pass before package handoff.
