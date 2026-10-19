@@ -13,10 +13,10 @@
     standardContent:{},portalManagerR2:{},attentionSettings:{},contactMessages:[],guestbook:[],monitoringTemplates:[],monitoringAssessments:[],formTemplates:[],monitoringWorks:[],formSubmissions:[],customerExperience:[],referenceCatalog:[],requirementMatrix:[],stationCapabilities:[]
   };
   const baseline={}; let hydrated=false; let pending=Promise.resolve(); let localRevision=0;
-  const CACHE_DB='GE_E1_CACHE_V30'; const CACHE_STORE='collections'; const CACHE_SCHEMA='34';
+  const CACHE_DB='GE_E1_CACHE_V30'; const CACHE_STORE='collections'; const CACHE_SCHEMA='35';
   function session(){return typeof window.gxGetSession==='function'?(window.gxGetSession()||{}):window.GX_CURRENT_USER||{}}
   function cacheAllowed(){return !!String(session().uid||session().id||session().email||'').trim()}
-  function cacheIdentity(){const s=session();return String(s.uid||s.id||s.email||'anon')+'|'+String(s.scopeType||'')+'|'+(Array.isArray(s.assignedStations)?s.assignedStations.slice().sort().join(','):(Array.isArray(s.airports)?s.airports.slice().sort().join(','):''))}
+  function cacheIdentity(){const s=session(),assigned=Array.isArray(s.assignedStations)&&s.assignedStations.length?s.assignedStations:Array.isArray(s.airports)?s.airports:[];return [String(s.uid||s.id||s.email||'anon'),String(s.role||''),String(s.accessLevel||''),String(s.scopeType||''),assigned.map(x=>String(x&&typeof x==='object'?(x.stationCode||x.code||x.iata||x.airportCode||x.id||''):x)).sort().join(',')].join('|')}
   function cacheKey(k){return CACHE_SCHEMA+'|'+cacheIdentity()+':'+collKey(k)}
   function openCache(){return new Promise((resolve,reject)=>{if(!window.indexedDB)return reject(new Error('IndexedDB unavailable'));const q=indexedDB.open(CACHE_DB,1);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains(CACHE_STORE))q.result.createObjectStore(CACHE_STORE)};q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)})}
   async function cacheGet(key){try{const db=await openCache();return await new Promise((resolve,reject)=>{const tx=db.transaction(CACHE_STORE,'readonly'),q=tx.objectStore(CACHE_STORE).get(key);q.onsuccess=()=>resolve(q.result??null);q.onerror=()=>reject(q.error)})}catch{return null}}
@@ -104,6 +104,7 @@
   }
   function indexById(rows){const m=new Map();(rows||[]).forEach(x=>m.set(String(x.id),x));return m}
   function same(a,b){return JSON.stringify(a)===JSON.stringify(b)}
+  function populated(value){return Array.isArray(value)?value.length>0:!!value&&typeof value==='object'&&Object.keys(value).length>0}
   async function persistSnapshot(snapshot){
     const keys=Object.keys(snapshot);
     for(const key of keys){
@@ -154,46 +155,66 @@
     window.dispatchEvent(new CustomEvent('gx-data-hydrated',{detail:{collections:requested,fresh:true}}));
     return state;
   }
+  const backgroundRefreshAt=new Map();
   async function hydrate(keys){
-    const requested=[...new Set(keys)];
-    // Non-Super Admin pages use a persistent per-user/per-scope cache. This makes page-to-page
-    // navigation instant and avoids re-reading entire Firestore collections on every page load.
+    const requested=[...new Set((keys||[]).map(String).filter(Boolean))];
+    if(!requested.length)return state;
+    // Keep cached rows—including an empty array—on the first paint path. An empty cache
+    // is a displayable snapshot, not proof that Firestore is empty; revalidate it in the
+    // background so direct Firestore imports become visible without blocking navigation.
     if(cacheAllowed()){
       const cachedCollections=await Promise.all(requested.map(key=>readCache(key)));
       requested.forEach((key,index)=>{
-        const cached=cachedCollections[index];if(!cached||!cached.rows.length)return;
-        const rows=normalizeCollection(key,cached.rows);
+        const cached=cachedCollections[index];if(!cached)return;
+        const rows=normalizeCollection(key,cached.rows),current=key==='projectEvents'?state.events:state[key];
+        // Never let an older empty disk snapshot erase a populated in-memory working set.
+        if(!populated(rows)&&populated(current))return;
         if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)}
       });
-      // An empty cache is never authoritative. Data is sometimes copied directly in Firestore,
-      // outside this portal, so cacheState may not be bumped. Empty collections are therefore
-      // fetched on the critical path while non-empty cached collections render immediately.
-      const missing=requested.filter((key,index)=>!cachedCollections[index]||!cachedCollections[index].rows.length);
+      const missing=requested.filter((key,index)=>!cachedCollections[index]);
       if(missing.length){
         const fresh=await apiGet(missing);
-        for(const key of missing){const apiKey=collKey(key),rows=normalizeCollection(key,fresh[apiKey]||[]);if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)};await writeCache(key,fresh[apiKey]||[])}
+        for(const key of missing){
+          const apiKey=collKey(key),rows=normalizeCollection(key,fresh[apiKey]||[]);
+          if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)}
+          await writeCache(key,fresh[apiKey]||[]);
+        }
       }
       hydrated=true;
-      // Always revalidate non-empty cached collections in the background. This keeps navigation
-      // fast while also reflecting direct Firestore copy/import work that does not touch cacheState.
-      const refreshRevision=localRevision;
-      const revalidate=requested.filter(key=>!missing.includes(key));
-      if(revalidate.length)Promise.resolve().then(async()=>{
-        try{
-          const result=await apiGet(revalidate);
-          if(localRevision!==refreshRevision)return;
-          let changed=false;
-          for(const key of revalidate){const apiKey=collKey(key),rows=normalizeCollection(key,result[apiKey]||[]),before=key==='projectEvents'?state.events:state[key];if(!same(before,rows))changed=true;if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)};await writeCache(key,result[apiKey]||[])}
-          if(changed)window.dispatchEvent(new CustomEvent('gx-data-background-refresh',{detail:{collections:revalidate}}));
-        }catch(e){console.warn('[Edition1 cache] background refresh unavailable; cached data remains active',e)}
+      const now=Date.now();
+      const revalidate=requested.filter((key,index)=>{
+        const cached=cachedCollections[index];if(!cached)return false;
+        const age=now-Number(cached.at||0),stamp=backgroundRefreshAt.get(cacheKey(key))||0;
+        return cached.rows.length===0 ? now-stamp>15000 : age>300000&&now-stamp>300000;
       });
+      if(revalidate.length){
+        const refreshRevision=localRevision;
+        revalidate.forEach(key=>backgroundRefreshAt.set(cacheKey(key),now));
+        Promise.resolve().then(async()=>{
+          try{
+            // Do not use the manifest as a data-version authority: manual Firestore copy/import
+            // does not bump it. The collection read itself is the source of truth.
+            const result=await apiGet(revalidate);
+            if(localRevision!==refreshRevision)return;
+            const changed=[];
+            for(const key of revalidate){
+              const apiKey=collKey(key),rows=normalizeCollection(key,result[apiKey]||[]),before=key==='projectEvents'?state.events:state[key];
+              if(!same(before,rows))changed.push(key);
+              if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)}
+              await writeCache(key,result[apiKey]||[]);
+            }
+            if(changed.length)window.dispatchEvent(new CustomEvent('gx-data-background-refresh',{detail:{collections:changed,source:'firestore-revalidation'}}));
+            if(cacheAllowed())try{await writeManifestCache(await apiManifest())}catch{}
+          }catch(e){console.warn('[Edition1 cache] background Firestore revalidation unavailable; cached data remains active',e)}
+        });
+      }
       window.dispatchEvent(new CustomEvent('gx-data-hydrated',{detail:{collections:requested,cached:requested.length!==missing.length}}));
       return state;
     }
     const result=await apiGet(requested);
     for(const key of requested){
-      const apiKey=collKey(key); const rows=normalizeCollection(key,result[apiKey]||[]);
-      if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows);} else {state[key]=rows;baseline[key]=clone(rows);}
+      const apiKey=collKey(key),rows=normalizeCollection(key,result[apiKey]||[]);
+      if(key==='projectEvents'){state.events=rows;baseline.events=clone(rows)}else{state[key]=rows;baseline[key]=clone(rows)}
       await writeCache(key,result[apiKey]||[]);
     }
     if(cacheAllowed())try{await writeManifestCache(await apiManifest())}catch{}

@@ -216,7 +216,7 @@ This is the single canonical work-history file for the portal. Entries are group
 - Category hub cards now use the same `planning-workspace-card` behavior and photo geometry for Service & Provider, Space & Building, Station Material / Tools / Equipment, Airport Systems, Planning Documents, and Standards / Reference. The separate `planning-category-visual` rendering path is no longer used.
 - Status filter no longer collapses to only Expired / Expiring Soon when records fail to hydrate. Stable baseline values include Valid, Pending, Invalid, Active, Draft, Inactive, Superseded, Expired, and Expiring Soon; record-specific values are appended.
 - Legacy/copied Planning records without `planningCategoryId` remain visible in All Records through category inference and an Unassigned compatibility state instead of being silently filtered out.
-- Planning routes now perform a direct canonical refresh of their required collections after cache hydration. Cache schema rotated once to remove stale empty collection snapshots.
+- Planning routes reuse the canonical cache without a second blocking refresh; cached-empty snapshots are revalidated in the background so navigation does not wait on a duplicate data request.
 - Client-side Planning audit injection was retired; successful mutations are audited by the canonical server adapter.
 
 ### Initiative & Improvement / scope
@@ -227,12 +227,12 @@ This is the single canonical work-history file for the portal. Entries are group
 - Removed the privileged `auditLogs` hydrate dependency from Master Data initialization and removed client-side audit-log writes from Add/Edit save. This prevents Admin/Editor saves from failing because Audit Log is Super Admin-only while retaining server-side mutation audit.
 
 ### Validation
-- Added R112 regression protection for the recovery paths. Full regression gate and UI integrity gate must pass before package handoff.
+- Added regression protection for the recovery paths. Full regression gate and UI integrity gate must pass before handoff.
 
 ## Canonical route/data recovery — 2026-10-16
 - Planning Workspace Add/Edit re-aligned to the canonical Lounge/Tenant modal geometry and field hierarchy; page width no longer dictates modal width.
 - Planning domain modal rows retain the Lounge/Tenant two-column form, Price Schedule, Capacity Schedule, and attachment pattern with responsive collapse only at mobile breakpoints.
-- Portal collection hydration no longer treats an empty IndexedDB cache as authoritative. Empty collections fetch from Firestore/API on the critical path; populated caches render immediately and revalidate in the background so direct Firestore imports/copies become visible without a cache-manifest bump.
+- Portal collection hydration keeps cached-empty arrays on the immediate render path and revalidates them in the background, bypassing the manifest-version shortcut because direct Firestore imports/copies do not necessarily bump portal metadata. Populated cache snapshots revalidate in the background after their freshness window.
 - Internal page navigation now switches the canonical `app.html` outlet in place instead of hard-reloading the shell on every sidebar/card navigation. Header/sidebar state remains persistent; route-specific Planning runtime is disposed/reloaded safely.
 - Runtime HTML/JS/CSS service-worker strategy changed to network-first to prevent a newly deployed shell from mixing with stale page/runtime assets.
 - Station scope readers use `assignedStations[]` as the canonical user field with legacy `airports[]` only as compatibility fallback.
@@ -254,6 +254,17 @@ This is the single canonical work-history file for the portal. Entries are group
 - Existing Add/Edit implementation and canonical modal behavior are preserved.
 
 ### Airport Experience Network
-- Removed the structural assessment-foundation override from Network & Map, Station 360, Service Experience, and Capability & Classification. The foundation remains scoped to Monitoring & Assessment.
-- Restored the existing page implementations as the canonical view; station photo/gallery support remains additive only.
-- Network/Map station detail retains six operational information tabs: Service, Lounge, People, Facility, System, and Contract.
+- Corrected the previous route recovery that had restricted the accepted R43 foundation to Monitoring & Assessment while leaving Service Experience on its static scaffold. The existing foundation now initializes again on Network & Map, Station 360, Service Experience, Capability & Classification, and Monitoring & Assessment; no new foundation renderer was introduced.
+- Removed the competing R40 four-tab map detail renderer and its now-unused R40 styles. R42 is the single station-detail owner and retains six operational information tabs: Service, Lounge, People, Facility, System, and Contract.
+- Photo/gallery behavior remains additive to station record content. Photo upload no longer hydrates privileged `auditLogs` before saving metadata; the canonical store/server mutation path handles persistence and audit.
+
+### Monitoring & Assessment / Shared Checklist
+- Restored the approved one-question-per-card presentation within `checklist-share.css` and aligned Guest respondent identity fields in a dedicated responsive row; global form styles remain untouched.
+- Public Guest forms no longer expose internal Touch Point/Journey/3P mapping hints. Internal form completion retains mapping context, while locked previews/submission details remain unchanged.
+
+### Firestore / Planning / Initiative
+- Cached empty collections no longer block page rendering or trigger a second awaited refresh. Empty snapshots are revalidated directly in the background, independent of the manifest version; populated cache snapshots revalidate after their freshness window.
+- Cache identity now includes role/access level and canonical station scope, with a schema rotation to prevent reuse of snapshots created under an older scope contract.
+- Server scope reads `assignedStations[]` first, accepts object/string station values, falls back to legacy `airports[]`, and normalizes the `Super Administrator` role alias before authorization/scope checks.
+- Planning Workspace and Initiative keep their initial render non-blocking; Firestore revalidation events rerender their existing canonical views when records arrive.
+- Added a runtime regression test with a simulated IndexedDB empty snapshot and delayed Firestore response; it verifies that the route returns immediately and the view receives fresh records through the background-refresh event.

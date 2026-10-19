@@ -24,6 +24,7 @@ function dataQuery(db, collection) {
   if (METADATA_COLLECTIONS.has(collection)) return db.collection('portalMetadata').doc(group).collection('records');
   return db.collection('portalData').doc(group).collection('records');
 }
+function canonicalRole(value){const role=String(value||'').trim();return ['super administrator','superadmin','super admin'].includes(role.toLowerCase())?'Super Admin':role}
 const READ_ROLES = new Set(['Super Admin','Admin','Management','Head Office','GE Team','Ground Experience Team','Branch Office','Staff','Viewer','Approver','Editor','External User','External','Collaborator','Lounge Staff','Lounge Luar Biasa']);
 const WRITE_LEVELS = new Set(['Editor','Admin']);
 const ADMIN_ROLES = new Set(['Super Admin','Admin']);
@@ -86,7 +87,7 @@ function allowedStations(actor){
   const assigned=Array.isArray(actor.assignedStations)?actor.assignedStations:[];
   const legacy=Array.isArray(actor.airports)?actor.airports:[];
   const a=assigned.length?assigned:legacy;
-  return new Set(a.map(x=>String(x).trim().toUpperCase()).filter(Boolean));
+  return new Set(a.map(x=>String(x&&typeof x==='object'?(x.stationCode||x.code||x.iata||x.airportCode||x.id||''):x).trim().toUpperCase()).filter(Boolean));
 }
 function stationsOf(x){
   const raw=x?.stations ?? x?.stationCodes ?? x?.stationCode ?? x?.airport ?? x?.station ?? x?.relatedAirport ?? [];
@@ -116,7 +117,8 @@ async function actorFor(event){
   const snap=await db.collection('users').doc(decoded.uid).get();
   if(!snap.exists) throw Object.assign(new Error('User profile not found.'),{statusCode:403,code:'PROFILE_NOT_FOUND'});
   // The authenticated UID is authoritative; a legacy profile's `id` must not override it.
-  const actor={...snap.data(),id:decoded.uid};
+  const profile=snap.data()||{};
+  const actor={...profile,id:decoded.uid,role:canonicalRole(profile.role)};
   if(!active(actor)) throw Object.assign(new Error('Account inactive.'),{statusCode:403,code:'ACCOUNT_INACTIVE'});
   return {db,actor};
 }
