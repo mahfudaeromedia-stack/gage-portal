@@ -49,10 +49,10 @@ Rule: CBNR (Canonical Baseline No-Regression Rule)
 | Master Data hydration | `assets/master-reference.js` | TEST-1 logic retained, operational hydration removed | R38.1 proves operational collections must not be hydrated as Master Data |
 | Initiative delete/filter | `assets/edition1-business-runtime.js` | TEST-1 change retained for semantic merge | Later runtime behavior uses GEStore persistence and explicit confirmation |
 | Planning cache/data | `assets/planning-domains.js` + `assets/edition1-store.js` | TEST-1 retained pending full route audit | Planning uses GEStore; store already implements IndexedDB cache-first + background manifest refresh |
-| Customer Experience | `assets/customer-experience-v257.js` | TEST-1 change retained | Adds derived performance API without removing existing canonical exports |
-| Management Outcome | `assets/management-outcome-v257.js` | TEST-1 change retained | Adds outcome metrics while preserving existing API |
-| Improvement / Monitoring bridge | `assets/improvement-v257.js` | TEST-1 change retained | Adds Monitoring Assessment → Opportunity traceability |
-| Permission scope | `assets/permission-v257.js` | TEST-1 change retained | Extends station/menu/effective scope while preserving existing station scope |
+| Customer Experience | `assets/customer-experience.js` | TEST-1 change retained | Adds derived performance API without removing existing canonical exports |
+| Management Outcome | `assets/management-outcome.js` | TEST-1 change retained | Adds outcome metrics while preserving existing API |
+| Improvement / Monitoring bridge | `assets/improvement.js` | TEST-1 change retained | Adds Monitoring Assessment → Opportunity traceability |
+| Permission scope | `assets/permission.js` | TEST-1 change retained | Extends station/menu/effective scope while preserving existing station scope |
 | Global UI | `assets/portal.css` + branch UI modules | NOT YET FINAL | Requires semantic consolidation; current CSS still contains overlapping historical layers |
 | Master catalog | MAIN `assets/reference-id-catalog.js` + TEST-1 `master-reference.js` | MERGE REQUIRED | MAIN-only catalog functionality must be incorporated into canonical Master Data, then standalone catalog removed |
 
@@ -125,3 +125,57 @@ Rule: CBNR (Canonical Baseline No-Regression Rule)
 - `npm test`: `CBNR_REGRESSION_GATE_PASS TESTS=55`.
 - Final artifact count: 147 files; `.patch/.diff` count 0; root HTML remains `app.html` + `login.html`.
 - Browser interactive smoke could not complete within the environment timeout; this is recorded as a validation limitation, not claimed as PASS.
+
+## 2026-10-02 — UI Canonical Consolidation Follow-up
+
+- Continued from the existing CBNR baseline; no MAIN + TEST-1 reconsolidation.
+- Removed duplicate `assets/lounge-planning.js`; its valid implementation was already consolidated into `assets/edition1-business-runtime.js`.
+- Removed dormant `assets/global-select-standard.js`; no production element used its opt-in marker.
+- Lounge/Tenant Grid/Details is now the shared segmented control, not a legacy select.
+- Default dropdown is native select with filled navy triangle treatment.
+- Shared button geometry, field geometry, muted placeholder/guidance typography, modal typography/layering, sortable whole-header-cell behavior and Gantt geometry are canonicalized in `assets/global-ui-canonical.css`.
+- `portal.css` contains zero `!important` declarations.
+- Full CBNR regression gate: `55/55 PASS`.
+
+
+## Active UI contract — Monitoring / Planning (2026-10-11)
+- English action labels across the portal; consistent control heights, typography and button variants are mandatory.
+- Multi-select fields must stage changes and expose **OK** and **Cancel**. Cancel, Escape and outside dismissal must restore the last committed selection.
+- Master Data `Jenis & Referensi` is intended to drive Planning Workspace child-page definitions. Stable IDs must not be derived from mutable display names; existing references and historical records must be preserved. This architecture remains pending implementation and migration verification.
+- The Lounge/Tenant visual screenshots are the reference for directories, modals and filter controls. Do not treat source-level regression passes as browser/role/Firebase acceptance.
+
+- Planning GHA station selector: checkbox dimensions 16×16, explicit OK/Cancel and confirmed state used on Save. Unconfirmed selections must not be persisted.
+
+- Planning modal actions must be in English (Save, Cancel, OK, Remove); primary buttons 42px min height, text 14px; checkbox native 16px. Scope CSS to canonical modal instead of global layered overrides.
+
+### Master Reference and GHA integrity (2026-10-11)
+- Reference IDs are immutable after creation; uniqueness must be scoped to `kind`, including `id:<entityKind>` records. Do not overwrite another kind with a colliding code.
+- Master Data multi-select changes are drafts until **OK**; **Cancel**, Escape, or outside click restores the last confirmed selection.
+- GHA creation with multiple stations must create separate station-scoped records when adding a new provider, without rewriting existing records. Editing preserves the record ID.
+- Master Data / GHA control labels are English; checkbox dimensions 16px and control typography follow the canonical UI baseline.
+
+### 2026-10-11 — Assessment workspace control normalization
+- Replaced legacy Indonesian text in the Assessment workspace with English labels and feedback.
+- Added canonical ge-btn class to previously unstyled table actions and Retry control.
+- Aligned canonical button font and control height to 14px / 42px; fixed invalid Planning station button font declaration.
+- Browser and Firebase verification are still outstanding; this is not a production release.
+
+## Canonical naming policy — 2026-10-11
+Nomor revisi Pxx/Rxx digunakan hanya untuk riwayat perubahan dan dokumentasi. Nama fungsi, variabel, komponen, CSS, dan route canonical baru harus berbasis domain/fungsi. Legacy identifier lintas file dan persisted ID hanya boleh dimigrasi dengan audit dependensi dan kompatibilitas; dilarang global search-and-replace tanpa validasi. Rincian audit: `VERSION-NAMING-AUDIT.md`.
+
+### Runtime naming — canonical
+Global export baru menggunakan nama domain/fungsi tanpa kode patch. Perubahan pada kontrak lama yang dipakai lintas modul wajib disertai migrasi seluruh caller dan tes fungsional; persisted storage ID tidak boleh diganti tanpa migrasi data.
+
+### Identifier internal
+Rename fungsi internal hanya setelah audit semua caller; identifier lintas-file dan ID persisten tidak boleh diubah sepihak.
+
+## Canonical control consolidation (11 October 2026)
+- Table/compact actions use the same `--ui-control-h` and `--ui-button-font` as other buttons; removed conflicting 36px/12px versus 38px/13px duplicate CSS rules.
+- Checkbox sizing is fixed at 16px for portal content, Master Reference modal and Planning modal, without inheriting text-field heights. The shared accent uses `--ui-navy`.
+- This is a CSS/control-contract change only. It does not establish browser/Firebase acceptance or complete the full portal standardization.
+
+## Planning Workspace canonical category and image-led hub (2026-10-11)
+- Master Data reference `code` is the business category key; Firestore `id` remains the immutable document identity. Legacy category references using the document ID are resolved without rewriting stored records.
+- The Planning Workspace hub uses local, image-led cards and English descriptions. The six top-level domains remain stable; child categories are sourced dynamically from referenceCatalog and planningDomains.
+- Built-in category names must not duplicate custom reference rows when an ID differs from the category code.
+- The hub must render records with existing category IDs even when there is no selected domain.

@@ -12,7 +12,7 @@
   window.addEventListener=function(type,fn,opt){ if(type==='DOMContentLoaded') return; return _w(type,fn,opt); };
   document.addEventListener=function(type,fn,opt){ if(type==='DOMContentLoaded') return; return _d(type,fn,opt); };
 
-/* SOURCE: assets/app.js */
+/* CONSOLIDATED: core business runtime */
 
 const store=window.GEStore;
 let data=store.get();
@@ -69,12 +69,16 @@ function currentInitiativeRows(){
  const q=(document.getElementById('q')?.value||'').toLowerCase();
  const tp=document.getElementById('ft')?.value||'';
  const st=document.getElementById('fs')?.value||'';
- return (data.initiatives||[]).filter(x=>
-   (!q||String(x.name||'').toLowerCase().includes(q)) &&
-   (!tp||x.tp===tp) &&
-   (!st||achievement(x.plan,x.real)===st) &&
-   (!activeJourney||((x.journey||getJourney(x.tp))===activeJourney))
- );
+ return (data.initiatives||[]).filter(x=>{
+   const touchpoints=(Array.isArray(x.touchpoints)?x.touchpoints:[x.tp||x.touchpoint]).map(v=>String(v||'').trim()).filter(Boolean);
+   const journeys=(Array.isArray(x.journeyScopes)?x.journeyScopes:[x.journey||getJourney(touchpoints[0])]).map(v=>String(v||'').trim()).filter(Boolean);
+   const stations=(Array.isArray(x.stations)?x.stations:String(x.airport||'').split(',')).map(v=>String(v||'').trim()).filter(Boolean);
+   const hay=[x.name,x.pic,x.remark,...touchpoints,...journeys,...stations].join(' ').toLowerCase();
+   return (!q||hay.includes(q)) &&
+     (!tp||touchpoints.includes(tp)) &&
+     (!st||achievement(x.plan,x.real)===st) &&
+     (!activeJourney||journeys.includes(activeJourney));
+ });
 }
 function geProgressToneR17(value){
  const v=Math.max(0,Math.min(100,Number(value)||0));
@@ -238,11 +242,11 @@ function importAirportCSV(input){
 
 function renderNews(){
  const b=document.getElementById('headlineList');if(!b)return;
- b.innerHTML=(data.news||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).map((n,i)=>`<article class="card headline-card" style="${i===0?'grid-row:span 2':''}"><small>${n.date} • ${n.category}</small><h2>${n.title}</h2><p>${n.summary}</p><button class="btn secondary">Baca Selengkapnya</button></article>`).join('');
+ b.innerHTML=(data.news||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).map((n,i)=>`<article class="card headline-card" style="${i===0?'grid-row:span 2':''}"><small>${n.date} • ${n.category}</small><h2>${n.title}</h2><p>${n.summary}</p><button class="ge-btn secondary">Baca Selengkapnya</button></article>`).join('');
 }
 function renderNewsAdmin(){
  const t=document.getElementById('newsAdminRows');if(!t)return;
- t.innerHTML=(data.news||[]).map((n,i)=>`<tr><td>${i+1}</td><td>${n.title}</td><td>${n.category}</td><td>${n.date}</td><td><button class="btn secondary" onclick="editNews(${n.id})">Edit</button> <button class="btn" onclick="deleteNews(${n.id})">Hapus</button></td></tr>`).join('');
+ t.innerHTML=(data.news||[]).map((n,i)=>`<tr><td>${i+1}</td><td>${n.title}</td><td>${n.category}</td><td>${n.date}</td><td><button class="ge-btn secondary" onclick="editNews(${n.id})">Edit</button> <button class="ge-btn" onclick="deleteNews(${n.id})">Delete</button></td></tr>`).join('');
 }
 function saveNewsForm(){
  const form=document.getElementById('newsForm');if(!form)return;
@@ -400,11 +404,11 @@ function renderDocumentsHome(){
  const sel=document.getElementById('docCategoryHome');if(sel){const cur=sel.value;sel.innerHTML='<option value="">Semua Kategori</option>'+documentCategories().map(x=>`<option>${x}</option>`).join('');sel.value=cur}
  const box=document.getElementById('documentHomeList');if(!box)return;
  const rows=(data.documents||[]).filter(x=>(!q||(x.title+' '+x.fileName+' '+x.note).toLowerCase().includes(q))&&(!cat||x.category===cat));
- box.innerHTML=rows.length?rows.map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}${x.note?' • '+x.note:''}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><button class="btn secondary" onclick="${x.blobKey?`GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')`:`alert('Sample metadata: file aktual belum diunggah pada browser ini.')`}">Unduh</button></div>`).join(''):'<p>Belum ada dokumen.</p>';
+ box.innerHTML=rows.length?rows.map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}${x.note?' • '+x.note:''}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><button class="ge-btn secondary" onclick="${x.blobKey?`GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')`:`alert('Sample metadata: file aktual belum diunggah pada browser ini.')`}">Download</button></div>`).join(''):'<p>Belum ada dokumen.</p>';
 }
 function renderDocumentsAdmin(){
  const box=document.getElementById('documentAdminList');if(!box)return;
- box.innerHTML=(data.documents||[]).map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><div>${x.blobKey?`<button class="btn secondary" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')">Unduh</button>`:''} <button class="btn" data-role-min="Admin" onclick="deletePortalDocument(${x.id})">Hapus</button></div></div>`).join('');
+ box.innerHTML=(data.documents||[]).map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><div>${x.blobKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')">Download</button>`:''} <button class="ge-btn" data-role-min="Admin" onclick="deletePortalDocument(${x.id})">Delete</button></div></div>`).join('');
  if(typeof gxApplyRole==='function')gxApplyRole();
 }
 async function addPortalDocument(){
@@ -435,7 +439,7 @@ function loungeVisitorFiltered(){
 
 function renderLounges(){
  const t=document.getElementById('loungeRows');if(!t)return;const admin=(typeof gxRoleLevel==='function'&&gxRoleLevel((gxGetSession()||{}).role)>=gxRoleLevel('Admin'));
- t.innerHTML=loungeFiltered().map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.name}</b></td><td>${x.pic}</td><td>${x.airport}</td><td><span class="pill">${x.status}</span></td><td>${x.period}</td><td>${x.documentName?`<button class="btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Dokumen sample belum tersimpan pada browser ini.')`}">Unduh</button>`:'-'}</td>${admin?`<td><button class="btn" onclick="deleteLounge(${x.id})">Hapus</button></td>`:''}</tr>`).join('');
+ t.innerHTML=loungeFiltered().map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.name}</b></td><td>${x.pic}</td><td>${x.airport}</td><td><span class="pill">${x.status}</span></td><td>${x.period}</td><td>${x.documentName?`<button class="ge-btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Dokumen sample belum tersimpan pada browser ini.')`}">Download</button>`:'-'}</td>${admin?`<td><button class="ge-btn" onclick="deleteLounge(${x.id})">Delete</button></td>`:''}</tr>`).join('');
 }
 async function addLounge(){
  const f=document.getElementById('loungeDocument')?.files?.[0];let key='';if(f){key='lounge_'+Date.now();await GEFiles.put(key,f)}
@@ -605,7 +609,7 @@ function prepareEligibleConfirmation(parsed){
 function openWarningModal(message){
   const body=document.getElementById('eligibilityModalBody');
   body.innerHTML=`<div class="eligibility-result warning-scan"><div class="status-icon">!</div><h2>Perlu Verifikasi Manual</h2><p>${message}</p>
-    <div class="confirm-actions"><button class="btn secondary" onclick="closeEligibilityModal();document.getElementById('manualEntry')?.classList.add('show')">Buka Input Manual</button></div></div>`;
+    <div class="confirm-actions"><button class="ge-btn secondary" onclick="closeEligibilityModal();document.getElementById('manualEntry')?.classList.add('show')">Buka Input Manual</button></div></div>`;
   document.getElementById('eligibilityModal').classList.add('show');
 }
 
@@ -799,12 +803,12 @@ function renderLounges(){
  t.innerHTML=loungeFiltered().map((x,i)=>{
    const e=loungeExpiryClass(x);
    const doc=x.documentName
-    ? `<button class="btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Lampiran metadata tersedia, tetapi file belum tersimpan pada browser ini.')`}">Unduh</button><small>${x.documentName}</small>`
+    ? `<button class="ge-btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Lampiran metadata tersedia, tetapi file belum tersimpan pada browser ini.')`}">Download</button><small>${x.documentName}</small>`
     : '<span>-</span>';
    const actions=admin?`<td><div class="row-actions">
-      <button class="btn secondary" onclick="openLoungeEdit(${x.id})">Edit</button>
-      <label class="btn secondary" style="cursor:pointer">Upload<input type="file" style="display:none" onchange="uploadLoungeDocument(${x.id},this)"></label>
-      <button class="btn btn-danger" onclick="deleteLounge(${x.id})">Hapus</button>
+      <button class="ge-btn secondary" onclick="openLoungeEdit(${x.id})">Edit</button>
+      <label class="ge-btn secondary" style="cursor:pointer">Upload<input type="file" style="display:none" onchange="uploadLoungeDocument(${x.id},this)"></label>
+      <button class="ge-btn ge-btn danger" onclick="deleteLounge(${x.id})">Delete</button>
     </div></td>`:'';
    return `<tr class="${e.row}">
     <td>${i+1}</td><td><b>${x.name}</b></td><td>${x.pic||'-'}</td><td><b>${x.airport}</b></td>
@@ -1042,13 +1046,13 @@ function renderLounges(){
  t.innerHTML=loungeFiltered().map((x,i)=>{
   const e=loungeExpiryClass(x);
   const doc=x.documentName
-   ? `<button class="btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Lampiran file belum tersimpan pada browser ini.')`}">Unduh</button><small>${x.documentName}</small>`
+   ? `<button class="ge-btn secondary" onclick="${x.documentKey?`GEFiles.download('${x.documentKey}','${String(x.documentName).replaceAll("'","")}')`:`alert('Lampiran file belum tersimpan pada browser ini.')`}">Download</button><small>${x.documentName}</small>`
    : '<span>-</span>';
   const statusClass=String(x.documentStatus||'').toLowerCase().includes('tidak')||String(x.documentStatus||'').toLowerCase().includes('invalid')?'doc-status-invalid':'';
   const actions=admin?`<td><div class="row-actions">
-    <button class="btn secondary" onclick="openLoungeEdit(${x.id})">Edit</button>
-    <label class="btn secondary" style="cursor:pointer">Upload<input type="file" style="display:none" onchange="uploadLoungeDocument(${x.id},this)"></label>
-    <button class="btn btn-danger" onclick="deleteLounge(${x.id})">Hapus</button>
+    <button class="ge-btn secondary" onclick="openLoungeEdit(${x.id})">Edit</button>
+    <label class="ge-btn secondary" style="cursor:pointer">Upload<input type="file" style="display:none" onchange="uploadLoungeDocument(${x.id},this)"></label>
+    <button class="ge-btn ge-btn danger" onclick="deleteLounge(${x.id})">Delete</button>
    </div></td>`:'';
   return `<tr class="${e.row}">
    <td>${x.no??i+1}</td>
@@ -1184,116 +1188,6 @@ window.addEventListener('DOMContentLoaded',()=>{geBackfillHistoricalVisitorPrice
 
 
 /* ==============================================================
-   V2.10.2 — Universal table controls
-   Every table: 10 / 20 / 50 rows + clickable sortable headers.
-   The displayed "No" value stays attached to its original row.
-   ============================================================== */
-const GETableState = new WeakMap();
-
-function geComparable(text){
-  const s=String(text??'').trim();
-  const normalized=s.replace(/\s+/g,' ');
-  if(/^[-+]?\d+(?:[.,]\d+)?%?$/.test(normalized)){
-    return {type:'number', value:Number(normalized.replace('%','').replace(',','.'))};
-  }
-  const idDate=normalized.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-  if(idDate)return {type:'number',value:new Date(+idDate[3],+idDate[2]-1,+idDate[1]).getTime()};
-  const iso=normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(iso)return {type:'number',value:new Date(+iso[1],+iso[2]-1,+iso[3]).getTime()};
-  const currency=normalized.match(/^(IDR|USD|SGD|AUD|JPY|CNY|SAR|MYR)\s*([\d.,]+)/i);
-  if(currency)return {type:'number',value:Number(currency[2].replace(/[.,]/g,''))};
-  return {type:'text',value:normalized.toLocaleLowerCase('id-ID')};
-}
-function geCompare(a,b){
-  if(a.type==='number'&&b.type==='number')return a.value-b.value;
-  return String(a.value).localeCompare(String(b.value),'id',{numeric:true,sensitivity:'base'});
-}
-function geTableApply(table){
-  const state=GETableState.get(table); if(!state)return;
-  const tbody=table.tBodies[0]; if(!tbody)return;
-  const rows=[...tbody.rows];
-  const total=rows.length;
-  const pages=Math.max(1,Math.ceil(total/state.size));
-  state.page=Math.min(state.page,pages);
-  const start=(state.page-1)*state.size, end=start+state.size;
-  rows.forEach((r,i)=>r.style.display=(i>=start&&i<end)?'':'none');
-
-  const from=total?start+1:0, to=Math.min(end,total);
-  state.info.textContent=`Menampilkan ${from}–${to} dari ${total} data`;
-  state.pageInfo.textContent=`Halaman ${state.page} / ${pages}`;
-  state.prev.disabled=state.page<=1;
-  state.next.disabled=state.page>=pages;
-}
-function geTableSort(table,col,th){
-  const state=GETableState.get(table); if(!state)return;
-  const tbody=table.tBodies[0]; if(!tbody)return;
-  const dir=(state.sortCol===col && state.sortDir==='asc')?'desc':'asc';
-  state.sortCol=col; state.sortDir=dir; state.page=1;
-  [...table.tHead.querySelectorAll('th')].forEach(h=>{h.classList.remove('sort-asc','sort-desc');h.removeAttribute('aria-sort')});
-  th.classList.add(dir==='asc'?'sort-asc':'sort-desc');
-  th.setAttribute('aria-sort',dir==='asc'?'ascending':'descending');
-
-  const rows=[...tbody.rows].map((row,idx)=>({row,idx,key:geComparable(row.cells[col]?.innerText||'')}));
-  rows.sort((a,b)=>{const c=geCompare(a.key,b.key); return (c===0?a.idx-b.idx:c)*(dir==='asc'?1:-1)});
-  state.muting=true;
-  rows.forEach(x=>tbody.appendChild(x.row));
-  state.muting=false;
-  geTableApply(table);
-}
-function geEnhanceTable(table){
-  if(GETableState.has(table) || !table.tHead || !table.tBodies.length)return;
-  const wrap=table.closest('.table-scroll,.card')||table.parentElement;
-  const controls=document.createElement('div');
-  controls.className='table-controls';
-  controls.innerHTML=`<div class="table-size-control"><span>Tampilkan</span>
-    <select aria-label="Jumlah data per halaman"><option>10</option><option>20</option><option>50</option></select>
-    <span>data</span></div>
-    <div class="table-page-control"><span class="table-info"></span>
-      <button type="button" class="table-page-btn prev" aria-label="Halaman sebelumnya">‹</button>
-      <span class="table-page-info"></span>
-      <button type="button" class="table-page-btn next" aria-label="Halaman berikutnya">›</button>
-    </div>`;
-  wrap.insertBefore(controls,table);
-
-  const state={
-    size:10,page:1,sortCol:null,sortDir:null,muting:false,
-    info:controls.querySelector('.table-info'),
-    pageInfo:controls.querySelector('.table-page-info'),
-    prev:controls.querySelector('.prev'),
-    next:controls.querySelector('.next')
-  };
-  GETableState.set(table,state);
-  controls.querySelector('select').addEventListener('change',e=>{state.size=Number(e.target.value);state.page=1;geTableApply(table)});
-  state.prev.addEventListener('click',()=>{if(state.page>1){state.page--;geTableApply(table)}});
-  state.next.addEventListener('click',()=>{state.page++;geTableApply(table)});
-
-  [...table.tHead.querySelectorAll('th')].forEach((th,col)=>{
-    th.classList.add('sortable-th');
-    th.tabIndex=0;
-    th.title='Klik untuk mengurutkan data';
-    th.addEventListener('click',()=>geTableSort(table,col,th));
-    th.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();geTableSort(table,col,th)}});
-  });
-
-  const obs=new MutationObserver(()=>{
-    if(state.muting)return;
-    state.page=1;
-    requestAnimationFrame(()=>geTableApply(table));
-  });
-  obs.observe(table.tBodies[0],{childList:true});
-  geTableApply(table);
-}
-function geEnhanceAllTables(){
-  document.querySelectorAll('table').forEach(geEnhanceTable);
-}
-window.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(geEnhanceAllTables,0);
-  const pageObserver=new MutationObserver(()=>geEnhanceAllTables());
-  pageObserver.observe(document.body,{childList:true,subtree:true});
-});
-
-
-/* ==============================================================
    V2.10.5 — Lounge Access categories + required eligibility ref
              Lounge Visitor Admin/Super Admin update/delete
    ============================================================== */
@@ -1355,8 +1249,8 @@ function prepareEligibleConfirmation(parsed){
           <small>Wajib diisi untuk kategori yang memerlukan validasi membership, partnership, atau EMD.</small>
         </label>
         <div class="confirm-actions">
-          <button class="btn" onclick="recordEligibleVisitor()">Konfirmasi & Rekam Visitor</button>
-          <button class="btn secondary" onclick="closeEligibilityModal()">Batal</button>
+          <button class="ge-btn" onclick="recordEligibleVisitor()">Konfirmasi & Rekam Visitor</button>
+          <button class="ge-btn secondary" onclick="closeEligibilityModal()">Cancel</button>
         </div>
       </div>`}
   </div>`;
@@ -1442,7 +1336,7 @@ function renderLoungeVisitors(){
   <td>${x.airport}</td><td>${x.loungeName||'-'}</td><td>${x.category}</td>
   <td>${x.eligibilityReference||'-'}</td>
   <td class="price-cell">${x.priceDisplay||((x.currency&&x.pricePerPax)?`${x.currency} ${Number(x.pricePerPax).toLocaleString('en-US')}`:'Belum diisi')}</td>
-  ${canManage?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="geVisitorEdit('${x.id}')">Edit</button><button class="btn danger compact-btn" onclick="geVisitorDelete('${x.id}')">Hapus</button></td>`:''}
+  ${canManage?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="geVisitorEdit('${x.id}')">Edit</button><button class="ge-btn danger compact-btn" onclick="geVisitorDelete('${x.id}')">Delete</button></td>`:''}
  </tr>`).join('');
 
  const totals={};
@@ -1651,7 +1545,7 @@ function renderUserAccounts(){
  t.innerHTML=(data.users||[]).map((u,i)=>{
   const scope=u.scopeType==='ALL'?'All Area':u.scopeType==='LOUNGE'?`${(u.loungeIds||[]).length} Lounge`:u.scopeType==='AIRPORT'?(u.airports||[]).join(', '):(u.unit||'Custom');
   const tabs=(u.tabs||[]).includes('ALL')?'Semua TAB':(u.tabs||[]).map(v=>GE_TAB_OPTIONS.find(x=>x[0]===v)?.[1]||v).join(', ');
-  return `<tr><td>${i+1}</td><td><b>${u.name||'-'}</b></td><td>${u.employeeNo||'-'}</td><td>${u.username||'-'}</td><td>${u.email||'-'}</td><td>${u.role||'-'}</td><td>${u.unit||'-'}</td><td>${scope}</td><td>${tabs}</td><td><span class="pill">${u.status||'-'}${u.mustChangePassword?' • Change password':''}</span></td>${can?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openUserModal('${String(u.id).replace(/'/g,"\\\\'")}')">Edit</button><button class="btn secondary compact-btn" onclick="resetUserPassword('${String(u.id).replace(/'/g,"\\\\'")}')">Reset Password</button></td>`:''}</tr>`;
+  return `<tr><td>${i+1}</td><td><b>${u.name||'-'}</b></td><td>${u.employeeNo||'-'}</td><td>${u.username||'-'}</td><td>${u.email||'-'}</td><td>${u.role||'-'}</td><td>${u.unit||'-'}</td><td>${scope}</td><td>${tabs}</td><td><span class="pill">${u.status||'-'}${u.mustChangePassword?' • Change password':''}</span></td>${can?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openUserModal('${String(u.id).replace(/'/g,"\\\\'")}')">Edit</button><button class="ge-btn secondary compact-btn" onclick="resetUserPassword('${String(u.id).replace(/'/g,"\\\\'")}')">Reset Password</button></td>`:''}</tr>`;
  }).join('');
  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
@@ -1785,7 +1679,7 @@ function renderPersonnel(){
     <td>${i+1}</td><td>${x.employeeNo||'-'}</td><td><b>${x.name||'-'}</b></td>
     <td>${x.position||'-'}</td><td>${x.sitaCode||'-'}</td><td><b>${x.airport||'-'}</b></td>
     <td><span class="function-pill">${x.function||'-'}</span></td><td>${x.email||'-'}</td>
-    ${can?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openPersonnelModal(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deletePersonnel(${x.id})">Hapus</button></td>`:''}
+    ${can?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openPersonnelModal(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deletePersonnel(${x.id})">Delete</button></td>`:''}
   </tr>`).join('');
   if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
@@ -1853,7 +1747,7 @@ function renderUserAccounts(){
    const scope=u.scopeType==='ALL'?'ALL':u.scopeType==='LOUNGE'?'LOUNGE':u.scopeType==='AIRPORT'||u.scopeType==='STATION'?'AIRPORT':(u.scopeType||'CUSTOM');
    const assigned=(u.airports||[]).join(', ')||(u.loungeIds||[]).join(', ')||'—';
    const protectedUser=u.role==='Super Admin';
-   return `<tr><td>${i+1}</td><td><b>${geEsc(u.name||u.fullName||'-')}</b><small>${geEsc(u.employeeNo||'')}</small></td><td><b>${geEsc(u.username||'-')}</b><small>${geEsc(u.email||'-')}</small></td><td>${geEsc(u.role||'-')}</td><td>${geEsc(u.accessLevel||u.level||'-')}</td><td>${geEsc(u.unit||u.department||'-')}</td><td><b>${geEsc(scope)}</b></td><td>${geEsc(assigned)}</td><td><span class="pill">${geEsc(u.status||'-')}</span></td><td>${geEsc(u.lastLogin||u.lastLoginAt||'Not available')}</td>${can?`<td class="visitor-actions">${protectedUser?'<span class="pill">Protected</span>':`<button class="btn secondary compact-btn" onclick="openUserModal('${String(u.id).replace(/'/g,"\\'")}')">Edit</button><button class="btn secondary compact-btn" onclick="resetUserPassword('${String(u.id).replace(/'/g,"\\'")}')">Reset Password</button>`}</td>`:''}</tr>`;
+   return `<tr><td>${i+1}</td><td><b>${geEsc(u.name||u.fullName||'-')}</b><small>${geEsc(u.employeeNo||'')}</small></td><td><b>${geEsc(u.username||'-')}</b><small>${geEsc(u.email||'-')}</small></td><td>${geEsc(u.role||'-')}</td><td>${geEsc(u.accessLevel||u.level||'-')}</td><td>${geEsc(u.unit||u.department||'-')}</td><td><b>${geEsc(scope)}</b></td><td>${geEsc(assigned)}</td><td><span class="pill">${geEsc(u.status||'-')}</span></td><td>${geEsc(u.lastLogin||u.lastLoginAt||'Not available')}</td>${can?`<td class="visitor-actions">${protectedUser?'<span class="pill">Protected</span>':`<button class="ge-btn secondary compact-btn" onclick="openUserModal('${String(u.id).replace(/'/g,"\\'")}')">Edit</button><button class="ge-btn secondary compact-btn" onclick="resetUserPassword('${String(u.id).replace(/'/g,"\\'")}')">Reset Password</button>`}</td>`:''}</tr>`;
  }).join(''):`<tr><td colspan="11" class="ge-data-state-r13">Tidak ada akun pada Firestore yang sesuai filter.</td></tr>`;
  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
@@ -1883,7 +1777,7 @@ function renderDocumentsAdmin(){
  const ce=document.getElementById('docAdminCategory');if(ce){const cur=ce.value;ce.innerHTML='<option value="">Semua Kategori</option>'+cats.map(x=>`<option>${x}</option>`).join('');ce.value=cur}
  const se=document.getElementById('docAdminSource');if(se){const cur=se.value;se.innerHTML='<option value="">Semua Sumber</option>'+sources.map(x=>`<option>${x}</option>`).join('');se.value=cur}
  const rows=(data.documents||[]).filter(x=>(!q||`${x.title} ${x.fileName} ${x.note}`.toLowerCase().includes(q))&&(!cat||x.category===cat)&&(!src||x.source===src));
- box.innerHTML=rows.map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><div>${x.blobKey?`<button class="btn secondary" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')">Unduh</button>`:''} <button class="btn" data-role-min="Admin" onclick="deletePortalDocument(${x.id})">Hapus</button></div></div>`).join('');
+ box.innerHTML=rows.map(x=>`<div class="document-row"><div><b>${x.title}</b><small>${x.fileName}</small></div><span>${x.category}</span><span>${x.source}</span><span>${x.date}</span><div>${x.blobKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName).replaceAll("'","")}')">Download</button>`:''} <button class="ge-btn" data-role-min="Admin" onclick="deletePortalDocument(${x.id})">Delete</button></div></div>`).join('');
  if(typeof gxApplyRole==='function')gxApplyRole();
 }
 
@@ -2184,9 +2078,9 @@ function renderAdminInbox(){
  <td>${i+1}</td><td>${geDateTime(x.createdAt)}</td><td><span class="inbox-type">${geEsc(x.type||'-')}</span></td>
  <td><b>${geEsc(x.senderName||x.from||'-')}</b><small>${geEsc(x.senderRole||'')}</small></td><td>${geEsc(x.senderArea||x.area||'-')}</td><td>${geEsc(x.subject||x.title||'-')}</td>
  <td><span class="pill">${geEsc(x.status||'Unread')}</span></td><td class="inbox-actions">
- <button class="btn secondary compact-btn" data-inbox-open="${geEsc(x.id)}">Buka</button>
- ${x.type==='Article Proposal'&&x.status!=='Handled'?`<button class="btn compact-btn" data-inbox-review="${geEsc(x.id)}">Review</button>`:''}
- <button class="btn danger compact-btn" data-inbox-delete="${geEsc(x.id)}">Hapus</button>
+ <button class="ge-btn secondary compact-btn" data-inbox-open="${geEsc(x.id)}">Buka</button>
+ ${x.type==='Article Proposal'&&x.status!=='Handled'?`<button class="ge-btn compact-btn" data-inbox-review="${geEsc(x.id)}">Review</button>`:''}
+ <button class="ge-btn danger compact-btn" data-inbox-delete="${geEsc(x.id)}">Delete</button>
  </td></tr>`).join('')||'<tr><td colspan="8">Belum ada pesan sesuai filter.</td></tr>';
  if(!t.dataset.bound){t.dataset.bound='1';t.addEventListener('click',e=>{const row=e.target.closest('[data-inbox-id]');if(!row)return;const id=row.dataset.inboxId;if(e.target.closest('[data-inbox-delete]'))deleteInbox(id);else if(e.target.closest('[data-inbox-review]'))reviewProposal(id);else openInboxDetail(id)})}
  if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);renderAdminOverview();
@@ -2201,8 +2095,8 @@ async function openInboxDetail(id){
  body.innerHTML=`<div class="inbox-detail-head"><span class="inbox-type">${geEsc(x.type||'-')}</span><h2>${geEsc(x.subject||x.title||'-')}</h2>
  <p>Dari <b>${geEsc(x.senderName||x.from||'-')}</b> • ${geEsc(x.senderArea||x.area||'-')} • ${geDateTime(x.createdAt)}</p></div>
  <div class="inbox-body-content">${x.type==='Article Proposal'?geSanitizeHTML(x.body||''):`<p>${geEsc(x.body||x.message||'').replace(/\n/g,'<br>')}</p>`}</div>
- ${!support&&!['Task Assignment','System Notification'].includes(x.type)&&x.senderId&&x.recipientId?`<section class="ge-inbox-thread"><h3>Percakapan</h3><div id="inboxThreadHistory">Memuat percakapan…</div><label>Balasan<textarea id="inboxReplyText" rows="3" placeholder="Tulis balasan"></textarea></label><button type="button" class="btn" id="inboxReplySend">Kirim Balasan</button><p id="inboxReplyStatus" role="status"></p></section>`:''}
- <div class="modal-actions">${support&&related?`<button class="btn" id="inboxSupportOpen">Buka Percakapan</button>`:''}${x.type==='Article Proposal'&&x.status!=='Handled'?`<button class="btn" id="inboxReviewOpen">Review Artikel</button>`:''}${x.type==='Task Assignment'&&related?`<button class="btn" id="inboxTaskOpen">Lihat Task</button>`:''}<button class="btn secondary" id="inboxCloseButton">Tutup</button></div>`;
+ ${!support&&!['Task Assignment','System Notification'].includes(x.type)&&x.senderId&&x.recipientId?`<section class="ge-inbox-thread"><h3>Percakapan</h3><div id="inboxThreadHistory">Memuat percakapan…</div><label>Balasan<textarea id="inboxReplyText" rows="3" placeholder="Tulis balasan"></textarea></label><button type="button" class="ge-btn" id="inboxReplySend">Kirim Balasan</button><p id="inboxReplyStatus" role="status"></p></section>`:''}
+ <div class="modal-actions">${support&&related?`<button class="ge-btn" id="inboxSupportOpen">Buka Percakapan</button>`:''}${x.type==='Article Proposal'&&x.status!=='Handled'?`<button class="ge-btn" id="inboxReviewOpen">Review Artikel</button>`:''}${x.type==='Task Assignment'&&related?`<button class="ge-btn" id="inboxTaskOpen">Lihat Task</button>`:''}<button class="ge-btn secondary" id="inboxCloseButton">Close</button></div>`;
  if(body.querySelector('#inboxThreadHistory')){const history=body.querySelector('#inboxThreadHistory'),status=body.querySelector('#inboxReplyStatus');const load=async()=>{try{const messages=await window.GEStore.loadInboxThread(x.id);history.innerHTML=messages.map(m=>`<article><b>${geEsc(m.senderName||'Pengirim')}</b><small>${geDateTime(m.createdAt)}</small><p>${geEsc(m.body||m.message||'').replace(/\n/g,'<br>')}</p></article>`).join('')}catch(err){status.textContent='Percakapan belum dapat dimuat: '+err.message;history.textContent=''}};load();body.querySelector('#inboxReplySend').onclick=async e=>{const message=body.querySelector('#inboxReplyText').value.trim();if(!message)return; e.target.disabled=true;try{await window.GEStore.replyInbox(x.id,message);body.querySelector('#inboxReplyText').value='';status.textContent='Balasan terkirim.';await load()}catch(err){status.textContent='Balasan belum terkirim: '+err.message}finally{e.target.disabled=false}}}
  body.querySelector('#inboxSupportOpen')?.addEventListener('click',()=>{closeInboxDetail();openSupportConversation(related)});
  body.querySelector('#inboxReviewOpen')?.addEventListener('click',()=>{closeInboxDetail();reviewProposal(id)});
@@ -2291,15 +2185,15 @@ function renderArticles(){
   <div class="featured-image">${f.coverKey?`<img id="articleCover_${f.id}" alt="${geEsc(f.title)}">`:'<div class="article-cover-placeholder">GROUND EXPERIENCE</div>'}</div>
   <div class="featured-copy"><span>Artikel Utama</span><h2>${geEsc(f.title)}</h2><p>${geEsc(geExcerpt(f.content,260))}</p>
    <div class="content-meta">By ${geEsc(f.authorInitial||'-')} • Created by ${geEsc(f.createdBy||'-')} • ${geDateTime(f.createdAt)}</div>
-   <button class="btn" onclick="viewArticle(${f.id})">Selengkapnya</button>
-   ${geIsAdmin()?`<div class="content-manage"><button class="btn secondary compact-btn" onclick="openArticleEditor(${f.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteArticle(${f.id})">Hapus</button></div>`:''}
+   <button class="ge-btn" onclick="viewArticle(${f.id})">Selengkapnya</button>
+   ${geIsAdmin()?`<div class="content-manage"><button class="ge-btn secondary compact-btn" onclick="openArticleEditor(${f.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteArticle(${f.id})">Delete</button></div>`:''}
   </div></article>`;
  if(f.coverKey)geSetImageFromKey(document.getElementById('articleCover_'+f.id),f.coverKey);
  grid.innerHTML=rows.slice(1).map(x=>`<article class="article-card card">
   <div class="article-card-image">${x.coverKey?`<img id="articleCover_${x.id}" alt="${geEsc(x.title)}">`:'<div class="article-cover-placeholder small">GX</div>'}</div>
   <div><h3>${geEsc(x.title)}</h3><p>${geEsc(geExcerpt(x.content,145))} <button class="read-more-link" onclick="viewArticle(${x.id})">selengkapnya klik</button></p>
   <div class="content-meta">By ${geEsc(x.authorInitial||'-')} • ${geDateTime(x.createdAt)}</div>
-  ${geIsAdmin()?`<div class="content-manage"><button class="btn secondary compact-btn" onclick="openArticleEditor(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteArticle(${x.id})">Hapus</button></div>`:''}</div>
+  ${geIsAdmin()?`<div class="content-manage"><button class="ge-btn secondary compact-btn" onclick="openArticleEditor(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteArticle(${x.id})">Delete</button></div>`:''}</div>
  </article>`).join('');
  rows.slice(1).forEach(x=>{if(x.coverKey)geSetImageFromKey(document.getElementById('articleCover_'+x.id),x.coverKey)});
 }
@@ -2351,7 +2245,7 @@ function renderAnnouncements(){
  const box=document.getElementById('announcementList');if(!box)return;
  const rows=(data.announcements||[]).filter(x=>x.status==='Published').sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
  box.innerHTML=rows.map(x=>`<article class="announcement-card card"><div class="announcement-date">${geDateTime(x.createdAt)}</div><h3>${geEsc(x.title)}</h3><div>${geSanitizeHTML(x.content)}</div>
- ${geIsAdmin()?`<div class="content-manage"><button class="btn secondary compact-btn" onclick="openAnnouncementEditor(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteAnnouncement(${x.id})">Hapus</button></div>`:''}</article>`).join('');
+ ${geIsAdmin()?`<div class="content-manage"><button class="ge-btn secondary compact-btn" onclick="openAnnouncementEditor(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteAnnouncement(${x.id})">Delete</button></div>`:''}</article>`).join('');
 }
 function openAnnouncementEditor(id=null){if(!geIsAdmin())return;const x=id?(data.announcements||[]).find(v=>v.id===id):null;announcementEditId.value=x?.id||'';announcementTitle.value=x?.title||'';announcementContent.innerHTML=x?.content||'';announcementEditorTitle.textContent=x?'Edit Pengumuman':'Tambah Pengumuman';announcementEditorModal.classList.add('show')}
 function closeAnnouncementEditor(){announcementEditorModal?.classList.remove('show')}
@@ -2361,7 +2255,7 @@ function deleteAnnouncement(id){if(geIsAdmin()&&confirm('Hapus pengumuman ini?')
 /* ---------- FAQ ---------- */
 function renderFaqs(){
  const box=document.getElementById('faqList');if(!box)return;
- box.innerHTML=(data.faqs||[]).filter(x=>x.status==='Published').map(x=>`<details class="faq-item card"><summary>${geEsc(x.question)}</summary><p>${geEsc(x.answer).replace(/\n/g,'<br>')}</p>${geIsAdmin()?`<div class="content-manage"><button class="btn secondary compact-btn" onclick="openFaqEditor(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteFaq(${x.id})">Hapus</button></div>`:''}</details>`).join('');
+ box.innerHTML=(data.faqs||[]).filter(x=>x.status==='Published').map(x=>`<details class="faq-item card"><summary>${geEsc(x.question)}</summary><p>${geEsc(x.answer).replace(/\n/g,'<br>')}</p>${geIsAdmin()?`<div class="content-manage"><button class="ge-btn secondary compact-btn" onclick="openFaqEditor(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteFaq(${x.id})">Delete</button></div>`:''}</details>`).join('');
 }
 function openFaqEditor(id=null){if(!geIsAdmin())return;const x=id?(data.faqs||[]).find(v=>v.id===id):null;faqEditId.value=x?.id||'';faqQuestion.value=x?.question||'';faqAnswer.value=x?.answer||'';faqEditorTitle.textContent=x?'Edit FAQ':'Tambah FAQ';faqEditorModal.classList.add('show')}
 function closeFaqEditor(){faqEditorModal?.classList.remove('show')}
@@ -2370,11 +2264,11 @@ function deleteFaq(id){if(geIsAdmin()&&confirm('Hapus FAQ ini?')){data.faqs=data
 
 /* ---------- Contact / Guestbook ---------- */
 function supportActor(){const u=geAuditUser();return {id:String(u.uid||u.id||''),name:u.name||u.username||u.email||'User',area:u.unit||(u.airports||[]).join(', ')||''}}
-function supportList(){const holder=document.getElementById('supportConversations');if(!holder)return;holder.innerHTML='<h3>Percakapan Bantuan</h3>'+((data.contactMessages||[]).length?(data.contactMessages||[]).map(x=>`<button type="button" class="btn secondary" data-support-id="${geEsc(x.id)}" style="display:block;margin:8px 0;width:100%;text-align:left">${geEsc(x.subject||'Permintaan Bantuan')} · ${geEsc(x.status||'Open')}</button>`).join(''):'<p>Belum ada percakapan.</p>');holder.querySelectorAll('[data-support-id]').forEach(b=>b.onclick=()=>openSupportConversation(b.dataset.supportId))}
+function supportList(){const holder=document.getElementById('supportConversations');if(!holder)return;holder.innerHTML='<h3>Percakapan Bantuan</h3>'+((data.contactMessages||[]).length?(data.contactMessages||[]).map(x=>`<button type="button" class="ge-btn secondary" data-support-id="${geEsc(x.id)}" style="display:block;margin:8px 0;width:100%;text-align:left">${geEsc(x.subject||'Permintaan Bantuan')} · ${geEsc(x.status||'Open')}</button>`).join(''):'<p>Belum ada percakapan.</p>');holder.querySelectorAll('[data-support-id]').forEach(b=>b.onclick=()=>openSupportConversation(b.dataset.supportId))}
 function openSupportConversation(id){
  const x=(data.contactMessages||[]).find(v=>String(v.id)===String(id));if(!x){alert('Percakapan tidak tersedia atau akses Anda telah berubah.');return}
  let modal=document.getElementById('supportConversationModal');if(!modal){modal=document.createElement('div');modal.id='supportConversationModal';modal.className='modal-backdrop';modal.innerHTML='<div class="modal-card" style="max-width:720px;max-height:85vh;overflow:auto"><button type="button" class="modal-x" id="supportClose">×</button><div id="supportConversationBody"></div></div>';document.body.appendChild(modal);modal.querySelector('#supportClose').onclick=()=>modal.classList.remove('show')}
- modal.querySelector('#supportConversationBody').innerHTML=`<h2>${geEsc(x.subject)}</h2><p>${geEsc(x.senderName||'-')} · ${geEsc(x.senderArea||'-')}</p><div>${(x.messages||[]).map(m=>`<div class="card" style="padding:12px;margin:8px 0"><b>${geEsc(m.senderName||'User')}</b><small> · ${geDateTime(m.at)}</small><p>${geEsc(m.body||'').replace(/\n/g,'<br>')}</p></div>`).join('')}</div><form id="supportReplyForm"><label>Balasan<textarea id="supportReplyText" required rows="3"></textarea></label><button class="btn" type="submit">Kirim Balasan</button></form>`;
+ modal.querySelector('#supportConversationBody').innerHTML=`<h2>${geEsc(x.subject)}</h2><p>${geEsc(x.senderName||'-')} · ${geEsc(x.senderArea||'-')}</p><div>${(x.messages||[]).map(m=>`<div class="card" style="padding:12px;margin:8px 0"><b>${geEsc(m.senderName||'User')}</b><small> · ${geDateTime(m.at)}</small><p>${geEsc(m.body||'').replace(/\n/g,'<br>')}</p></div>`).join('')}</div><form id="supportReplyForm"><label>Balasan<textarea id="supportReplyText" required rows="3"></textarea></label><button class="ge-btn" type="submit">Kirim Balasan</button></form>`;
  modal.querySelector('#supportReplyForm').onsubmit=async e=>{e.preventDefault();const input=modal.querySelector('#supportReplyText'),reply=input.value.trim();if(!reply)return;const actor=supportActor(),button=e.target.querySelector('button');button.disabled=true;try{x.messages=[...(x.messages||[]),{actorId:actor.id,senderName:actor.name,body:reply,at:new Date().toISOString()}];window.GEStore.save(data);await window.GEStore.flush();openSupportConversation(id);supportList()}catch(error){x.messages.pop();alert('Balasan gagal disimpan: '+error.message)}finally{button.disabled=false}};
  modal.classList.add('show');
 }
@@ -2469,7 +2363,7 @@ function populateAirportMasterFilters(){
     e.value=cur;
   };
   fill('airportWilayahFilter','Semua Wilayah',rows.map(x=>x.wilayah));
-  fill('airportRegionFilter','Semua Region',rows.map(x=>x.region));
+  fill('airportRegionFilter','Semua Region',[...rows.map(x=>x.region),...(data.referenceCatalog||[]).filter(x=>x.kind==='id:regions'&&x.status!=='Inactive').map(x=>x.name||x.id)]);
 }
 function airportMasterFiltered(){
   const q=(document.getElementById('airportSearch')?.value||'').toLowerCase();
@@ -2503,7 +2397,7 @@ function renderAirports(){
 }
 
 /* ---------- Dynamic world map ---------- */
-let GE_MAP_REGION='';
+window.GE_MAP_REGION=window.GE_MAP_REGION||'';
 const GE_MAP_ZOOM={
   '':{scale:1,origin:'50% 50%',label:'World View'},
   'Domestik':{scale:3.25,origin:'82.5% 52%',label:'Indonesia / Domestic View'},
@@ -2520,7 +2414,7 @@ function geMapFilteredAirports(){
   const status=document.getElementById('mapStatusFilter')?.value||'';
   const pending=document.getElementById('mapPendingFilter')?.value||'';
   return geAirportVisibleRows().filter(a=>
-    (!GE_MAP_REGION||a.wilayah===GE_MAP_REGION)&&
+    (!window.GE_MAP_REGION||a.wilayah===window.GE_MAP_REGION)&&
     (!q||`${a.code} ${a.city} ${a.gm}`.toLowerCase().includes(q))&&
     (!status||a.status===status)&&
     (!pending||(pending==='pending'?a.pending>0:a.pending===0))
@@ -2571,9 +2465,9 @@ function selectAirport(code,marker){
     ${contractRows.length?`<div class="map-contract-mini"><span>Provider Lounge</span>${contractRows.slice(0,4).map(l=>`<div>${geEsc(l.name)}<b>${geContractNeedsFollowup(l)?'Follow-up':'OK'}</b></div>`).join('')}${contractRows.length>4?`<small>+${contractRows.length-4} provider lainnya</small>`:''}</div>`:''}`;
 }
 function filterAirportMap(region,button){
-  GE_MAP_REGION=region||'';
+  window.GE_MAP_REGION=region||'';
   document.querySelectorAll('.map-chip').forEach(x=>x.classList.remove('active'));button?.classList.add('active');
-  const cfg=GE_MAP_ZOOM[GE_MAP_REGION]||GE_MAP_ZOOM[''],stage=document.getElementById('mapStage');
+  const cfg=GE_MAP_ZOOM[window.GE_MAP_REGION]||GE_MAP_ZOOM[''],stage=document.getElementById('mapStage');
   if(stage){stage.style.transformOrigin=cfg.origin;stage.style.transform=`scale(${cfg.scale})`}
   const label=document.getElementById('mapZoomLabel');if(label)label.textContent=cfg.label;
   hideAirportTooltip();renderAirportMapMarkers();
@@ -2596,7 +2490,7 @@ const GE_MAP_VIEW_215={
 };
 function geApplyMapView(){
   const stage=document.getElementById('mapStage');if(!stage)return;
-  const cfg=GE_MAP_VIEW_215[GE_MAP_REGION]||GE_MAP_VIEW_215[''];
+  const cfg=GE_MAP_VIEW_215[window.GE_MAP_REGION]||GE_MAP_VIEW_215[''];
   const scale=Math.max(.85,Math.min(2.6,cfg.scale*GE_MAP_USER_ZOOM));
   stage.style.transformOrigin=cfg.origin;
   stage.style.transform=`scale(${scale})`;
@@ -2625,10 +2519,10 @@ function geUpdateMapRegionCounts(){
   });
 }
 function filterAirportMap(region,button){
-  GE_MAP_REGION=region||'';GE_MAP_USER_ZOOM=1;
+  window.GE_MAP_REGION=region||'';GE_MAP_USER_ZOOM=1;
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   if(button)button.classList.add('active');
-  document.querySelectorAll(`.map-chip[data-region="${GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
+  document.querySelectorAll(`.map-chip[data-region="${window.GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
   hideAirportTooltip();renderAirportMapMarkers();geApplyMapView();geUpdateMapRegionCounts();
 }
 function geMapPosition(lat,lon){
@@ -2685,7 +2579,7 @@ function geMapPosition(lat,lon){
 
 function geApplyMapView(){
   const stage=document.getElementById('mapStage'); if(!stage)return;
-  const cfg=GE_MAP_VIEW_216[GE_MAP_REGION]||GE_MAP_VIEW_216[''];
+  const cfg=GE_MAP_VIEW_216[window.GE_MAP_REGION]||GE_MAP_VIEW_216[''];
   const scale=Math.max(.82,Math.min(3.15,cfg.scale*GE_MAP_USER_ZOOM_216));
   stage.style.transformOrigin=cfg.origin;
   stage.style.transform=`scale(${scale})`;
@@ -2700,7 +2594,7 @@ function geMapZoomStep(direction){
 }
 function geMapResetView(){
   GE_MAP_USER_ZOOM_216=1;
-  GE_MAP_REGION='';
+  window.GE_MAP_REGION='';
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   document.querySelector('.map-region-cards button:first-child')?.classList.add('active');
   document.querySelector('.map-chip[data-region=""]')?.classList.add('active');
@@ -2709,12 +2603,12 @@ function geMapResetView(){
 }
 
 function filterAirportMap(region,button){
-  GE_MAP_REGION=region||'';
+  window.GE_MAP_REGION=region||'';
   GE_MAP_USER_ZOOM_216=1;
 
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   if(button)button.classList.add('active');
-  document.querySelectorAll(`.map-chip[data-region="${GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
+  document.querySelectorAll(`.map-chip[data-region="${window.GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
 
   hideAirportTooltip();
   renderAirportMapMarkers();
@@ -2829,7 +2723,7 @@ function geOpenAirportDetail217(code,marker){
     <div class="detail-row">Kontrak Lounge<b>${d.contracts} kontrak</b></div>
     <div class="detail-row">Pending Contract<b>${d.pending} item</b></div>
     <div class="detail-row">Koordinat<b>${Number(d.lat).toFixed(4)}, ${Number(d.lon).toFixed(4)}</b></div>
-    ${geIsSuperAdmin217()?`<div class="map-admin-note-v217">Pemindahan koordinat hanya aktif melalui tombol khusus ini.</div><button type="button" class="btn secondary compact-btn map-relocate-action-r104" onclick="geOpenMoveModal218('${d.code}',document.querySelector('.airport-marker[data-code=&quot;${d.code}&quot;]'))">Pindahkan Koordinat Station</button>`:''}
+    ${geIsSuperAdmin217()?`<div class="map-admin-note-v217">Pemindahan koordinat hanya aktif melalui tombol khusus ini.</div><button type="button" class="ge-btn secondary compact-btn map-relocate-action-r104" onclick="geOpenMoveModal218('${d.code}',document.querySelector('.airport-marker[data-code=&quot;${d.code}&quot;]'))">Pindahkan Koordinat Station</button>`:''}
     ${contractRows.length?`<div class="map-contract-mini"><span>Provider Lounge</span>${contractRows.slice(0,4).map(l=>`<div>${geEsc(l.name)}<b>${geContractNeedsFollowup(l)?'Follow-up':'OK'}</b></div>`).join('')}${contractRows.length>4?`<small>+${contractRows.length-4} provider lainnya</small>`:''}</div>`:''}`;
 }
 function selectAirport(code,marker){
@@ -3235,7 +3129,7 @@ function openPlanningRecordModal(type,id=null){
    }
    return`<label>${label}<input data-plan-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`;
   }).join('')
- }</div><div class="modal-actions sticky-actions"><button class="btn">Simpan</button><button type="button" class="btn secondary" onclick="closePlanningRecordModal()">Batal</button></div></form>`;
+ }</div><div class="modal-actions sticky-actions"><button class="ge-btn">Save</button><button type="button" class="ge-btn secondary" onclick="closePlanningRecordModal()">Cancel</button></div></form>`;
  document.getElementById('planningRecordModal').classList.add('show');
 }
 function closePlanningRecordModal(){document.getElementById('planningRecordModal')?.classList.remove('show')}
@@ -3250,11 +3144,16 @@ function savePlanningRecord(){
  if(id)Object.assign((data[coll]||[]).find(x=>x.id===id),obj);else data[coll].push(obj);
  save();closePlanningRecordModal();geRenderPlanningPage();
 }
-function deletePlanningRecord(type,id){
- if(!gePlanningCanManage()||!confirm('Hapus planning record ini?'))return;
- const coll=GE_PLANNING_COLLECTION[type];data[coll]=(data[coll]||[]).filter(x=>x.id!==id);save();geRenderPlanningPage();
+async function deletePlanningRecord(type,id){
+ if(!gePlanningCanManage())return;
+ const coll=GE_PLANNING_COLLECTION[type],x=(data[coll]||[]).find(v=>String(v.id)===String(id));
+ if(!x)return;
+ const label=x.name||x.product||x.airport||x.touchpoint||x.code||'Planning Record';
+ const ok=typeof geConfirmDeleteV234==='function'?await geConfirmDeleteV234({title:'Delete Data',item:label,message:'Data yang dihapus tidak dapat dikembalikan.',confirmLabel:'Delete',cancelLabel:'Cancel'}):window.confirm(`Delete ${label}?`);
+ if(!ok)return;
+ data[coll]=(data[coll]||[]).filter(v=>String(v.id)!==String(id));save();geRenderPlanningPage();
 }
-function planAction(type,id){return gePlanningCanManage()?`<td><button class="btn secondary compact-btn" onclick="openPlanningRecordModal('${type}',${id})">Edit</button><button class="btn danger compact-btn" onclick="deletePlanningRecord('${type}',${id})">Hapus</button></td>`:''}
+function planAction(type,id){return gePlanningCanManage()?`<td><button class="ge-btn secondary compact-btn" onclick="openPlanningRecordModal('${type}',${id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deletePlanningRecord('${type}',${id})">Delete</button></td>`:''}
 
 /* Landing */
 function renderPlanningOverview(){
@@ -3333,7 +3232,7 @@ function renderPlanningDocuments(){
  gePlanningPopulateSelect('planningDocCategory',rows.map(x=>x.category),'Semua Category');gePlanningPopulateSelect('planningDocAirport',rows.map(x=>x.airport||x.relatedAirport),'Semua Airport');
  const q=(planningDocSearch?.value||'').toLowerCase(),c=planningDocCategory?.value||'',a=planningDocAirport?.value||'';
  const filtered=rows.filter(x=>(!q||`${x.title} ${x.fileName} ${x.airport||''} ${x.relatedAirport||''}`.toLowerCase().includes(q))&&(!c||x.category===c)&&(!a||(x.airport||x.relatedAirport)===a));
- tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date||'-'}</td><td>${geEsc(x.category||'-')}</td><td><b>${geEsc(x.title||'-')}</b></td><td>${geEsc(x.airport||x.relatedAirport||'-')}</td><td>${geEsc(x.source||'-')}</td><td>${x.blobKey?`<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Unduh</button>`:geEsc(x.fileName||'-')}</td></tr>`).join('');
+ tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date||'-'}</td><td>${geEsc(x.category||'-')}</td><td><b>${geEsc(x.title||'-')}</b></td><td>${geEsc(x.airport||x.relatedAirport||'-')}</td><td>${geEsc(x.source||'-')}</td><td>${x.blobKey?`<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`:geEsc(x.fileName||'-')}</td></tr>`).join('');
  gePlanningEmpty('planningDocumentEmpty',filtered);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
 
@@ -3444,12 +3343,12 @@ function geEnsureStationMaterialViewR65(){
  <div class="data-filter-grid"><input id="materialSearch" placeholder="Cari kode, barang, atau provider" oninput="renderStationMaterials()"><select id="materialAreaFilterV231" onchange="renderStationMaterials()"><option value="">Semua Area</option></select><select id="materialVendorFilterV231" onchange="renderStationMaterials()"><option value="">Semua Vendor</option></select><select id="materialStatusFilter" onchange="renderStationMaterials()"><option value="">Semua Status</option></select></div>
  <div class="modal-actions" id="materialActionsR65"></div><div class="table-scroll"><table><thead><tr><th>No</th><th>Kode</th><th>Nama Barang</th><th>Area</th><th>Provider</th><th>Mulai</th><th>Berakhir</th><th>Status</th><th>Dokumen</th><th>Kelola</th></tr></thead><tbody id="stationMaterialRows"></tbody></table></div><div id="stationMaterialEmpty"></div>`;
  document.getElementById('planning-master')?.insertAdjacentElement('afterend',section);
- if(geAdminV231())document.getElementById('materialActionsR65').innerHTML='<button class="btn secondary" type="button" id="materialTemplateR65">Download Template CSV</button><button class="btn secondary" type="button" id="materialUploadR65">Upload Data</button><button class="btn" type="button" id="materialAddR65">+ Add Data</button>';
+ if(geAdminV231())document.getElementById('materialActionsR65').innerHTML='<button class="ge-btn secondary" type="button" id="materialTemplateR65">Download Template</button><button class="ge-btn secondary" type="button" id="materialUploadR65">Upload Data</button><button class="ge-btn" type="button" id="materialAddR65">+ Add Data</button>';
  document.getElementById('materialTemplateR65')?.addEventListener('click',()=>{const csv='Kode Barang,Nama Barang Cetak Kestasiunan,Area,Provider,Mulai,Berakhir,Status\r\n';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='station-material-template.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
  document.getElementById('materialUploadR65')?.addEventListener('click',()=>openBulkImportV223('station-material'));
  document.getElementById('materialAddR65')?.addEventListener('click',()=>openStationMaterialModalV231());
- document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="stationMaterialModalV231"><div class="modal-card"><button class="modal-x" type="button" onclick="closeStationMaterialModalV231()">×</button><h2 id="stationMaterialModalTitleV231">Station Material</h2><input id="stationMaterialEditIdV231" type="hidden"><div class="formgrid"><label>Kode Barang<input id="stationMaterialCodeV231"></label><label>Nama Barang<input id="stationMaterialNameV231"></label><label>Area<input id="stationMaterialAreaV231"></label><label>Provider<input id="stationMaterialVendorV231"></label><label>Periode<input id="stationMaterialPeriodV231"></label><label>Mulai<input id="stationMaterialStartV246" type="date"></label><label>Berakhir<input id="stationMaterialEndV246" type="date"></label><label>Status<input id="stationMaterialStatusV231"></label><label>Dokumen<input id="stationMaterialFileV231" type="file"></label></div><div class="modal-actions"><button class="btn" type="button" onclick="saveStationMaterialV231()">Simpan</button><button class="btn secondary" type="button" onclick="closeStationMaterialModalV231()">Batal</button></div></div></div>
- <div class="modal-backdrop" id="bulkImportModalV223"><div class="modal-card bulk-import-modal-v223"><button class="modal-x" type="button" onclick="closeBulkImportV223()">×</button><h2 id="bulkImportTitleV223">Upload Data</h2><p id="bulkImportHelpV223"></p><input id="bulkImportFileV223" type="file" accept=".csv,.xlsx" onchange="previewBulkImportV223(this.files[0])"><div id="bulkImportPreviewV223"></div><div class="modal-actions"><button class="btn" id="bulkImportConfirmV223" type="button" disabled onclick="confirmBulkImportV243()">Import Data</button><button class="btn secondary" type="button" onclick="closeBulkImportV223()">Batal</button></div></div></div>`);
+ document.body.insertAdjacentHTML('beforeend',`<div class="modal-backdrop" id="stationMaterialModalV231"><div class="modal-card"><button class="modal-x" type="button" onclick="closeStationMaterialModalV231()">×</button><h2 id="stationMaterialModalTitleV231">Station Material</h2><input id="stationMaterialEditIdV231" type="hidden"><div class="formgrid"><label>Kode Barang<input id="stationMaterialCodeV231"></label><label>Nama Barang<input id="stationMaterialNameV231"></label><label>Area<input id="stationMaterialAreaV231"></label><label>Provider<input id="stationMaterialVendorV231"></label><label>Periode<input id="stationMaterialPeriodV231"></label><label>Mulai<input id="stationMaterialStartV246" type="date"></label><label>Berakhir<input id="stationMaterialEndV246" type="date"></label><label>Status<input id="stationMaterialStatusV231"></label><label>Dokumen<input id="stationMaterialFileV231" type="file"></label></div><div class="modal-actions"><button class="ge-btn" type="button" onclick="saveStationMaterialV231()">Save</button><button class="ge-btn secondary" type="button" onclick="closeStationMaterialModalV231()">Cancel</button></div></div></div>
+ <div class="modal-backdrop" id="bulkImportModalV223"><div class="modal-card bulk-import-modal-v223"><button class="modal-x" type="button" onclick="closeBulkImportV223()">×</button><h2 id="bulkImportTitleV223">Upload Data</h2><p id="bulkImportHelpV223"></p><input id="bulkImportFileV223" type="file" accept=".csv,.xlsx" onchange="previewBulkImportV223(this.files[0])"><div id="bulkImportPreviewV223"></div><div class="modal-actions"><button class="ge-btn" id="bulkImportConfirmV223" type="button" disabled onclick="confirmBulkImportV243()">Import Data</button><button class="ge-btn secondary" type="button" onclick="closeBulkImportV223()">Cancel</button></div></div></div>`);
  const panel=new URLSearchParams(location.search).get('panel');if(panel==='material')section.scrollIntoView({block:'start'});
 }
 function geRenderPlanningPage(){
@@ -3465,7 +3364,7 @@ window.addEventListener('DOMContentLoaded',()=>{gxApplyNavigationV220();geRender
 function openInitiativeModalV221(){
   if(!(typeof gxCanManage==='function'&&gxCanManage()))return;
   const hidden=document.getElementById('journeyPageValue');
-  const journey=(hidden?.value||window.activeJourney||'Pre-Flight');
+  const journey=(hidden?.value||window.GE_ACTIVE_JOURNEY||window.activeJourney||'Pre-Flight');
   initiativeJourneyV221.value=journey||'Pre-Flight';
   initiativeNameV221.value='';initiativeTouchpointV221.value='';initiativeActivityV221.value='';
   initiativePlanV221.value='';initiativeRealV221.value='';initiativeRemarkV221.value='';
@@ -3707,7 +3606,7 @@ function geStorageNoticeV223(title,message,type='warning'){
       <h2 id="geStorageNoticeTitleV223"></h2>
       <p id="geStorageNoticeMessageV223"></p>
       <div class="modal-actions">
-        <button class="btn" onclick="document.getElementById('geStorageNoticeV223')?.classList.remove('show')">OK</button>
+        <button class="ge-btn" onclick="document.getElementById('geStorageNoticeV223')?.classList.remove('show')">OK</button>
       </div>
     </div>`;
     document.body.appendChild(modal);
@@ -4274,7 +4173,7 @@ window.addEventListener('DOMContentLoaded',()=>{geApplyBulkVisitorUIV223()});
    V2.24 — Initiative Governance, Due Date Warning & Timeline
    ============================================================== */
 function geInitiativeUserV224(){return typeof gxGetSession==='function'?(gxGetSession()||{}):{}}
-function geInitiativeAdminV224(){const u=geInitiativeUserV224();return u.role==='Super Admin'||(!['External User','External','Collaborator'].includes(u.role)&&(u.role==='Admin'||String(u.accessLevel||'')==='Admin'))}
+function geInitiativeAdminV224(){const u=geInitiativeUserV224(),role=String(u.role||'');return /^(Super Admin|Super Administrator)$/i.test(role)||(!['External User','External','Collaborator'].includes(role)&&(role==='Admin'||String(u.accessLevel||'')==='Admin'))}
 function geInitiativeCanProgressV224(){const u=geInitiativeUserV224();return geInitiativeAdminV224()||(!['External User','External','Collaborator'].includes(u.role)&&String(u.accessLevel||'')==='Editor')}
 function geInitiativeProgressAllowedV224(x){const u=geInitiativeUserV224();return geInitiativeCanProgressV224()&&geInitiativeScopedV224(x)&&(geInitiativeAdminV224()||String(x.createdByAccessLevel||'').toLowerCase()!=='admin'&&String(x.createdByRole||'')!=='Super Admin')}
 
@@ -4304,12 +4203,14 @@ function geDueLabelV224(x){
   return`<span class="due-badge">${d}</span>`;
 }
 function geInitiativeManageButtonsV224(x){
-  const parts=[`<button class="btn secondary compact-btn" onclick="openInitiativeTimelineV224(${x.id})">Detail / Timeline</button>`];
+  const listView=window.GE_INITIATIVE_VIEW==='list'||document.getElementById('geInitiativeViewSelect')?.value==='list';
+  const parts=[];
+  if(!listView)parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeTimelineV224(${x.id})">Detail / Timeline</button>`);
   if(geInitiativeAdminV224()){
-    parts.push(`<button class="btn secondary compact-btn" onclick="openInitiativeModalV224(${x.id})">Edit</button>`);
-    parts.push(`<button class="btn danger compact-btn" onclick="deleteInitiativeV224(${x.id})">Hapus</button>`);
-  }else if(geInitiativeProgressAllowedV224(x)){
-    parts.push(`<button class="btn secondary compact-btn" onclick="openInitiativeProgressV224(${x.id})">Edit Progress</button>`);
+    parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeModalV224(${x.id})">Update</button>`);
+    parts.push(`<button class="ge-btn danger compact-btn" onclick="deleteInitiativeV224(${x.id})">Delete</button>`);
+  }else if(!listView&&geInitiativeProgressAllowedV224(x)){
+    parts.push(`<button class="ge-btn secondary compact-btn" onclick="openInitiativeProgressV224(${x.id})">Edit Progress</button>`);
   }
   return `<div class="initiative-actions-v224">${parts.join('')}</div>`;
 }
@@ -4387,9 +4288,12 @@ function saveInitiativeV224(){
   save();closeInitiativeModalV224();renderInitiatives();
   geStorageNoticeV223('Inisiatif Tersimpan',`${obj.name} berhasil disimpan.`,'success');
 }
-function deleteInitiativeV224(id){
-  if(!geInitiativeAdminV224()||!confirm('Hapus inisiatif ini?'))return;
-  data.initiatives=data.initiatives.filter(x=>x.id!==id);save();renderInitiatives();
+async function deleteInitiativeV224(id){
+  if(!geInitiativeAdminV224())return;
+  const row=(data.initiatives||[]).find(x=>String(x.id)===String(id));
+  const ok=window.gePortalConfirm?await window.gePortalConfirm({title:'Delete Initiative',message:`Delete ${row?.name||'this initiative'}? This action cannot be undone.`,confirmLabel:'Delete',danger:true}):window.confirm('Delete this initiative?');
+  if(!ok)return;
+  data.initiatives=data.initiatives.filter(x=>String(x.id)!==String(id));save();renderInitiatives();
 }
 
 /* Staff / BO progress-only edit */
@@ -4438,7 +4342,7 @@ function geDocCardV227(d,kind,parentId,index){
       <div class="initiative-doc-file-v227">${geEsc(d.fileName||'Belum ada file')} ${d.version?`• ${geEsc(d.version)}`:''} <span class="doc-status-v227 ${String(d.status||'Current').toLowerCase()}">${geEsc(d.status||'Current')}</span></div>
       ${d.description?`<div class="initiative-doc-desc-v227">${geEsc(d.description)}</div>`:''}
     </div>
-    ${can?`<div class="initiative-doc-actions-v227"><button class="timeline-link-v224" onclick="openInitiativeDocumentV227(${parentId},'${kind}',${index})">Edit</button><button class="timeline-link-v224 danger" onclick="deleteInitiativeDocumentV227(${parentId},'${kind}',${index})">Hapus</button></div>`:''}
+    ${can?`<div class="initiative-doc-actions-v227"><button class="timeline-link-v224" onclick="openInitiativeDocumentV227(${parentId},'${kind}',${index})">Edit</button><button class="timeline-link-v224 danger" onclick="deleteInitiativeDocumentV227(${parentId},'${kind}',${index})">Delete</button></div>`:''}
   </div>`;
 }
 function geInitiativeDocumentsSectionV227(x){
@@ -4451,11 +4355,11 @@ function geInitiativeDocumentsSectionV227(x){
     <div class="initiative-doc-progress-v227"><i style="width:${r.pct}%"></i></div>
     <div class="initiative-doc-columns-v227">
       <section>
-        <div class="initiative-doc-column-head-v227"><div><h4>Dasar & Trigger Inisiatif</h4><p>Notice, IOC, memo, regulasi, temuan, arahan, atau correspondence yang memicu inisiatif.</p></div>${can?`<button class="btn secondary compact-btn" onclick="openInitiativeDocumentV227(${x.id},'trigger')">Tambah Dokumen</button>`:''}</div>
+        <div class="initiative-doc-column-head-v227"><div><h4>Dasar & Trigger Inisiatif</h4><p>Notice, IOC, memo, regulasi, temuan, arahan, atau correspondence yang memicu inisiatif.</p></div>${can?`<button class="ge-btn secondary compact-btn" onclick="openInitiativeDocumentV227(${x.id},'trigger')">Tambah Dokumen</button>`:''}</div>
         <div class="initiative-doc-list-v227">${x.triggerDocuments.length?x.triggerDocuments.map((d,i)=>geDocCardV227(d,'trigger',x.id,i)).join(''):'<div class="planning-empty">Belum ada dokumen trigger.</div>'}</div>
       </section>
       <section>
-        <div class="initiative-doc-column-head-v227"><div><h4>Dokumen Pelaksanaan</h4><p>PPA/FRA, TOR, kajian, BA, kontrak, BAST, dan dokumen pendukung lainnya.</p></div>${can?`<button class="btn secondary compact-btn" onclick="openInitiativeDocumentV227(${x.id},'supporting')">Tambah Dokumen</button>`:''}</div>
+        <div class="initiative-doc-column-head-v227"><div><h4>Dokumen Pelaksanaan</h4><p>PPA/FRA, TOR, kajian, BA, kontrak, BAST, dan dokumen pendukung lainnya.</p></div>${can?`<button class="ge-btn secondary compact-btn" onclick="openInitiativeDocumentV227(${x.id},'supporting')">Tambah Dokumen</button>`:''}</div>
         <div class="initiative-doc-list-v227">${x.supportingDocuments.length?x.supportingDocuments.map((d,i)=>geDocCardV227(d,'supporting',x.id,i)).join(''):'<div class="planning-empty">Belum ada dokumen pelaksanaan.</div>'}</div>
       </section>
     </div>
@@ -4512,8 +4416,9 @@ function saveInitiativeDocumentV227(){
   save();closeInitiativeDocumentV227();openInitiativeTimelineV224(id);
   geStorageNoticeV223('Dokumen Tersimpan',`${obj.type} berhasil dikaitkan dengan inisiatif.`,'success');
 }
-function deleteInitiativeDocumentV227(id,kind,index){
-  if(!geInitiativeAdminV224()||!confirm('Hapus dokumen dari inisiatif ini?'))return;
+async function deleteInitiativeDocumentV227(id,kind,index){
+  if(!geInitiativeAdminV224())return;
+  const ok=window.gePortalConfirm?await window.gePortalConfirm({title:'Delete Initiative Document',message:'Delete this document from the initiative? This action cannot be undone.',confirmLabel:'Delete',danger:true}):false;if(!ok)return;
   const x=(data.initiatives||[]).find(v=>v.id===id);if(!x)return;
   geInitDocsV227(x);
   (kind==='trigger'?x.triggerDocuments:x.supportingDocuments).splice(index,1);
@@ -4533,7 +4438,7 @@ function openInitiativeTimelineV224(id){
     <div class="initiative-detail-head-v224">
       <div><span class="eyebrow">Initiative Detail</span><h2>${geEsc(x.name)}</h2>
       <p>${geEsc(x.tp)} • ${geEsc(x.airport||'All Airport')} • PIC ${geEsc(x.pic||'-')}</p></div>
-      ${geInitiativeAdminV224()?`<button class="btn" onclick="openInitiativeStepV224(${x.id})">Tambah Tahapan</button>`:''}
+      ${geInitiativeAdminV224()?`<button class="ge-btn" onclick="openInitiativeStepV224(${x.id})">Add Milestone</button>`:''}
     </div>
     <div class="initiative-detail-kpi-v224">
       <div><span>Target</span><b>${Number(x.plan||0)}%</b></div>
@@ -4548,7 +4453,7 @@ function openInitiativeTimelineV224(id){
           <div class="timeline-marker-v224"><span>${i+1}</span></div>
           <div class="timeline-card-v224">
             <div class="timeline-card-head-v224"><div><h4>${geEsc(s.title||'Tahapan')}</h4><span>${geEsc(s.status||'Not Started')}</span></div>
-            ${geInitiativeAdminV224()?`<div><button class="timeline-link-v224" onclick="openInitiativeStepV224(${x.id},${i})">Edit</button><button class="timeline-link-v224 danger" onclick="deleteInitiativeStepV224(${x.id},${i})">Hapus</button></div>`:''}</div>
+            ${geInitiativeAdminV224()?`<div><button class="timeline-link-v224" onclick="openInitiativeStepV224(${x.id},${i})">Edit</button><button class="timeline-link-v224 danger" onclick="deleteInitiativeStepV224(${x.id},${i})">Delete</button></div>`:''}</div>
             <div class="timeline-meta-v224"><span>PIC <b>${geEsc(s.pic||'-')}</b></span><span>Due <b>${s.dueDate||'-'}</b></span></div>
             ${s.remark?`<p>${geEsc(s.remark)}</p>`:''}
           </div>
@@ -4585,11 +4490,13 @@ function saveInitiativeStepV224(){
   if(idx==='')x.workflow.push(obj);else x.workflow[Number(idx)]=obj;
   save();closeInitiativeStepV224();openInitiativeTimelineV224(id);
 }
-function deleteInitiativeStepV224(id,index){
-  if(!geInitiativeAdminV224()||!confirm('Hapus tahapan ini?'))return;
+async function deleteInitiativeStepV224(id,index){
+  if(!geInitiativeAdminV224())return;
+  const ok=window.gePortalConfirm?await window.gePortalConfirm({title:'Delete Milestone',message:'Delete this milestone? This action cannot be undone.',confirmLabel:'Delete',danger:true}):false;if(!ok)return;
   const x=(data.initiatives||[]).find(v=>v.id===id);if(!x)return;
   x.workflow.splice(index,1);save();openInitiativeTimelineV224(id);
 }
+window.deleteInitiativeStepV224=deleteInitiativeStepV224;
 
 /* Updated CSV — Initiative + Milestone visibility */
 exportCSV=function(){
@@ -4828,7 +4735,7 @@ renderPlanningDocuments = function(){
     <td>${geEsc(x.source||'-')}</td>
     <td>${
       x.blobKey
-        ? `<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Unduh</button>`
+        ? `<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`
         : geEsc(x.fileName||'-')
     }</td>
   </tr>`).join('');
@@ -5045,7 +4952,7 @@ renderAirports=function(){
   <td>${a.no||i+1}</td><td><b>${geEsc(a.code)}</b></td><td>${geEsc(a.city)}</td><td>${geEsc(a.wilayah)}</td><td>${geEsc(a.region||'-')}</td>
   <td>${can?`<select class="inline-status-select ${a.status==='Inactive'?'inactive':''}" onchange="geSetAirportStatus('${a.code}',this.value)"><option ${a.status==='Active'?'selected':''}>Active</option><option ${a.status==='Inactive'?'selected':''}>Inactive</option></select>`:`<span class="pill">${geEsc(a.status)}</span>`}</td>
   <td>${geEsc(a.gm)}</td><td>${Number(a.visitorLounge).toLocaleString('id-ID')}</td><td>${a.contracts}</td><td>${a.pending?`<span class="pending-count">${a.pending}</span>`:'<span class="clear-count">0</span>'}</td>
-  ${can?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openAirportModalV231(${a.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteAirportV231(${a.id})">Hapus</button></td>`:''}
+  ${can?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openAirportModalV231(${a.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteAirportV231(${a.id})">Delete</button></td>`:''}
  </tr>`).join('');
  const all=geAirportVisibleRows(),set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
  set('airportMasterTotal',all.length);set('airportMasterActive',all.filter(x=>x.status==='Active').length);set('airportMasterInactive',all.filter(x=>x.status==='Inactive').length);
@@ -5077,7 +4984,7 @@ renderStationMaterials=function(){
  gePlanningPopulateSelect('materialAreaFilterV231',rows.map(x=>x.area),'Semua Area');gePlanningPopulateSelect('materialVendorFilterV231',rows.map(x=>x.vendor),'Semua Vendor');gePlanningPopulateSelect('materialStatusFilter',rows.map(x=>x.status),'Semua Status');
  const q=(materialSearch?.value||'').toLowerCase(),a=materialAreaFilterV231?.value||'',v=materialVendorFilterV231?.value||'',s=materialStatusFilter?.value||'';
  const filtered=rows.filter(x=>(!q||`${x.code} ${x.product} ${x.vendor}`.toLowerCase().includes(q))&&(!a||x.area===a)&&(!v||x.vendor===v)&&(!s||x.status===s));
- tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.code)}</b></td><td>${geEsc(x.product)}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.vendor||'-')}</td><td>${geEsc(x.contractPeriod||'-')}</td><td><span class="planning-status">${geEsc(x.status||'-')}</span></td><td>${x.documentKey?`<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.documentKey}','${String(x.documentName||'document').replaceAll("'","")}')">Unduh</button>`:geEsc(x.documentName||'-')}</td>${geAdminV231()?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openStationMaterialModalV231(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteStationMaterialV231(${x.id})">Hapus</button></td>`:''}</tr>`).join('');
+ tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.code)}</b></td><td>${geEsc(x.product)}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.vendor||'-')}</td><td>${geEsc(x.contractPeriod||'-')}</td><td><span class="planning-status">${geEsc(x.status||'-')}</span></td><td>${x.documentKey?`<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.documentKey}','${String(x.documentName||'document').replaceAll("'","")}')">Download</button>`:geEsc(x.documentName||'-')}</td>${geAdminV231()?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openStationMaterialModalV231(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteStationMaterialV231(${x.id})">Delete</button></td>`:''}</tr>`).join('');
  gePlanningEmpty('stationMaterialEmpty',filtered);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 };
 
@@ -5103,7 +5010,7 @@ renderAirportSystems=function(){
  gePlanningPopulateSelect('systemAirportFilter',rows.map(x=>x.airport),'Semua Airport');gePlanningPopulateSelect('systemProviderFilterV231',rows.map(x=>x.provider),'Semua Provider');gePlanningPopulateSelect('systemAreaFilterV231',rows.map(x=>x.area),'Semua Area');
  const q=(systemSearch?.value||'').toLowerCase(),a=systemAirportFilter?.value||'',p=systemProviderFilterV231?.value||'',ar=systemAreaFilterV231?.value||'';
  const filtered=rows.filter(x=>(!q||`${x.airport} ${x.provider} ${x.checkin} ${x.boardingGate}`.toLowerCase().includes(q))&&(!a||x.airport===a)&&(!p||x.provider===p)&&(!ar||x.area===ar));
- tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.airport)}</b></td><td>${geEsc(x.sbd||'-')}</td><td>${geEsc(x.kiosk||'-')}</td><td>${geEsc(x.checkin||'-')}</td><td>${geEsc(x.boardingGate||'-')}</td><td>${geEsc(x.transferDesk||'-')}</td><td>${geEsc(x.provider||'-')}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.remarks||'-')}</td>${geAdminV231()?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openAirportSystemModalV231(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteAirportSystemV231(${x.id})">Hapus</button></td>`:''}</tr>`).join('');
+ tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.airport)}</b></td><td>${geEsc(x.sbd||'-')}</td><td>${geEsc(x.kiosk||'-')}</td><td>${geEsc(x.checkin||'-')}</td><td>${geEsc(x.boardingGate||'-')}</td><td>${geEsc(x.transferDesk||'-')}</td><td>${geEsc(x.provider||'-')}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.remarks||'-')}</td>${geAdminV231()?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openAirportSystemModalV231(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteAirportSystemV231(${x.id})">Delete</button></td>`:''}</tr>`).join('');
  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('systemTotalV231',rows.length);set('systemKioskV231',rows.filter(x=>String(x.kiosk).toLowerCase().includes('tersedia')).length);set('systemSbdV231',rows.filter(x=>String(x.sbd).toLowerCase().includes('tersedia')).length);set('systemMcoV231',rows.filter(x=>String(x.provider).toUpperCase()==='MCO').length);
  gePlanningEmpty('airportSystemEmpty',filtered);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 };
@@ -5127,7 +5034,7 @@ function openGasoModalV231(type,id=null){
  gasoModalFormV231.innerHTML=`<form onsubmit="event.preventDefault();saveGasoV231()"><div class="formgrid">${GE_GASO_FIELDS_V231[type].map(([key,label,kind])=>{
   const val=x?.[key]??'';if(kind==='textarea')return`<label>${label}<textarea data-gaso-field="${key}" rows="3">${geEsc(val)}</textarea></label>`;
   if(kind.startsWith('select:'))return`<label>${label}<select data-gaso-field="${key}">${kind.slice(7).split('|').map(o=>`<option ${val===o?'selected':''}>${o}</option>`).join('')}</select></label>`;
-  return`<label>${label}<input data-gaso-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`}).join('')}</div><div class="modal-actions sticky-actions"><button class="btn">Simpan</button><button type="button" class="btn secondary" onclick="closeGasoModalV231()">Batal</button></div></form>`;
+  return`<label>${label}<input data-gaso-field="${key}" type="${kind}" value="${geEsc(val)}"></label>`}).join('')}</div><div class="modal-actions sticky-actions"><button class="ge-btn">Save</button><button type="button" class="ge-btn secondary" onclick="closeGasoModalV231()">Cancel</button></div></form>`;
  gasoModalV231.classList.add('show');
 }
 function closeGasoModalV231(){gasoModalV231?.classList.remove('show')}
@@ -5138,7 +5045,7 @@ function saveGasoV231(){
  if(id)Object.assign(data[coll].find(x=>x.id===id),obj);else data[coll].push(obj);save();closeGasoModalV231();renderGasoAllV231();
 }
 function deleteGasoV231(type,id){if(!geAdminV231())return;const coll=GE_GASO_COLLECTION_V231[type],x=data[coll].find(v=>v.id===id);if(!x||!geDeleteConfirmV231(x.code||'GASO record'))return;data[coll]=data[coll].filter(v=>v.id!==id);save();renderGasoAllV231()}
-function gasoActionsV231(type,id){return geAdminV231()?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openGasoModalV231('${type}',${id})">Edit</button><button class="btn danger compact-btn" onclick="deleteGasoV231('${type}',${id})">Hapus</button></td>`:''}
+function gasoActionsV231(type,id){return geAdminV231()?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openGasoModalV231('${type}',${id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteGasoV231('${type}',${id})">Delete</button></td>`:''}
 function renderGasoMasterV231(){
  const t=document.getElementById('gasoMasterRowsV231');if(!t)return;const rows=data.gasoMaster||[];gePlanningPopulateSelect('gasoMasterRegionV231',rows.map(x=>x.region),'Semua Region');
  const q=(gasoMasterSearchV231?.value||'').toLowerCase(),r=gasoMasterRegionV231?.value||'',s=gasoMasterStatusV231?.value||'',f=rows.filter(x=>(!q||`${x.code} ${x.officeName} ${x.city} ${x.pic}`.toLowerCase().includes(q))&&(!r||x.region===r)&&(!s||x.status===s));
@@ -5201,7 +5108,7 @@ renderPlanningDocuments=function(){
  const tbody=document.getElementById('planningDocumentRows');if(!tbody)return;const rows=typeof gePlanningDocumentsV229==='function'?gePlanningDocumentsV229():(data.documents||[]);
  gePlanningPopulateSelect('planningDocCategory',rows.map(x=>x.category),'Semua Category');gePlanningPopulateSelect('planningDocAirport',rows.map(x=>x.airport),'Semua Airport');
  const q=(planningDocSearch?.value||'').toLowerCase(),c=planningDocCategory?.value||'',a=planningDocAirport?.value||'',filtered=rows.filter(x=>(!q||`${x.title} ${x.fileName} ${x.reference||''} ${x.source||''} ${x.airport||''}`.toLowerCase().includes(q))&&(!c||x.category===c)&&(!a||x.airport===a));
- tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date||'-'}</td><td>${geEsc(x.category||'-')}</td><td><b>${geEsc(x.title||'-')}</b>${x.reference?`<div class="planning-doc-ref-v229">${geEsc(x.reference)}</div>`:''}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.source||'-')}</td><td>${x.blobKey?`<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Unduh</button>`:(x.fileName?`<button class="btn secondary compact-btn" disabled title="File binary belum tersimpan">${geEsc(x.fileName)}</button>`:'-')}</td>${geAdminV231()?`<td><button class="btn secondary compact-btn" onclick="geStorageNoticeV223('Dokumen Planning','Edit/hapus dokumen dilakukan pada modul sumber: ${String(x.source||'Document Master').replaceAll("'","")}.')">Kelola di Sumber</button></td>`:''}</tr>`).join('');
+ tbody.innerHTML=filtered.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date||'-'}</td><td>${geEsc(x.category||'-')}</td><td><b>${geEsc(x.title||'-')}</b>${x.reference?`<div class="planning-doc-ref-v229">${geEsc(x.reference)}</div>`:''}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.source||'-')}</td><td>${x.blobKey?`<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.blobKey}','${String(x.fileName||'document').replaceAll("'","")}')">Download</button>`:(x.fileName?`<button class="ge-btn secondary compact-btn" disabled title="File binary belum tersimpan">${geEsc(x.fileName)}</button>`:'-')}</td>${geAdminV231()?`<td><button class="ge-btn secondary compact-btn" onclick="geStorageNoticeV223('Dokumen Planning','Edit/hapus dokumen dilakukan pada modul sumber: ${String(x.source||'Document Master').replaceAll("'","")}.')">Kelola di Sumber</button></td>`:''}</tr>`).join('');
  gePlanningEmpty('planningDocumentEmpty',filtered);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 };
 
@@ -5365,7 +5272,7 @@ function renderPurchaseV232(){
     return(!q||`${x.name} ${x.flight} ${x.reference}`.toLowerCase().includes(q))&&(!a||x.airport===a)&&(!st||x.status===st);
   });
   gePlanningPopulateSelect('purchaseAirportFilterV232',(data.loungePurchases||[]).map(x=>x.airport),'Semua Airport');
-  tbody.innerHTML=rows.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date}</td><td>${x.time}</td><td><b>${geEsc(x.name)}</b></td><td>${geEsc(x.flight||'-')}</td><td>${geEsc(x.airport)}</td><td>${geEsc(x.serviceName||'-')}</td><td>${geEsc(x.accessType)}</td><td>${geEsc(x.reference||'-')}</td><td>${geEsc(x.currency)} ${Number(x.amount||0).toLocaleString('id-ID')}</td><td>${geEsc(x.status)}</td><td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openPurchaseModalV232(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deletePurchaseV232(${x.id})">Hapus</button></td></tr>`).join('');
+  tbody.innerHTML=rows.map((x,i)=>`<tr><td>${i+1}</td><td>${x.date}</td><td>${x.time}</td><td><b>${geEsc(x.name)}</b></td><td>${geEsc(x.flight||'-')}</td><td>${geEsc(x.airport)}</td><td>${geEsc(x.serviceName||'-')}</td><td>${geEsc(x.accessType)}</td><td>${geEsc(x.reference||'-')}</td><td>${geEsc(x.currency)} ${Number(x.amount||0).toLocaleString('id-ID')}</td><td>${geEsc(x.status)}</td><td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openPurchaseModalV232(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deletePurchaseV232(${x.id})">Delete</button></td></tr>`).join('');
   const all=data.loungePurchases||[],set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
   set('purchaseTotalV232',all.length);set('purchasePaidV232',all.filter(x=>x.status==='Paid').length);set('purchasePendingV232',all.filter(x=>x.status==='Pending').length);set('purchaseAirportCountV232',new Set(all.map(x=>x.airport)).size);
   gePlanningEmpty('purchaseEmptyV232',rows);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
@@ -5408,7 +5315,7 @@ function geRestoreNavGroupsV233(){
 }
 function geSetMobileDrawerV233(open){
   document.body.classList.toggle('mobile-nav-open-v233',!!open);
-  const b=document.getElementById('mobileNavTriggerV233');
+  const b=document.getElementById('mobileNavTrigger');
   if(b){
     b.setAttribute('aria-expanded',open?'true':'false');
     b.textContent=open?'×':'☰';
@@ -5439,7 +5346,7 @@ function geInitNavigationV233(){
     try{document.body.classList.toggle('side-hidden',geUiGet('GE_SIDE_HIDDEN')==='true')}catch(e){}
   }
 
-  document.getElementById('mobileNavTriggerV233')?.addEventListener('click',e=>{
+  document.getElementById('mobileNavTrigger')?.addEventListener('click',e=>{
     e.preventDefault();e.stopPropagation();toggleSidebar();
   });
 
@@ -5467,7 +5374,7 @@ function geInitNavigationV233(){
   /* Tap outside closes mobile drawer. */
   document.addEventListener('click',e=>{
     if(!geIsMobileV233()||!document.body.classList.contains('mobile-nav-open-v233'))return;
-    if(e.target.closest('.side')||e.target.closest('#mobileNavTriggerV233'))return;
+    if(e.target.closest('.side')||e.target.closest('#mobileNavTrigger'))return;
     geSetMobileDrawerV233(false);
   });
 
@@ -5531,8 +5438,8 @@ function geConfirmDeleteV234(options={}){
           <p class="ge-delete-item-v234" id="geDeleteItemV234"></p>
           <p class="ge-delete-message-v234" id="geDeleteMessageV234"></p>
           <div class="ge-delete-actions-v234">
-            <button class="btn secondary ge-delete-cancel-v234" type="button"></button>
-            <button class="btn danger ge-delete-confirm-v234" type="button"></button>
+            <button class="ge-btn secondary ge-delete-cancel-v234" type="button"></button>
+            <button class="ge-btn danger ge-delete-confirm-v234" type="button"></button>
           </div>
         </div>`;
       document.body.appendChild(modal);
@@ -5854,7 +5761,7 @@ verifyBoardingPass=function(){
   if(parsed.indicator==='?')return geStorageNoticeV223('Eligibility Tidak Ditemukan','Indicator Y/N tidak ditemukan pada data boarding pass.');
   if(parsed.indicator==='N'){
     eligibilityModalBody.innerHTML=`<div class="lounge-denied-v236"><div class="status-icon">×</div><h2>Tidak Eligible Lounge</h2>${geParsedPassengerGridV236(parsed)}
-    <p>Akses Lounge/Tenant tidak dapat diberikan berdasarkan indicator eligibility.</p><div class="modal-actions"><button class="btn secondary" onclick="closeEligibilityModal();boardingScan.focus()">Scan Ulang</button><button class="btn" onclick="closeEligibilityModal()">Tutup</button></div></div>`;
+    <p>Akses Lounge/Tenant tidak dapat diberikan berdasarkan indicator eligibility.</p><div class="modal-actions"><button class="ge-btn secondary" onclick="closeEligibilityModal();boardingScan.focus()">Scan Ulang</button><button class="ge-btn" onclick="closeEligibilityModal()">Close</button></div></div>`;
     eligibilityModal.classList.add('show');return;
   }
   prepareEligibleConfirmation(parsed);
@@ -5866,7 +5773,7 @@ verifyManualPassenger=function(){
   parsed.route=parsed.origin&&parsed.destination?`${parsed.origin}-${parsed.destination}`:'';parsed.indicator=geEligibilityFromCabinMemberV236(parsed.cabin,parsed.member);
   if(!parsed.name||!parsed.flight||!parsed.seq||!parsed.cabin)return geStorageNoticeV223('Data Manual Belum Lengkap','Nama, Flight Number, Cabin, dan Sequence wajib diisi.');
   showPassengerPreview(parsed,parsed.indicator);
-  if(parsed.indicator!=='Y'){eligibilityModalBody.innerHTML=`<div class="lounge-denied-v236"><div class="status-icon">×</div><h2>Tidak Eligible Lounge</h2>${geParsedPassengerGridV236(parsed)}<p>Eligibility dihitung otomatis dari Cabin dan Member.</p><div class="modal-actions"><button class="btn" onclick="closeEligibilityModal()">Tutup</button></div></div>`;eligibilityModal.classList.add('show');return}
+  if(parsed.indicator!=='Y'){eligibilityModalBody.innerHTML=`<div class="lounge-denied-v236"><div class="status-icon">×</div><h2>Tidak Eligible Lounge</h2>${geParsedPassengerGridV236(parsed)}<p>Eligibility dihitung otomatis dari Cabin dan Member.</p><div class="modal-actions"><button class="ge-btn" onclick="closeEligibilityModal()">Close</button></div></div>`;eligibilityModal.classList.add('show');return}
   prepareEligibleConfirmation(parsed);
 };
 function geCategoryReferenceLabelV236(category){if(category==='Kerjasama MPA')return'Nama Maskapai / Mitra';if(category==='EMD')return'Nomor EMD';return'Nomor Member'}
@@ -5874,13 +5781,13 @@ prepareEligibleConfirmation=function(parsed){
   window._eligibleScan=parsed;const duplicate=isDuplicateVisitor(parsed);
   if(duplicate){
     eligibilityModalBody.innerHTML=`<div class="lounge-denied-v236 duplicate-v236"><div class="status-icon">!</div><h2>Duplicate Visitor</h2>${geParsedPassengerGridV236(parsed)}
-    <p>Kombinasi Nama Penumpang + Flight Number + Sequence Check-in sudah pernah direkam.</p><div class="modal-actions"><button class="btn" onclick="closeEligibilityModal()">Tutup</button></div></div>`;
+    <p>Kombinasi Nama Penumpang + Flight Number + Sequence Check-in sudah pernah direkam.</p><div class="modal-actions"><button class="ge-btn" onclick="closeEligibilityModal()">Close</button></div></div>`;
   }else{
     const initial=parsed.cabin==='C'?'Business Class':(['Platinum','Elite Plus'].includes(parsed.member)?parsed.member:'Business Class');
     eligibilityModalBody.innerHTML=`<div class="lounge-eligible-v236"><div class="lounge-modal-success-v236">✓</div><h2>Eligible Lounge/Tenant</h2><p>Konfirmasi kategori penumpang sebelum visitor direkam.</p>
     ${geParsedPassengerGridV236(parsed)}<div class="lounge-category-box-v236"><label>Kategori Penumpang<select id="eligibleCategoryV236" onchange="geEligibilityCategoryChangedV236()">${GE_LOUNGE_FINAL_CATEGORIES_V236.map(x=>`<option ${x===initial?'selected':''}>${x}</option>`).join('')}</select></label>
     <label id="eligibleReferenceWrapV236" style="display:none"><span id="eligibleReferenceLabelV236">Nomor Member</span><input id="eligibleReferenceV236"></label></div>
-    <div class="modal-actions"><button class="btn lounge-primary-v236" onclick="recordEligibleVisitorV236()">Konfirmasi & Rekam Visitor</button><button class="btn secondary" onclick="closeEligibilityModal()">Batal</button></div></div>`;
+    <div class="modal-actions"><button class="ge-btn lounge-primary-v236" onclick="recordEligibleVisitorV236()">Konfirmasi & Rekam Visitor</button><button class="ge-btn secondary" onclick="closeEligibilityModal()">Cancel</button></div></div>`;
     setTimeout(geEligibilityCategoryChangedV236,0);
   }
   eligibilityModal.classList.add('show');
@@ -5950,7 +5857,7 @@ renderLoungeVisitors=function(){
     <td>${geEsc(x.route||((x.origin&&x.destination)?x.origin+'-'+x.destination:'-'))}</td><td>${geEsc(x.flight||'-')}</td>
     <td>${geEsc(x.cabin||'-')} / ${geEsc(x.seat||'-')}</td><td>${geEsc(x.seq||'-')}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.loungeName||'-')}</td>
     <td>${geEsc(x.category||'-')}</td><td>${geEsc(x.eligibilityReference||'-')}</td><td class="price-cell">${x.priceDisplay||((x.currency&&x.pricePerPax)?`${x.currency} ${Number(x.pricePerPax).toLocaleString('id-ID')}`:'Belum diisi')}</td>
-    ${admin?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openVisitorEdit(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteVisitor(${x.id})">Hapus</button></td>`:''}</tr>`).join('');
+    ${admin?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openVisitorEdit(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteVisitor(${x.id})">Delete</button></td>`:''}</tr>`).join('');
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};set('visitorCount',rows.length);set('visitorBusiness',rows.filter(x=>x.category==='Business Class').length);set('visitorTier',rows.filter(x=>x.category!=='Business Class').length);set('visitorFilteredTotal',rows.length);
   if(typeof renderVisitorCostSummary==='function')renderVisitorCostSummary(rows);if(typeof renderVisitorTrafficV232==='function')renderVisitorTrafficV232();if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 };
@@ -5982,7 +5889,7 @@ function renderFlightsV236(){
   const tbody=document.getElementById('flightRowsV236');if(!tbody)return;const all=(data.flightSchedule||[]).filter(geFlightVisibleV236),q=(flightSearchV236?.value||'').toLowerCase(),a=flightAirportV236?.value||'',s=flightStatusFilterV236?.value||'',d=flightDateFilterV236?.value||'';
   const rows=all.filter(x=>(!q||`${x.flight} ${x.from}-${x.to}`.toLowerCase().includes(q))&&(!a||(x.from===a||x.to===a))&&(!s||x.status===s)&&(!d||x.date===d));
   gePlanningPopulateSelect('flightAirportV236',[...all.map(x=>x.from),...all.map(x=>x.to)],'Semua Airport');gePlanningPopulateSelect('flightStatusFilterV236',all.map(x=>x.status),'Semua Status');
-  tbody.innerHTML=rows.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.flight)}</b></td><td>${geEsc(x.from)}-${geEsc(x.to)}</td><td>${x.date}</td><td>${x.std||'-'}</td><td>${x.etd||'-'}</td><td>${Number(x.capacity||0).toLocaleString('id-ID')}</td><td><span class="flight-status-v236 ${String(x.status||'').toLowerCase().replace(/\s+/g,'-')}">${geEsc(x.status||'-')}</span></td><td>${geCanManageFlightsV236()?`<div class="visitor-actions"><button class="btn secondary compact-btn" onclick="openFlightModalV236(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteFlightV236(${x.id})">Hapus</button></div>`:'-'}</td></tr>`).join('');gePlanningEmpty('flightEmptyV236',rows);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
+  tbody.innerHTML=rows.map((x,i)=>`<tr><td>${i+1}</td><td><b>${geEsc(x.flight)}</b></td><td>${geEsc(x.from)}-${geEsc(x.to)}</td><td>${x.date}</td><td>${x.std||'-'}</td><td>${x.etd||'-'}</td><td>${Number(x.capacity||0).toLocaleString('id-ID')}</td><td><span class="flight-status-v236 ${String(x.status||'').toLowerCase().replace(/\s+/g,'-')}">${geEsc(x.status||'-')}</span></td><td>${geCanManageFlightsV236()?`<div class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openFlightModalV236(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteFlightV236(${x.id})">Delete</button></div>`:'-'}</td></tr>`).join('');gePlanningEmpty('flightEmptyV236',rows);if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0);
 }
 let GE_FLIGHT_BULK_ROWS_V236=[];
 function openFlightBulkV236(){if(!geCanManageFlightsV236())return;GE_FLIGHT_BULK_ROWS_V236=[];flightBulkFileV236.value='';flightBulkPreviewV236.innerHTML='Belum ada file dipilih.';flightBulkConfirmV236.disabled=true;flightBulkModalV236.classList.add('show')}
@@ -6052,12 +5959,12 @@ function renderLoungeCardsV237(){
         <dl><div><dt>Periode kerja sama</dt><dd>${geEsc(x.startDate||x.contractStart||x.start||'-')} — ${geEsc(x.endDate||x.contractEnd||x.end||'-')}</dd></div>
         <div><dt>Harga per pax</dt><dd>${geEsc(geLoungePriceV237(x))}</dd></div></dl>
         <div class="lounge-card-actions-v237">
-          ${typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="btn secondary compact-btn" onclick="openLoungeEdit?.(${Number(x.id)})">Edit</button>`:''}
+          ${typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn secondary compact-btn" onclick='openLoungeEdit?.(${JSON.stringify(String(x.id))})'>Edit</button>`:''}
         </div>
       </div>
     </article>`;
   }).join('') || '<div class="lounge-master-empty-v237">Belum ada data Lounge/Tenant pada filter ini.</div>';
-  const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Halaman ${GE_LOUNGE_CARD_PAGE_V237} dari ${pages} • ${rows.length} data`;
+  const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Page ${GE_LOUNGE_CARD_PAGE_V237} of ${pages} • ${rows.length} data`;
   const prev=document.getElementById('loungeCardPrevV237'),next=document.getElementById('loungeCardNextV237');
   if(prev)prev.disabled=GE_LOUNGE_CARD_PAGE_V237<=1;if(next)next.disabled=GE_LOUNGE_CARD_PAGE_V237>=pages;
 }
@@ -6082,7 +5989,7 @@ function geManualFallbackMarkupV238(){
       <label>Sequence Check-in<input id="manualSeq" placeholder="107"></label><label>Ticket Number<input id="manualTicket" placeholder="126xxxxxxxxxxx"></label>
       <label>Member<select id="manualMember"><option value="">Tidak Ada / Lainnya</option><option>Platinum</option><option>Elite Plus</option></select></label>
     </div><div class="scanner-note lounge-note-v236">Eligibility dihitung otomatis: Cabin C/Business = Eligible. Cabin Y/Economy = Eligible untuk Platinum atau Elite Plus; kombinasi lain = Tidak Eligible.</div>
-    <div class="scan-actions"><button class="btn lounge-primary-v236" onclick="verifyManualPassenger()">Verifikasi Data Manual</button><button class="btn secondary" onclick="resetLoungeAccess()">Batal</button></div></div>`;
+    <div class="scan-actions"><button class="ge-btn lounge-primary-v236" onclick="verifyManualPassenger()">Verifikasi Data Manual</button><button class="ge-btn secondary" onclick="resetLoungeAccess()">Cancel</button></div></div>`;
 }
 toggleManualEntry=function(){
   stopCameraScanner?.();
@@ -6119,9 +6026,9 @@ resetLoungeAccess=function(){
 function deleteLoungeV239(id){
   if(!(typeof gePlanningCanAction==='function'?gePlanningCanAction('Delete'):(typeof geIsAdmin==='function'&&geIsAdmin()))) return;
   const x=(data.lounges||[]).find(a=>String(a.id)===String(id)); if(!x)return;
-  const run=()=>{data.lounges=(data.lounges||[]).filter(a=>String(a.id)!==String(id));save();renderLounges();renderLoungeCardsV237();};
-  if(typeof geConfirmDeleteV234==='function') geConfirmDeleteV234({title:'Hapus Lounge/Tenant?',item:x.name||'Lounge/Tenant',message:'Data master, harga, periode kerja sama, dan referensi layanan ini akan dihapus.'}).then(ok=>{if(ok)run()});
-  else if(confirm(`Hapus ${x.name||'Lounge/Tenant'}?`)) run();
+  const run=()=>{data.lounges=(data.lounges||[]).filter(a=>String(a.id)!==String(id));save();renderLounges();renderLoungeCardsV237();geStorageNoticeV223?.('Record Deleted',`${x.name||'Lounge/Tenant'} was deleted successfully.`,'success');};
+  if(typeof geConfirmDeleteV234==='function') geConfirmDeleteV234({title:'Delete Lounge/Tenant?',item:x.name||'Lounge/Tenant',message:'Master data, pricing, agreement period, and service references will be deleted.'}).then(ok=>{if(ok)run()});
+  else if(typeof window.gePortalConfirm==='function') window.gePortalConfirm({title:'Delete Record',message:`Delete ${x.name||'Lounge/Tenant'}? This action cannot be undone.`,confirmLabel:'Delete',cancelLabel:'Cancel',danger:true}).then(ok=>{if(ok)run()});
 }
 window.deleteLoungeV239=deleteLoungeV239;
 const GE_RENDER_CARDS_V239=renderLoungeCardsV237;
@@ -6132,7 +6039,7 @@ renderLoungeCardsV237=function(){
   document.querySelectorAll('#loungeCardGridV237 .lounge-master-card-v237').forEach((card,i)=>{
     const x=rows[start+i]; if(!x)return;
     const actions=card.querySelector('.lounge-card-actions-v237');
-    if(actions && !actions.querySelector('.danger')) actions.insertAdjacentHTML('beforeend',`<button class="btn danger compact-btn" onclick="deleteLoungeV239(${Number(x.id)})">Hapus</button>`);
+    if(actions && !actions.querySelector('.danger')) actions.insertAdjacentHTML('beforeend',`<button class="ge-btn danger compact-btn" onclick='deleteLoungeV239(${JSON.stringify(String(x.id))})'>Delete</button>`);
   });
 };
 
@@ -6256,10 +6163,11 @@ function gePopulateLoungeProviderFilterV243(){
 }
 loungeFiltered=function(){
   const region=document.getElementById('loungeRegionFilter')?.value||'';
-  const station=document.getElementById('loungeAirportFilter')?.value||'';
+  const stationEl=document.getElementById('loungeAirportFilter');
+  const stationValue=String(stationEl?.value||'').toUpperCase();
   const provider=document.getElementById('loungeNameFilter')?.value||'';
   const status=document.getElementById('loungeStatusFilter')?.value||'';
-  return (data.lounges||[]).filter(x=>(!region||x.region===region)&&(!station||x.airport===station)&&(!provider||String(x.name||'')===provider)&&(!status||x.documentStatus===status));
+  return (data.lounges||[]).filter(x=>(!region||String(x.region||'')===region)&&(!stationValue||stationValue===String(x.airport||x.station||x.stationCode||'').toUpperCase())&&(!provider||String(x.name||'')===provider)&&(!status||String(x.documentStatus||'')===status));
 };
 geLoungeCardSourceV237=function(){return loungeFiltered()};
 
@@ -6309,7 +6217,7 @@ renderLoungeProcurement=function(){
   tbody.innerHTML=filtered.map((x,i)=>{
     const b=geBudgetApprovalForLounge({airport:x.airport,name:x.serviceName}),f=geServiceFollowupV243(x);
     const actions=gePlanningCanManage()
-      ? (x._source==='service'?`<td class="visitor-actions"><button class="btn secondary compact-btn" onclick="openServiceProcurementModalV243(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteServiceProcurementV243(${x.id})">Hapus</button></td>`:`<td><a class="btn secondary compact-btn" href="lounge-list.html">Kelola di Lounge Master</a></td>`)
+      ? (x._source==='service'?`<td class="visitor-actions"><button class="ge-btn secondary compact-btn" onclick="openServiceProcurementModalV243(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteServiceProcurementV243(${x.id})">Delete</button></td>`:`<td><a class="ge-btn secondary compact-btn" href="lounge-list.html">Kelola di Lounge Master</a></td>`)
       :'';
     return `<tr><td>${i+1}</td><td><b>${geEsc(x.airport||'-')}</b></td><td>${geEsc(x.categoryService||'-')}</td><td>${geEsc(x.serviceName||'-')}</td><td>${geEsc(geServicePriceV243(x))}</td><td>${geEsc(x.startDate||'-')} — ${geEsc(x.endDate||'-')}</td><td><span class="planning-status">${f?'Follow-up':'Covered'}</span></td><td>${b?geEsc(b.title):'Belum terhubung'}</td><td>${geEsc(x.documentNumber||x.documentName||'-')}</td>${actions}</tr>`;
   }).join('');
@@ -6628,7 +6536,7 @@ function geApplyMapView(){
   const viewport=document.getElementById('mapViewport');
   if(!stage||!viewport)return;
 
-  const cfg=GE_MAP_PRESET_V245[GE_MAP_REGION]||GE_MAP_PRESET_V245[''];
+  const cfg=GE_MAP_PRESET_V245[window.GE_MAP_REGION]||GE_MAP_PRESET_V245[''];
   const scale=Math.max(1,Math.min(3.20,cfg.base*GE_MAP_ZOOM_V245));
 
   const w=viewport.clientWidth||1, h=viewport.clientHeight||1;
@@ -6650,7 +6558,7 @@ function geMapZoomStep(direction){
 }
 function geMapResetView(){
   GE_MAP_ZOOM_V245=1;
-  GE_MAP_REGION='';
+  window.GE_MAP_REGION='';
   window.GEActiveMapRegion='';
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   document.querySelector('.map-region-cards button:first-child')?.classList.add('active');
@@ -6660,12 +6568,12 @@ function geMapResetView(){
   geApplyMapView();
 }
 function filterAirportMap(region,button){
-  GE_MAP_REGION=region||'';
-  window.GEActiveMapRegion=GE_MAP_REGION;
+  window.GE_MAP_REGION=region||'';
+  window.GEActiveMapRegion=window.GE_MAP_REGION;
   GE_MAP_ZOOM_V245=1;
   document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));
   button?.classList.add('active');
-  document.querySelectorAll(`.map-chip[data-region="${GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
+  document.querySelectorAll(`.map-chip[data-region="${window.GE_MAP_REGION}"]`).forEach(x=>x.classList.add('active'));
   hideAirportTooltip();
   renderAirportMapMarkers();
   geApplyMapView();
@@ -6863,13 +6771,13 @@ saveInitiativeProgressV224=function(){const id=Number(initiativeProgressIdV224?.
 /* Station Material V2.46: start/end period and warning */
 const GE_OPEN_SM_V246=openStationMaterialModalV231;
 openStationMaterialModalV231=function(id=null){GE_OPEN_SM_V246(id);const x=id?(data.stationMaterials||[]).find(v=>v.id===id):null;if(document.getElementById('stationMaterialStartV246'))stationMaterialStartV246.value=x?.startDate||'';if(document.getElementById('stationMaterialEndV246'))stationMaterialEndV246.value=x?.endDate||''};
-renderStationMaterials=function(){const tbody=document.getElementById('stationMaterialRows');if(!tbody)return;gePlanningPopulateSelect('materialAreaFilterV231',(data.stationMaterials||[]).map(x=>x.area),'Semua Area');gePlanningPopulateSelect('materialVendorFilterV231',(data.stationMaterials||[]).map(x=>x.vendor),'Semua Provider');const q=(materialSearch?.value||'').toLowerCase(),a=materialAreaFilterV231?.value||'',v=materialVendorFilterV231?.value||'',s=materialStatusFilter?.value||'';const rows=(data.stationMaterials||[]).filter(x=>(!q||`${x.code} ${x.product} ${x.vendor}`.toLowerCase().includes(q))&&(!a||x.area===a)&&(!v||x.vendor===v)&&(!s||x.status===s));tbody.innerHTML=rows.map((x,i)=>{const w=geMonthsWarningV246(x.endDate);return `<tr class="contract-row-v246 ${w.cls}"><td>${i+1}</td><td><b>${geEsc(x.code||'')}</b></td><td>${geEsc(x.product||'')}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.vendor||'-')}</td><td>${x.startDate||'-'}</td><td><b>${x.endDate||'-'}</b><small class="contract-label-v246">${w.label}</small></td><td>${geEsc(x.status||'-')}</td><td>${x.documentKey?`<button class="btn secondary compact-btn" onclick="GEFiles.download('${x.documentKey}','${geEsc(x.documentName||'document')}')">Unduh</button>`:'-'}</td>${geAdminV231()?`<td><div class="manage-inline-v246"><button class="btn secondary compact-btn" onclick="openStationMaterialModalV231(${x.id})">Edit</button><button class="btn danger compact-btn" onclick="deleteStationMaterialV231(${x.id})">Hapus</button></div></td>`:''}</tr>`}).join('');if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0)};
+renderStationMaterials=function(){const tbody=document.getElementById('stationMaterialRows');if(!tbody)return;gePlanningPopulateSelect('materialAreaFilterV231',(data.stationMaterials||[]).map(x=>x.area),'Semua Area');gePlanningPopulateSelect('materialVendorFilterV231',(data.stationMaterials||[]).map(x=>x.vendor),'Semua Provider');const q=(materialSearch?.value||'').toLowerCase(),a=materialAreaFilterV231?.value||'',v=materialVendorFilterV231?.value||'',s=materialStatusFilter?.value||'';const rows=(data.stationMaterials||[]).filter(x=>(!q||`${x.code} ${x.product} ${x.vendor}`.toLowerCase().includes(q))&&(!a||x.area===a)&&(!v||x.vendor===v)&&(!s||x.status===s));tbody.innerHTML=rows.map((x,i)=>{const w=geMonthsWarningV246(x.endDate);return `<tr class="contract-row-v246 ${w.cls}"><td>${i+1}</td><td><b>${geEsc(x.code||'')}</b></td><td>${geEsc(x.product||'')}</td><td>${geEsc(x.area||'-')}</td><td>${geEsc(x.vendor||'-')}</td><td>${x.startDate||'-'}</td><td><b>${x.endDate||'-'}</b><small class="contract-label-v246">${w.label}</small></td><td>${geEsc(x.status||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary compact-btn" onclick="GEFiles.download('${x.documentKey}','${geEsc(x.documentName||'document')}')">Download</button>`:'-'}</td>${geAdminV231()?`<td><div class="manage-inline-v246"><button class="ge-btn secondary compact-btn" onclick="openStationMaterialModalV231(${x.id})">Edit</button><button class="ge-btn danger compact-btn" onclick="deleteStationMaterialV231(${x.id})">Delete</button></div></td>`:''}</tr>`}).join('');if(typeof geEnhanceAllTables==='function')setTimeout(geEnhanceAllTables,0)};
 /* Announcement library */
 window.geAnnouncementLibraryV246=[
  {id:'preboarding',title:'Pre-Boarding Announcement',touchpoint:'Boarding Gate',type:'Group Boarding',variants:['Narrow Body','Wide Body'],languages:['Bahasa Indonesia','English'],summary:'Announcement sebelum boarding dimulai, termasuk prioritas dan urutan boarding group.',groups:['Priority — special assistance, infant/children, elderly, expectant mother','Group 1 — Business / premium frequent flyer priority','Group 2 — priority frequent flyer / priority service','Group 3–6 — Economy berdasarkan seat zone']},
  {id:'boarding',title:'Boarding Announcement',touchpoint:'Boarding Gate',type:'Group Boarding',variants:['Narrow Body','Wide Body'],languages:['Bahasa Indonesia','English'],summary:'Announcement saat proses boarding dimulai dengan urutan priority dan boarding group.',groups:['Priority Boarding','Group 1','Group 2','Group 3','Group 4','Group 5','Group 6']}
 ];
-function renderAnnouncementLibraryV246(){const box=document.getElementById('announcementLibraryV246');if(!box)return;const q=(document.getElementById('announcementSearchV246')?.value||'').toLowerCase(),type=document.getElementById('announcementTypeV246')?.value||'',aircraft=document.getElementById('announcementAircraftV246')?.value||'',lang=document.getElementById('announcementLanguageV246')?.value||'';const rows=geAnnouncementLibraryV246.filter(x=>(!q||`${x.title} ${x.touchpoint} ${x.type}`.toLowerCase().includes(q))&&(!type||x.touchpoint===type)&&(!aircraft||x.variants.includes(aircraft))&&(!lang||x.languages.includes(lang)));box.innerHTML=rows.map((x,i)=>`<article class="announcement-card-v246"><div class="announcement-no-v246">${String(i+1).padStart(2,'0')}</div><div><span class="eyebrow">${geEsc(x.touchpoint)} • ${geEsc(x.type)}</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.summary)}</p><div class="announcement-tags-v246">${x.variants.map(v=>`<span>${v}</span>`).join('')}${x.languages.map(v=>`<span>${v}</span>`).join('')}</div><button class="btn secondary compact-btn" onclick="openAnnouncementReferenceV246('${x.id}')">Buka Announcement</button></div></article>`).join('')};
+function renderAnnouncementLibraryV246(){const box=document.getElementById('announcementLibraryV246');if(!box)return;const q=(document.getElementById('announcementSearchV246')?.value||'').toLowerCase(),type=document.getElementById('announcementTypeV246')?.value||'',aircraft=document.getElementById('announcementAircraftV246')?.value||'',lang=document.getElementById('announcementLanguageV246')?.value||'';const rows=geAnnouncementLibraryV246.filter(x=>(!q||`${x.title} ${x.touchpoint} ${x.type}`.toLowerCase().includes(q))&&(!type||x.touchpoint===type)&&(!aircraft||x.variants.includes(aircraft))&&(!lang||x.languages.includes(lang)));box.innerHTML=rows.map((x,i)=>`<article class="announcement-card-v246"><div class="announcement-no-v246">${String(i+1).padStart(2,'0')}</div><div><span class="eyebrow">${geEsc(x.touchpoint)} • ${geEsc(x.type)}</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.summary)}</p><div class="announcement-tags-v246">${x.variants.map(v=>`<span>${v}</span>`).join('')}${x.languages.map(v=>`<span>${v}</span>`).join('')}</div><button class="ge-btn secondary compact-btn" onclick="openAnnouncementReferenceV246('${x.id}')">Buka Announcement</button></div></article>`).join('')};
 function openAnnouncementReferenceV246(id){const x=geAnnouncementLibraryV246.find(v=>v.id===id);if(!x)return;document.getElementById('announcementReferenceTitleV246').textContent=x.title;document.getElementById('announcementReferenceBodyV246').innerHTML=`<div class="announcement-reference-head-v246"><span>${x.touchpoint}</span><span>${x.type}</span></div><p>${geEsc(x.summary)}</p><h4>Urutan / Struktur Announcement</h4><div class="announcement-sequence-v246">${x.groups.map((g,i)=>`<div><b>${String(i+1).padStart(2,'0')}</b><span>${geEsc(g)}</span></div>`).join('')}</div><div class="announcement-note-v246">Script lengkap mengikuti master announcement resmi yang dikelola pada modul ini.</div>`;document.getElementById('announcementReferenceModalV246').classList.add('show')}
 function closeAnnouncementReferenceV246(){document.getElementById('announcementReferenceModalV246')?.classList.remove('show')}
 window.addEventListener('DOMContentLoaded',()=>{renderAnnouncementLibraryV246()});
@@ -7239,8 +7147,8 @@ function geApplyStandardContentV248(){
 
 function geEnsureStandardModalV248(){
   if(document.getElementById('standardContentModalV248')){gePromoteModalViewportV248(document.getElementById('standardContentModalV248'));gePromoteModalViewportV248(document.getElementById('announcementEditModalV248'));return}
-  document.body.insertAdjacentHTML('beforeend',`<div id="standardContentModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseStandardContentModalV248()">×</button><h2 id="standardContentModalTitleV248">Kelola Konten</h2><input type="hidden" id="standardContentModeV248"><input type="hidden" id="standardContentKeyV248"><div id="standardContentFieldsV248" class="formgrid"></div><div class="modal-actions sticky-actions"><button class="btn" onclick="geSaveStandardContentV248()">Simpan</button><button class="btn secondary" onclick="geCloseStandardContentModalV248()">Batal</button></div></div></div>
-  <div id="announcementEditModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseAnnouncementEditV248()">×</button><h2 id="announcementEditTitleV248">Tambah Announcement</h2><input type="hidden" id="announcementEditIdV248"><div class="formgrid"><label>Judul<input id="annTitleV248"></label><label>Touch Point<input id="annTouchpointV248"></label><label>Jenis / Type<input id="annTypeV248"></label><label>Aircraft Type<textarea id="annVariantsV248" rows="2" placeholder="Narrow Body\nWide Body"></textarea></label><label>Bahasa<textarea id="annLanguagesV248" rows="2" placeholder="Bahasa Indonesia\nEnglish"></textarea></label><label class="span2">Ringkasan / Isi<textarea id="annSummaryV248" rows="4"></textarea></label><label class="span2">Poin / Urutan Announcement<textarea id="annGroupsV248" rows="7" placeholder="Satu poin per baris"></textarea></label></div><div class="modal-actions sticky-actions"><button class="btn" onclick="geSaveAnnouncementV248()">Simpan Announcement</button><button class="btn secondary" onclick="geCloseAnnouncementEditV248()">Batal</button></div></div></div>`);
+  document.body.insertAdjacentHTML('beforeend',`<div id="standardContentModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseStandardContentModalV248()">×</button><h2 id="standardContentModalTitleV248">Kelola Konten</h2><input type="hidden" id="standardContentModeV248"><input type="hidden" id="standardContentKeyV248"><div id="standardContentFieldsV248" class="formgrid"></div><div class="modal-actions sticky-actions"><button class="ge-btn" onclick="geSaveStandardContentV248()">Save</button><button class="ge-btn secondary" onclick="geCloseStandardContentModalV248()">Cancel</button></div></div></div>
+  <div id="announcementEditModalV248" class="modal-backdrop"><div class="modal-card standard-content-modal-v248"><button class="modal-x" onclick="geCloseAnnouncementEditV248()">×</button><h2 id="announcementEditTitleV248">Tambah Announcement</h2><input type="hidden" id="announcementEditIdV248"><div class="formgrid"><label>Judul<input id="annTitleV248"></label><label>Touch Point<input id="annTouchpointV248"></label><label>Jenis / Type<input id="annTypeV248"></label><label>Aircraft Type<textarea id="annVariantsV248" rows="2" placeholder="Narrow Body\nWide Body"></textarea></label><label>Bahasa<textarea id="annLanguagesV248" rows="2" placeholder="Bahasa Indonesia\nEnglish"></textarea></label><label class="span2">Ringkasan / Isi<textarea id="annSummaryV248" rows="4"></textarea></label><label class="span2">Poin / Urutan Announcement<textarea id="annGroupsV248" rows="7" placeholder="Satu poin per baris"></textarea></label></div><div class="modal-actions sticky-actions"><button class="ge-btn" onclick="geSaveAnnouncementV248()">Simpan Announcement</button><button class="ge-btn secondary" onclick="geCloseAnnouncementEditV248()">Cancel</button></div></div></div>`);
   gePromoteModalViewportV248(document.getElementById('standardContentModalV248'));
   gePromoteModalViewportV248(document.getElementById('announcementEditModalV248'));
 }
@@ -7266,12 +7174,12 @@ function geSaveStandardContentV248(){
 async function geDeleteExtraStandardSectionV248(id){if(!geIsStandardAdminV248())return;const ok=typeof geConfirmDeleteV234==='function'?await geConfirmDeleteV234({title:'Hapus Sub Judul?',item:'Konten Standar Layanan',message:'Sub judul dan penjelasannya akan dihapus.'}):confirm('Hapus sub judul?');if(!ok)return;const sc=geEnsureStandardContentV248();sc.extraSections=sc.extraSections.filter(x=>String(x.id)!==String(id));save();geApplyStandardContentV248()}
 
 function geRenderExtraStandardSectionsV248(){
-  const sc=geEnsureStandardContentV248();['people','process','premises','skypriority'].forEach(panel=>{const host=document.getElementById('standard'+panel.charAt(0).toUpperCase()+panel.slice(1)+'Panel');if(!host)return;let box=host.querySelector('.standard-extra-sections-v248');if(!box){box=document.createElement('div');box.className='standard-extra-sections-v248';host.appendChild(box)}const rows=sc.extraSections.filter(x=>x.panel===panel);box.innerHTML=rows.map(x=>`<article class="card standard-extra-card-v248"><div><span class="eyebrow">${panel.toUpperCase()} STANDARD</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.description||'')}</p>${x.points?.length?`<ul>${x.points.map(p=>`<li>${geEsc(p)}</li>`).join('')}</ul>`:''}</div>${geIsStandardAdminV248()?`<div class="standard-inline-actions-v248"><button class="btn secondary compact-btn" onclick="geOpenStandardContentV248('extra','${x.id}')">Edit</button><button class="btn danger compact-btn" onclick="geDeleteExtraStandardSectionV248('${x.id}')">Hapus</button></div>`:''}</article>`).join('')});
+  const sc=geEnsureStandardContentV248();['people','process','premises','skypriority'].forEach(panel=>{const host=document.getElementById('standard'+panel.charAt(0).toUpperCase()+panel.slice(1)+'Panel');if(!host)return;let box=host.querySelector('.standard-extra-sections-v248');if(!box){box=document.createElement('div');box.className='standard-extra-sections-v248';host.appendChild(box)}const rows=sc.extraSections.filter(x=>x.panel===panel);box.innerHTML=rows.map(x=>`<article class="card standard-extra-card-v248"><div><span class="eyebrow">${panel.toUpperCase()} STANDARD</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.description||'')}</p>${x.points?.length?`<ul>${x.points.map(p=>`<li>${geEsc(p)}</li>`).join('')}</ul>`:''}</div>${geIsStandardAdminV248()?`<div class="standard-inline-actions-v248"><button class="ge-btn secondary compact-btn" onclick="geOpenStandardContentV248('extra','${x.id}')">Edit</button><button class="ge-btn danger compact-btn" onclick="geDeleteExtraStandardSectionV248('${x.id}')">Delete</button></div>`:''}</article>`).join('')});
 }
 function geRenderStandardAdminButtonsV248(){
   document.querySelectorAll('.standard-admin-toolbar-v248,.standard-card-edit-v248').forEach(x=>x.remove());if(!geIsStandardAdminV248())return;
-  const hero=document.querySelector('main.main>.hero');if(hero){hero.insertAdjacentHTML('beforeend','<button class="btn secondary compact-btn standard-admin-toolbar-v248" onclick="geOpenStandardContentV248(\'hero\',\'hero\')">Edit Teks Halaman</button>')}
-  ['people','process','premises','skypriority'].forEach(k=>{const btn=document.querySelector(`[data-standard-panel="${k}"]`);if(btn)btn.insertAdjacentHTML('beforeend',`<span class="standard-card-edit-v248" onclick="event.stopPropagation();geOpenStandardContentV248('selector','${k}')">Edit</span>`);const panel=document.getElementById('standard'+k.charAt(0).toUpperCase()+k.slice(1)+'Panel');if(panel){const anchor=panel.querySelector('.page-header,.title,.standard-coming-panel,.personnel-readiness-title');if(anchor)anchor.insertAdjacentHTML('beforeend',`<div class="standard-admin-toolbar-v248"><button class="btn secondary compact-btn" onclick="geOpenStandardContentV248('main','${k}')">Edit Sub Judul</button><button class="btn secondary compact-btn" onclick="geOpenStandardContentV248('extra','${k}')">Tambah Sub Judul</button>${k==='process'?'<button class="btn compact-btn" onclick="geOpenAnnouncementEditV248()">Tambah Announcement</button>':''}</div>`)} });
+  const hero=document.querySelector('main.main>.hero');if(hero){hero.insertAdjacentHTML('beforeend','<button class="ge-btn secondary compact-btn standard-admin-toolbar-v248" onclick="geOpenStandardContentV248(\'hero\',\'hero\')">Edit Teks Halaman</button>')}
+  ['people','process','premises','skypriority'].forEach(k=>{const btn=document.querySelector(`[data-standard-panel="${k}"]`);if(btn)btn.insertAdjacentHTML('beforeend',`<span class="standard-card-edit-v248" onclick="event.stopPropagation();geOpenStandardContentV248('selector','${k}')">Edit</span>`);const panel=document.getElementById('standard'+k.charAt(0).toUpperCase()+k.slice(1)+'Panel');if(panel){const anchor=panel.querySelector('.page-header,.title,.standard-coming-panel,.personnel-readiness-title');if(anchor)anchor.insertAdjacentHTML('beforeend',`<div class="standard-admin-toolbar-v248"><button class="ge-btn secondary compact-btn" onclick="geOpenStandardContentV248('main','${k}')">Edit Sub Judul</button><button class="ge-btn secondary compact-btn" onclick="geOpenStandardContentV248('extra','${k}')">Tambah Sub Judul</button>${k==='process'?'<button class="ge-btn compact-btn" onclick="geOpenAnnouncementEditV248()">Tambah Announcement</button>':''}</div>`)} });
 }
 
 /* ---------- Announcement CRUD ---------- */
@@ -7281,7 +7189,7 @@ renderAnnouncementLibraryV246=function(){
   const box=document.getElementById('announcementLibraryV246');if(!box)return;geAnnouncementLibraryV246=geAnnouncementRowsV248();
   const q=(document.getElementById('announcementSearchV246')?.value||'').toLowerCase(),type=document.getElementById('announcementTypeV246')?.value||'',aircraft=document.getElementById('announcementAircraftV246')?.value||'',lang=document.getElementById('announcementLanguageV246')?.value||'';
   const rows=geAnnouncementLibraryV246.filter(x=>(!q||`${x.title} ${x.touchpoint} ${x.type} ${x.summary}`.toLowerCase().includes(q))&&(!type||x.touchpoint===type)&&(!aircraft||(x.variants||[]).includes(aircraft))&&(!lang||(x.languages||[]).includes(lang)));
-  box.innerHTML=rows.map((x,i)=>`<article class="announcement-card-v246"><div class="announcement-no-v246">${String(i+1).padStart(2,'0')}</div><div><span class="eyebrow">${geEsc(x.touchpoint)} • ${geEsc(x.type)}</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.summary)}</p><div class="announcement-tags-v246">${(x.variants||[]).map(v=>`<span>${geEsc(v)}</span>`).join('')}${(x.languages||[]).map(v=>`<span>${geEsc(v)}</span>`).join('')}</div><div class="announcement-actions-v248"><button class="btn secondary compact-btn" onclick="openAnnouncementReferenceV246('${x.id}')">Buka Announcement</button>${geIsStandardAdminV248()?`<button class="btn secondary compact-btn" onclick="geOpenAnnouncementEditV248('${x.id}')">Edit</button><button class="btn danger compact-btn" onclick="geDeleteAnnouncementV248('${x.id}')">Hapus</button>`:''}</div></div></article>`).join('');
+  box.innerHTML=rows.map((x,i)=>`<article class="announcement-card-v246"><div class="announcement-no-v246">${String(i+1).padStart(2,'0')}</div><div><span class="eyebrow">${geEsc(x.touchpoint)} • ${geEsc(x.type)}</span><h3>${geEsc(x.title)}</h3><p>${geEsc(x.summary)}</p><div class="announcement-tags-v246">${(x.variants||[]).map(v=>`<span>${geEsc(v)}</span>`).join('')}${(x.languages||[]).map(v=>`<span>${geEsc(v)}</span>`).join('')}</div><div class="announcement-actions-v248"><button class="ge-btn secondary compact-btn" onclick="openAnnouncementReferenceV246('${x.id}')">Buka Announcement</button>${geIsStandardAdminV248()?`<button class="ge-btn secondary compact-btn" onclick="geOpenAnnouncementEditV248('${x.id}')">Edit</button><button class="ge-btn danger compact-btn" onclick="geDeleteAnnouncementV248('${x.id}')">Delete</button>`:''}</div></div></article>`).join('');
 };
 openAnnouncementReferenceV246=function(id){const x=geAnnouncementRowsV248().find(v=>String(v.id)===String(id));if(!x)return;document.getElementById('announcementReferenceTitleV246').textContent=x.title;document.getElementById('announcementReferenceBodyV246').innerHTML=`<div class="announcement-reference-head-v246"><span>${geEsc(x.touchpoint)}</span><span>${geEsc(x.type)}</span></div><p>${geEsc(x.summary)}</p><h4>Urutan / Struktur Announcement</h4><div class="announcement-sequence-v246">${(x.groups||[]).map((g,i)=>`<div><b>${String(i+1).padStart(2,'0')}</b><span>${geEsc(g)}</span></div>`).join('')}</div>`;document.getElementById('announcementReferenceModalV246').classList.add('show')};
 function geOpenAnnouncementEditV248(id=null){if(!geIsStandardAdminV248())return;geEnsureStandardModalV248();const x=id?geAnnouncementRowsV248().find(v=>String(v.id)===String(id)):null;announcementEditTitleV248.textContent=x?'Update Announcement':'Tambah Announcement';announcementEditIdV248.value=x?.id||'';annTitleV248.value=x?.title||'';annTouchpointV248.value=x?.touchpoint||'';annTypeV248.value=x?.type||'';annVariantsV248.value=(x?.variants||[]).join('\n');annLanguagesV248.value=(x?.languages||[]).join('\n');annSummaryV248.value=x?.summary||'';annGroupsV248.value=(x?.groups||[]).join('\n');announcementEditModalV248.classList.add('show')}
@@ -7299,7 +7207,7 @@ function pmSaveDraft(area){const x=pmState();x.updatedAt=new Date().toISOString(
 function pmPreview(){const x=pmState();pmActivity('Preview siap • '+(x.title||'perubahan portal')+'. Pada production preview akan dibuka pada staging route sebelum Publish.');}
 function pmPublish(){const x=pmState();x.status='Published';x.publishedAt=new Date().toISOString();pmWrite(x);const s=document.getElementById('portalPublishState');if(s)s.textContent='Published';pmActivity('Perubahan ditandai Published pada prototype V2.50.');if(s)s.textContent='Published';}
 function pmNewPage(){document.getElementById('pmTitle').value='';document.getElementById('pmDescription').value='';pmActivity('Draft page baru dibuat. Pilih layout/component sebelum Publish.');}
-function pmAddMenu(){const l=document.getElementById('pmMenuList');if(!l)return;const d=document.createElement('div');d.className='portal-menu-item';d.innerHTML='<span class="portal-drag">↕</span><b>Menu Baru</b><small>Draft</small><button class="btn secondary">Kelola</button>';l.appendChild(d);pmActivity('Menu baru ditambahkan ke draft layout.');}
+function pmAddMenu(){const l=document.getElementById('pmMenuList');if(!l)return;const d=document.createElement('div');d.className='portal-menu-item';d.innerHTML='<span class="portal-drag">↕</span><b>Menu Baru</b><small>Draft</small><button class="ge-btn secondary">Kelola</button>';l.appendChild(d);pmActivity('Menu baru ditambahkan ke draft layout.');}
 function pmRegisterAssets(){const f=[...(document.getElementById('pmAsset')?.files||[])];if(!f.length){pmActivity('Pilih asset terlebih dahulu.');return}const x=pmState();x.assets=(x.assets||[]).concat(f.map(a=>({name:a.name,size:a.size,type:a.type,registeredAt:new Date().toISOString()})));pmWrite(x);pmActivity(f.length+' asset diregister sebagai metadata prototype.');}
 function pmAssetList(){const a=pmState().assets||[];pmActivity(a.length?('Asset Library prototype: '+a.map(x=>x.name).join(', ')):'Asset Library masih kosong.');}
 
@@ -7323,7 +7231,7 @@ function geV251Ensure(){
 function geV251ReadImage(file,cb){if(!file)return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file)}
 function geV251EditVisual(key){if(!geV251Admin())return;const s=geV251Ensure().visuals[key];geV251OpenEditor('Edit Referensi Visual',s,(v)=>{Object.assign(s,v);save();geV251RenderTouchpointPage()})}
 function geV251OpenEditor(title,obj,onSave){
- let m=document.getElementById('geV251Editor');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Editor" class="modal-backdrop"><div class="modal-card"><button class="modal-x" onclick="geV251CloseEditor()">×</button><h2 id="geV251EditorTitle"></h2><div class="formgrid"><label>Judul<input id="geV251EdTitle"></label><label class="span2">Keterangan<textarea id="geV251EdCaption" rows="4"></textarea></label><label class="span2">Gambar<input id="geV251EdFile" type="file" accept="image/*"></label></div><div class="modal-actions"><button class="btn" id="geV251EdSave">Simpan</button><button class="btn secondary" onclick="geV251CloseEditor()">Batal</button></div></div></div>`);m=document.getElementById('geV251Editor')}
+ let m=document.getElementById('geV251Editor');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Editor" class="modal-backdrop"><div class="modal-card"><button class="modal-x" onclick="geV251CloseEditor()">×</button><h2 id="geV251EditorTitle"></h2><div class="formgrid"><label>Judul<input id="geV251EdTitle"></label><label class="span2">Keterangan<textarea id="geV251EdCaption" rows="4"></textarea></label><label class="span2">Gambar<input id="geV251EdFile" type="file" accept="image/*"></label></div><div class="modal-actions"><button class="ge-btn" id="geV251EdSave">Save</button><button class="ge-btn secondary" onclick="geV251CloseEditor()">Cancel</button></div></div></div>`);m=document.getElementById('geV251Editor')}
  geV251EditorTitle.textContent=title;geV251EdTitle.value=obj.title||'';geV251EdCaption.value=obj.caption||'';geV251EdFile.value='';geV251EdSave.onclick=()=>{const done=(img)=>{onSave({title:geV251EdTitle.value.trim(),caption:geV251EdCaption.value.trim(),image:img||obj.image||''});geV251CloseEditor()};const f=geV251EdFile.files[0];f?geV251ReadImage(f,done):done(obj.image)};m.classList.add('show')
 }
 function geV251CloseEditor(){document.getElementById('geV251Editor')?.classList.remove('show')}
@@ -7337,7 +7245,7 @@ function geV251TPKey(j,n){return `${j}::${n}`}
 function geV251TPData(j,n){const s=geV251Ensure(),k=geV251TPKey(j,n);s.touchpoints[k] ||= {title:n,caption:'Area description • Airport • List Inisiatif',images:[]};return s.touchpoints[k]}
 function geV251EditTP(j,n){if(!geV251Admin())return;const x=geV251TPData(j,n);geV251OpenEditor(`Edit ${n}`,{title:x.title,caption:x.caption,image:x.images[0]?.src||''},v=>{x.title=v.title||n;x.caption=v.caption;if(v.image){if(x.images.length)x.images[0]={src:v.image,caption:v.caption};else x.images.push({src:v.image,caption:v.caption})}save();geV251RenderTouchpointPage()})}
 let geV251Gallery={items:[],i:0,t:null};
-function geV251OpenGallery(j,n){const x=geV251TPData(j,n);geV251Gallery.items=x.images.length?x.images:[{src:'',caption:x.caption}];geV251Gallery.i=0;let m=document.getElementById('geV251Gallery');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Gallery" class="modal-backdrop"><div class="modal-card ge-gallery-v251"><button class="modal-x" onclick="geV251CloseGallery()">×</button><h2 id="geV251GalleryTitle"></h2><div id="geV251GalleryMedia"></div><div class="ge-gallery-controls-v251"><button class="btn secondary compact-btn" onclick="geV251GalleryMove(-1)">←</button><span id="geV251GalleryDots" class="ge-gallery-dots-v251"></span><button class="btn secondary compact-btn" onclick="geV251GalleryMove(1)">→</button></div><p id="geV251GalleryCaption" class="ge-gallery-caption-v251"></p></div></div>`);m=document.getElementById('geV251Gallery')}geV251GalleryTitle.textContent=x.title;geV251GalleryDraw();m.classList.add('show');clearInterval(geV251Gallery.t);if(geV251Gallery.items.length>1)geV251Gallery.t=setInterval(()=>geV251GalleryMove(1),5000)}
+function geV251OpenGallery(j,n){const x=geV251TPData(j,n);geV251Gallery.items=x.images.length?x.images:[{src:'',caption:x.caption}];geV251Gallery.i=0;let m=document.getElementById('geV251Gallery');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Gallery" class="modal-backdrop"><div class="modal-card ge-gallery-v251"><button class="modal-x" onclick="geV251CloseGallery()">×</button><h2 id="geV251GalleryTitle"></h2><div id="geV251GalleryMedia"></div><div class="ge-gallery-controls-v251"><button class="ge-btn secondary compact-btn" onclick="geV251GalleryMove(-1)">←</button><span id="geV251GalleryDots" class="ge-gallery-dots-v251"></span><button class="ge-btn secondary compact-btn" onclick="geV251GalleryMove(1)">→</button></div><p id="geV251GalleryCaption" class="ge-gallery-caption-v251"></p></div></div>`);m=document.getElementById('geV251Gallery')}geV251GalleryTitle.textContent=x.title;geV251GalleryDraw();m.classList.add('show');clearInterval(geV251Gallery.t);if(geV251Gallery.items.length>1)geV251Gallery.t=setInterval(()=>geV251GalleryMove(1),5000)}
 function geV251GalleryDraw(){const a=geV251Gallery.items,i=geV251Gallery.i,x=a[i];geV251GalleryMedia.innerHTML=x.src?`<img class="ge-gallery-image-v251" src="${x.src}" alt="">`:`<div class="ge-gallery-image-v251" style="display:grid;place-items:center;color:#7b939d">Belum ada foto</div>`;geV251GalleryCaption.textContent=x.caption||'';geV251GalleryDots.textContent=a.map((_,k)=>k===i?'●':'○').join(' ')}
 function geV251GalleryMove(d){geV251Gallery.i=(geV251Gallery.i+d+geV251Gallery.items.length)%geV251Gallery.items.length;geV251GalleryDraw()}
 function geV251CloseGallery(){clearInterval(geV251Gallery.t);document.getElementById('geV251Gallery')?.classList.remove('show')}
@@ -7389,7 +7297,7 @@ function geV251C1EnsureTPModal(){
       </div>
       <div class="ge-tp-photo-head-v251c1"><b>Gallery Touch Point</b><span>Caption dapat berbeda untuk setiap foto.</span></div>
       <div id="geV251C1TPPhotoList" class="ge-tp-photo-list-v251c1"></div>
-      <div class="modal-actions sticky-actions"><button class="btn" onclick="geV251C1SaveTP()">Simpan</button><button class="btn secondary" onclick="geV251C1CloseTPEditor()">Batal</button></div>
+      <div class="modal-actions sticky-actions"><button class="ge-btn" onclick="geV251C1SaveTP()">Save</button><button class="ge-btn secondary" onclick="geV251C1CloseTPEditor()">Cancel</button></div>
     </div></div>`);
   m=document.getElementById('geV251C1TPEditor');
   document.getElementById('geV251C1TPFiles').addEventListener('change',e=>{
@@ -7419,7 +7327,7 @@ function geV251C1RenderTPPhotoList(){
   box.innerHTML=rows.length?rows.map(r=>`<div class="ge-tp-photo-item-v251c1">
     <div class="ge-tp-photo-preview-v251c1">${r.kind==='new'?`<img src="${r.x.preview}" alt="">`:`<img data-tp-existing="${r.i}" alt="">`}</div>
     <label>Keterangan Foto<textarea rows="2" data-tp-caption="${r.kind}:${r.i}">${geEsc(r.x.caption||'')}</textarea></label>
-    <button class="btn danger compact-btn" type="button" onclick="geV251C1RemoveTPPhoto('${r.kind}',${r.i})">Hapus</button>
+    <button class="ge-btn danger compact-btn" type="button" onclick="geV251C1RemoveTPPhoto('${r.kind}',${r.i})">Delete</button>
   </div>`).join(''):'<div class="planning-empty">Belum ada foto. Pilih beberapa file pada field Tambah Foto.</div>';
   box.querySelectorAll('[data-tp-existing]').forEach(async img=>{const i=Number(img.dataset.tpExisting),item=GE_V251C1_TP_EDIT.existing[i];await geV251C1HydrateImage(img,item)});
 }
@@ -7439,7 +7347,7 @@ async function geV251C1SaveTP(){
 /* Gallery keeps each image's natural orientation/aspect ratio. */
 async function geV251OpenGallery(j,n){
   const x=geV251TPData(j,n);geV251Gallery.items=x.images.length?x.images:[{src:'',caption:x.caption}];geV251Gallery.i=0;
-  let m=document.getElementById('geV251Gallery');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Gallery" class="modal-backdrop"><div class="modal-card ge-gallery-v251 ge-gallery-natural-v251c1"><button class="modal-x" onclick="geV251CloseGallery()">×</button><h2 id="geV251GalleryTitle"></h2><div id="geV251GalleryMedia" class="ge-gallery-media-v251c1"></div><div class="ge-gallery-controls-v251"><button class="btn secondary compact-btn" onclick="geV251GalleryMove(-1)">←</button><span id="geV251GalleryDots" class="ge-gallery-dots-v251"></span><button class="btn secondary compact-btn" onclick="geV251GalleryMove(1)">→</button></div><p id="geV251GalleryCaption" class="ge-gallery-caption-v251"></p></div></div>`);m=document.getElementById('geV251Gallery')}
+  let m=document.getElementById('geV251Gallery');if(!m){document.body.insertAdjacentHTML('beforeend',`<div id="geV251Gallery" class="modal-backdrop"><div class="modal-card ge-gallery-v251 ge-gallery-natural-v251c1"><button class="modal-x" onclick="geV251CloseGallery()">×</button><h2 id="geV251GalleryTitle"></h2><div id="geV251GalleryMedia" class="ge-gallery-media-v251c1"></div><div class="ge-gallery-controls-v251"><button class="ge-btn secondary compact-btn" onclick="geV251GalleryMove(-1)">←</button><span id="geV251GalleryDots" class="ge-gallery-dots-v251"></span><button class="ge-btn secondary compact-btn" onclick="geV251GalleryMove(1)">→</button></div><p id="geV251GalleryCaption" class="ge-gallery-caption-v251"></p></div></div>`);m=document.getElementById('geV251Gallery')}
   geV251GalleryTitle.textContent=x.title;await geV251GalleryDraw();m.classList.add('show');clearInterval(geV251Gallery.t);if(geV251Gallery.items.length>1)geV251Gallery.t=setInterval(()=>geV251GalleryMove(1),5000);
 }
 async function geV251GalleryDraw(){
@@ -7463,7 +7371,7 @@ function geV251RenderTouchpointPage(){
 
 /* ---------- Global page content / section visibility ---------- */
 function pmCfgR2(){data.portalManagerR2||={};data.portalManagerR2.pages||={};data.portalManagerR2.menus||={};return data.portalManagerR2}
-function pmPageKeyR2(){const f=(location.pathname.split('/').pop()||'index.html');if(f==='app.html'){const r=String(new URLSearchParams(location.search).get('page')||'index');const a=(window.P40_CLEAN_ALIASES||{})[r]||r;return a.split('?')[0]+'.html'}return f}
+function pmPageKeyR2(){const f=(location.pathname.split('/').pop()||'index.html');if(f==='app.html'){const r=String(new URLSearchParams(location.search).get('page')||'index');const a=(window.GE_ROUTE_ALIASES||{})[r]||r;return a.split('?')[0]+'.html'}return f}
 function pmApplyPageR2(){
  const cfg=pmCfgR2(),key=pmPageKeyR2(),pc=cfg.pages[key]||{};
  if(pc.title){const hero=document.querySelector('.hero h2,.page-header h2');if(hero)hero.textContent=pc.title}
@@ -7499,7 +7407,7 @@ function pmLoadPageR2(){
 }
 function pmRenderSectionsR2(){
  const key=pmPage.value||'index.html',box=document.getElementById('pmSectionListR2');if(!box)return;const cfg=pmCfgR2().pages[key]||{},sections=cfg.sections||{},order=cfg.order||PM_PAGE_SECTIONS_R2[key]?.map(x=>x[0])||[];const labels=Object.fromEntries(PM_PAGE_SECTIONS_R2[key]||[]);
- box.innerHTML=order.map((id,i)=>{const s=sections[id]||{visible:true};return `<div class="pm-section-row-r2" data-id="${geEsc(id)}"><span class="portal-drag">↕</span><b>${geEsc(labels[id]||id)}</b><label class="pm-switch-r2"><input type="checkbox" ${s.visible===false?'':'checked'}><span></span></label><button class="btn secondary compact-btn" onclick="pmMoveSectionR2('${geEsc(id)}',-1)">↑</button><button class="btn secondary compact-btn" onclick="pmMoveSectionR2('${geEsc(id)}',1)">↓</button></div>`}).join('')||'<div class="portal-note">Section manager untuk page ini belum didefinisikan.</div>';
+ box.innerHTML=order.map((id,i)=>{const s=sections[id]||{visible:true};return `<div class="pm-section-row-r2" data-id="${geEsc(id)}"><span class="portal-drag">↕</span><b>${geEsc(labels[id]||id)}</b><label class="pm-switch-r2"><input type="checkbox" ${s.visible===false?'':'checked'}><span></span></label><button class="ge-btn secondary compact-btn" onclick="pmMoveSectionR2('${geEsc(id)}',-1)">↑</button><button class="ge-btn secondary compact-btn" onclick="pmMoveSectionR2('${geEsc(id)}',1)">↓</button></div>`}).join('')||'<div class="portal-note">Section manager untuk page ini belum didefinisikan.</div>';
 }
 function pmMoveSectionR2(id,dir){const key=pmPage.value,cfg=pmCfgR2();cfg.pages[key]||={};let order=cfg.pages[key].order||PM_PAGE_SECTIONS_R2[key]?.map(x=>x[0])||[];const i=order.indexOf(id),j=i+dir;if(i<0||j<0||j>=order.length)return;[order[i],order[j]]=[order[j],order[i]];cfg.pages[key].order=order;save();pmRenderSectionsR2()}
 function pmSaveSectionsR2(){const key=pmPage.value,cfg=pmCfgR2();cfg.pages[key]||={};cfg.pages[key].sections||={};document.querySelectorAll('#pmSectionListR2 .pm-section-row-r2').forEach(r=>cfg.pages[key].sections[r.dataset.id]={visible:r.querySelector('input')?.checked!==false});cfg.pages[key].order=[...document.querySelectorAll('#pmSectionListR2 .pm-section-row-r2')].map(r=>r.dataset.id);cfg.pages[key].draft=true;save();pmActivity('Layout page disimpan sebagai draft.')}
@@ -7513,12 +7421,12 @@ window.addEventListener('DOMContentLoaded',()=>{if(document.getElementById('pmPa
 
 /* ---------- Asset Library: actual IndexedDB files ---------- */
 async function pmRegisterAssetsR2(){const files=[...(pmAsset?.files||[])];if(!files.length)return pmActivity('Pilih asset terlebih dahulu.');const cfg=pmCfgR2();cfg.assets||=[];for(const f of files){const key=`portal_asset_${Date.now()}_${Math.random().toString(36).slice(2)}`;await GEFiles.put(key,f);cfg.assets.push({key,name:f.name,size:f.size,type:f.type,createdAt:new Date().toISOString()})}save();pmAsset.value='';pmActivity(`${files.length} asset tersimpan di IndexedDB browser.`);pmAssetListR2()}
-async function pmAssetListR2(){const box=document.getElementById('pmAssetLibraryR2');if(!box)return;const rows=pmCfgR2().assets||[];box.innerHTML=rows.length?(await Promise.all(rows.map(async x=>{let preview='';if(String(x.type).startsWith('image/')){try{const f=await GEFiles.get(x.key);if(f)preview=`<img src="${URL.createObjectURL(f)}" alt="">`}catch(e){}}return `<div class="pm-asset-card-r2">${preview||'<div class="pm-asset-file-r2">FILE</div>'}<div><b>${geEsc(x.name)}</b><small>${Math.round(x.size/1024)} KB</small></div><button class="btn danger compact-btn" onclick="pmDeleteAssetR2('${x.key}')">Hapus</button></div>`}))).join(''):'<div class="portal-note">Asset Library masih kosong.</div>'}
+async function pmAssetListR2(){const box=document.getElementById('pmAssetLibraryR2');if(!box)return;const rows=pmCfgR2().assets||[];box.innerHTML=rows.length?(await Promise.all(rows.map(async x=>{let preview='';if(String(x.type).startsWith('image/')){try{const f=await GEFiles.get(x.key);if(f)preview=`<img src="${URL.createObjectURL(f)}" alt="">`}catch(e){}}return `<div class="pm-asset-card-r2">${preview||'<div class="pm-asset-file-r2">FILE</div>'}<div><b>${geEsc(x.name)}</b><small>${Math.round(x.size/1024)} KB</small></div><button class="ge-btn danger compact-btn" onclick="pmDeleteAssetR2('${x.key}')">Delete</button></div>`}))).join(''):'<div class="portal-note">Asset Library masih kosong.</div>'}
 async function pmDeleteAssetR2(key){const cfg=pmCfgR2();cfg.assets=(cfg.assets||[]).filter(x=>x.key!==key);try{await GEFiles.del(key)}catch(e){}save();pmAssetListR2()}
 
 /* ---------- Initiative long text / announcement preview ---------- */
 const GE_RENDER_ANN_R2=renderAnnouncementLibraryV246;
-renderAnnouncementLibraryV246=function(){GE_RENDER_ANN_R2();document.querySelectorAll('#announcementLibraryV246 .announcement-card-v246 p').forEach(p=>{p.classList.add('ge-clamp-v251');if(!p.nextElementSibling?.classList.contains('ge-more-inline-r2')){const b=document.createElement('button');b.className='ge-more-inline-r2';b.textContent='… lihat selengkapnya ›';b.onclick=()=>p.closest('.announcement-card-v246')?.querySelector('.announcement-actions-v248 .btn')?.click();p.after(b)}})};
+renderAnnouncementLibraryV246=function(){GE_RENDER_ANN_R2();document.querySelectorAll('#announcementLibraryV246 .announcement-card-v246 p').forEach(p=>{p.classList.add('ge-clamp-v251');if(!p.nextElementSibling?.classList.contains('ge-more-inline-r2')){const b=document.createElement('button');b.className='ge-more-inline-r2';b.textContent='… lihat selengkapnya ›';b.onclick=()=>p.closest('.announcement-card-v246')?.querySelector('.announcement-actions-v248 .ge-btn')?.click();p.after(b)}})};
 
 /* ---------- Calendar Project Tracking R2 ---------- */
 let GE_CAL_VIEW_R2='month';
@@ -7534,9 +7442,9 @@ function geV251RenderCalendar(){
  }else if(GE_CAL_VIEW_R2==='week'){
   const start=new Date(base);start.setDate(base.getDate()-base.getDay());geCalendarTitleV251.textContent=`Minggu ${start.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}`;grid.className='calendar-week-r2';grid.innerHTML=Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);const iso=d.toLocaleDateString('en-CA'),rows=events.filter(e=>String(e.date).slice(0,10)===iso);return `<div class="calendar-week-col-r2"><h4>${d.toLocaleDateString('id-ID',{weekday:'short',day:'numeric'})}</h4>${rows.map(geCalEventHTMLR2).join('')||'<small>Tidak ada agenda</small>'}</div>`}).join('');
  }else if(GE_CAL_VIEW_R2==='day'){
-  const iso=base.toLocaleDateString('en-CA'),rows=events.filter(e=>String(e.date).slice(0,10)===iso).sort((a,b)=>String(a.time||'99:99').localeCompare(String(b.time||'99:99')));geCalendarTitleV251.textContent=base.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});grid.className='calendar-day-r2';grid.innerHTML=rows.map(e=>`<div class="calendar-day-event-r2"><time>${geEsc(e.time||'All day')}</time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.category||e.source||'Event')} • ${geEsc(e.airport||'-')} • PIC ${geEsc(e.pic||'-')}</span></div><button class="btn secondary compact-btn" onclick='geV251OpenEventDetailR2(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Tidak ada agenda.</div>';
+  const iso=base.toLocaleDateString('en-CA'),rows=events.filter(e=>String(e.date).slice(0,10)===iso).sort((a,b)=>String(a.time||'99:99').localeCompare(String(b.time||'99:99')));geCalendarTitleV251.textContent=base.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});grid.className='calendar-day-r2';grid.innerHTML=rows.map(e=>`<div class="calendar-day-event-r2"><time>${geEsc(e.time||'All day')}</time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.category||e.source||'Event')} • ${geEsc(e.airport||'-')} • PIC ${geEsc(e.pic||'-')}</span></div><button class="ge-btn secondary compact-btn" onclick='geV251OpenEventDetailR2(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Tidak ada agenda.</div>';
  }else{
-  grid.style.display='none';agenda.style.display='grid';geCalendarTitleV251.textContent='Agenda';const rows=[...events].filter(e=>e.date).sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(0,120);agenda.innerHTML=rows.map(e=>`<div class="calendar-agenda-item-r2"><time><b>${new Date(e.date+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short'})}</b><span>${geEsc(e.time||'')}</span></time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.category||e.source)} • ${geEsc(e.airport||'-')} • ${geEsc(e.touchpoint||'-')}</span></div><button class="btn secondary compact-btn" onclick='geV251OpenEventDetailR2(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Belum ada agenda.</div>';
+  grid.style.display='none';agenda.style.display='grid';geCalendarTitleV251.textContent='Agenda';const rows=[...events].filter(e=>e.date).sort((a,b)=>String(a.date).localeCompare(String(b.date))).slice(0,120);agenda.innerHTML=rows.map(e=>`<div class="calendar-agenda-item-r2"><time><b>${new Date(e.date+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short'})}</b><span>${geEsc(e.time||'')}</span></time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.category||e.source)} • ${geEsc(e.airport||'-')} • ${geEsc(e.touchpoint||'-')}</span></div><button class="ge-btn secondary compact-btn" onclick='geV251OpenEventDetailR2(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Belum ada agenda.</div>';
  }
  const monthEvents=events.filter(e=>{const d=new Date(e.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===m});geCalendarSummaryV251.innerHTML=`<span>${monthEvents.length} agenda bulan ini</span><span>${monthEvents.filter(e=>e.source==='Initiative').length} due date inisiatif</span><span>${monthEvents.filter(e=>e.source==='Milestone').length} milestone</span><span>${monthEvents.filter(e=>e.source==='Manual').length} kegiatan manual</span>`;
 }
@@ -7614,7 +7522,7 @@ currentInitiativeRows=function(){
  const focused=window.GE_INITIATIVE_FOCUS_ID_R65;
  if(focused)return (data.initiatives||[]).filter(x=>String(x.id)===String(focused));
  let rows=(data.initiatives||[]).slice();
- const page=document.getElementById('journeyPageValue')?.value||activeJourney||'';
+ const page=document.getElementById('journeyPageValue')?.value||window.GE_ACTIVE_JOURNEY||'';
  if(page)rows=rows.filter(x=>geMatchesJourneyV252(x,page));
  const q=(document.getElementById('q')?.value||'').toLowerCase();
  const ft=document.getElementById('ft')?.value||'', fs=document.getElementById('fs')?.value||'', fp=document.getElementById('fp')?.value||'';
@@ -7836,7 +7744,7 @@ function geV2532RenderCalendar(){
     const iso=base.toLocaleDateString('en-CA'),rows=events.filter(e=>String(e.date||'').slice(0,10)===iso).sort((a,b)=>String(a.time||'99:99').localeCompare(String(b.time||'99:99')));
     geCalendarTitleV251.textContent=base.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     grid.className='calendar-day-r2';
-    grid.innerHTML=rows.map(e=>`<div class="calendar-day-event-r2"><time>${geEsc(e.time||'All day')}</time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.source||e.category||'Event')} • ${geEsc(e.airport||'-')} • PIC ${geEsc(e.pic||'-')}</span></div><button class="btn secondary compact-btn" onclick='geV2532OpenDetail(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Tidak ada agenda.</div>';
+    grid.innerHTML=rows.map(e=>`<div class="calendar-day-event-r2"><time>${geEsc(e.time||'All day')}</time><div><b>${geEsc(e.title)}</b><span>${geEsc(e.source||e.category||'Event')} • ${geEsc(e.airport||'-')} • PIC ${geEsc(e.pic||'-')}</span></div><button class="ge-btn secondary compact-btn" onclick='geV2532OpenDetail(${JSON.stringify(String(e.id))})'>Detail</button></div>`).join('')||'<div class="planning-empty">Tidak ada agenda.</div>';
   } else {
     grid.style.display='none'; if(agenda)agenda.style.display='grid';
     geCalendarTitleV251.textContent='Agenda';
@@ -8127,6 +8035,7 @@ function geCalEventHTMLV2533(e){
 }
 
 function geCalRenderV2533(){
+  geEnsureCalendarYearViewR30();
   const grid=document.getElementById('geCalendarV251');
   const agenda=document.getElementById('geCalendarAgendaR2');
   if(!grid)return;
@@ -8139,7 +8048,11 @@ function geCalRenderV2533(){
   if(agenda)agenda.style.display='none';
   grid.style.display='';
 
-  if(view==='month'){
+  if(view==='year'){
+    if(window.geCalendarTitleV251)geCalendarTitleV251.textContent=String(y);
+    grid.className='calendar-year-grid';
+    grid.innerHTML=Array.from({length:12},(_,month)=>{const first=new Date(y,month,1),last=new Date(y,month+1,0),prefix=`${y}-${String(month+1).padStart(2,'0')}`,rows=events.filter(e=>String(e.date||'').startsWith(prefix));return `<button type="button" class="calendar-year-month" onclick="geCalendarOpenMonthR30(${month})"><span>${first.toLocaleDateString('id-ID',{month:'long'})}</span><b>${rows.length}</b><small>${rows.length?'agenda':'Tidak ada agenda'}</small><i>${last.getDate()} hari</i></button>`}).join('');
+  } else if(view==='month'){
     const first=new Date(y,m,1), start=new Date(y,m,1-first.getDay());
     if(window.geCalendarTitleV251)geCalendarTitleV251.textContent=
       new Intl.DateTimeFormat('id-ID',{month:'long',year:'numeric'}).format(first);
@@ -8203,9 +8116,12 @@ function geCalMoveV2533(n){
   const v=window.GE_CAL_VIEW_R2||'month';
   if(v==='day')geV251CalDate.setDate(geV251CalDate.getDate()+n);
   else if(v==='week')geV251CalDate.setDate(geV251CalDate.getDate()+7*n);
+  else if(v==='year')geV251CalDate=new Date(geV251CalDate.getFullYear()+n,0,1);
   else geV251CalDate=new Date(geV251CalDate.getFullYear(),geV251CalDate.getMonth()+n,1);
   geCalRenderV2533();
 }
+window.geCalendarOpenMonthR30=function(month){window.geV251CalDate=new Date((window.geV251CalDate||new Date()).getFullYear(),Number(month)||0,1);window.GE_CAL_VIEW_R2='month';document.querySelectorAll('[data-cal-view]').forEach(x=>x.classList.toggle('active',x.dataset.calView==='month'));geCalRenderV2533()};
+function geEnsureCalendarYearViewR30(){const group=document.querySelector('[data-cal-view]')?.parentElement;if(!group||group.querySelector('[data-cal-view="year"]'))return;const b=document.createElement('button');b.type='button';b.dataset.calView='year';b.className='btn secondary compact-btn';b.textContent='Year';b.onclick=()=>geCalSetViewV2533('year',b);group.insertBefore(b,group.querySelector('[data-cal-view="month"]')||group.firstChild)}
 function geCalTodayV2533(){window.geV251CalDate=new Date();geCalRenderV2533()}
 
 /* self-contained add/update activity modal — avoids dependency on older calendar wrappers */
@@ -8542,40 +8458,29 @@ function geCalElV2535(id){return document.getElementById(id)}
 function geCalEnsureProjectFieldsV2535(){
   const modal=geCalElV2535('geV251EventModal');
   if(!modal || geCalElV2535('geCalProjectFieldsV2535')) return;
+  ['geCalProjectFieldsV2533','geCalProjectFieldsV2534'].forEach(id=>geCalElV2535(id)?.remove());
 
   const form=modal.querySelector('.formgrid');
   if(!form)return;
 
   form.insertAdjacentHTML('beforeend',`
     <div id="geCalProjectFieldsV2535" class="span2 ge-cal-project-fields-v2533">
-      <label>Jenis Kegiatan
-        <select id="geCalActivityTypeV2535">
-          <option value="standalone">Standalone Activity</option>
-          <option value="initiative">Terkait Initiative</option>
-        </select>
-      </label>
-
-      <label>Initiative Terkait
-        <select id="geCalInitiativeV2535">
-          <option value="">Tidak terkait Initiative</option>
-        </select>
-      </label>
-
-      <label>Journey Scope
-        <select id="geCalJourneyEditV2535" multiple size="7">
-          <option>Tidak Terkait Journey</option>
-          <option>Pre-Journey</option>
-          <option>Pre-Flight</option>
-          <option>Post-Flight</option>
-          <option>Post-Journey</option>
-          <option>Cross-Journey / End-to-End</option>
-          <option>Supporting / Enabler</option>
-        </select>
-      </label>
-
-      <label>Touch Point
-        <select id="geCalTouchEditV2535" multiple size="6"></select>
-      </label>
+      <label>Jenis Kegiatan<select id="geCalActivityTypeV2535"><option value="standalone">Standalone Activity</option><option value="initiative">Terkait Initiative</option></select></label>
+      <label>Initiative Terkait<select id="geCalInitiativeV2535"><option value="">Tidak terkait Initiative</option></select></label>
+      <label>Journey Scope<input id="geCalJourneyEditV2535" type="text" placeholder="Contoh: Pre-Flight, Post-Journey"></label>
+      <label>Touch Point (bisa lebih dari satu)<select id="geCalTouchEditV2535" multiple size="6"></select></label>
+      <label>Start Date<input id="geCalStartDateV2535" type="date"></label>
+      <label>End / Target Date<input id="geCalEndDateV2535" type="date"></label>
+      <label>Due Date<input id="geCalDueDateV2535" type="date"></label>
+      <label>Actual Date<input id="geCalActualDateV2535" type="date"></label>
+      <label>Target (%)<input id="geCalPlanV2535" type="number" min="0" max="100" step="0.01"></label>
+      <label>Realisasi (%)<input id="geCalRealV2535" type="number" min="0" max="100" step="0.01"></label>
+      <label>Estimasi Biaya<input id="geCalEstimatedCostV2535" type="number" min="0" step="1000"></label>
+      <label>Anggaran<input id="geCalBudgetV2535" type="number" min="0" step="1000"></label>
+      <label>Realisasi Biaya<input id="geCalActualCostV2535" type="number" min="0" step="1000"></label>
+      <label>Status<select id="geCalStatusV2535"><option>Not Started</option><option>On Progress</option><option>Completed</option><option>Hold</option></select></label>
+      <label class="span2">Target / Output<textarea id="geCalOutputV2535" rows="3"></textarea></label>
+      <label class="span2">Realisasi / Achievement<textarea id="geCalAchievementV2535" rows="3"></textarea></label>
     </div>`);
 }
 
@@ -8599,14 +8504,16 @@ function geCalPopulateActivitySelectorsV2535(e){
     [...touchSel.options].forEach(o=>o.selected=selected.includes(o.value));
   }
 
-  const scopeSel=geCalElV2535('geCalJourneyEditV2535');
-  if(scopeSel){
+  const scopeInput=geCalElV2535('geCalJourneyEditV2535');
+  if(scopeInput){
     const selected=geCalArrV2533(e?.journeyScopes);
-    [...scopeSel.options].forEach(o=>o.selected=selected.length?selected.includes(o.value):o.value==='Tidak Terkait Journey');
+    scopeInput.value=selected.join(', ');
   }
 
   const typeSel=geCalElV2535('geCalActivityTypeV2535');
   if(typeSel)typeSel.value=e?.activityType||'standalone';
+  const set=(id,value)=>{const el=geCalElV2535(id);if(el)el.value=value??''};
+  set('geCalStartDateV2535',e?.startDate||e?.date||'');set('geCalEndDateV2535',e?.endDate||e?.date||'');set('geCalDueDateV2535',e?.dueDate||e?.date||'');set('geCalActualDateV2535',e?.actualDate||'');set('geCalPlanV2535',e?.plan??0);set('geCalRealV2535',e?.real??0);set('geCalEstimatedCostV2535',e?.estimatedCost??'');set('geCalBudgetV2535',e?.budget??'');set('geCalActualCostV2535',e?.actualCost??'');set('geCalStatusV2535',e?.status||'Not Started');set('geCalOutputV2535',e?.targetText||'');set('geCalAchievementV2535',e?.achievementText||'');
 }
 
 function geCalOpenActivityV2535(id=null){
@@ -8658,12 +8565,8 @@ function geCalSaveActivityV2535(){
   const id=val('geV251EventIdR2');
   const old=id?data.events.find(x=>String(x.id)===String(id)):null;
 
-  const scopeSel=geCalElV2535('geCalJourneyEditV2535');
-  const scopes=scopeSel?[...scopeSel.selectedOptions].map(o=>o.value):[];
-  if(scopes.includes('Tidak Terkait Journey')&&scopes.length>1){
-    alert('"Tidak Terkait Journey" tidak dapat digabung dengan Journey Scope lainnya.');
-    return;
-  }
+  const scopeInput=geCalElV2535('geCalJourneyEditV2535');
+  const scopes=(scopeInput?.value||'').split(/[;,]/).map(v=>v.trim()).filter(Boolean);
 
   const touchSel=geCalElV2535('geCalTouchEditV2535');
   const touchpoints=touchSel?[...touchSel.selectedOptions].map(o=>o.value):geCalArrV2533(val('geV251EventTouchpointR2'));
@@ -8685,6 +8588,18 @@ function geCalSaveActivityV2535(){
     activityType:val('geCalActivityTypeV2535')||'standalone',
     initiativeId:val('geCalInitiativeV2535')||'',
     journeyScopes:scopes,
+    startDate:val('geCalStartDateV2535')||date,
+    endDate:val('geCalEndDateV2535')||date,
+    dueDate:val('geCalDueDateV2535')||date,
+    actualDate:val('geCalActualDateV2535'),
+    plan:Number(val('geCalPlanV2535')||0),
+    real:Number(val('geCalRealV2535')||0),
+    estimatedCost:Number(val('geCalEstimatedCostV2535')||0),
+    budget:Number(val('geCalBudgetV2535')||0),
+    actualCost:Number(val('geCalActualCostV2535')||0),
+    status:val('geCalStatusV2535')||'Not Started',
+    targetText:val('geCalOutputV2535').trim(),
+    achievementText:val('geCalAchievementV2535').trim(),
     source:'Manual'
   };
 
@@ -8725,8 +8640,8 @@ document.addEventListener('change',e=>{
   if(pic&&!pic.value)pic.value=x.pic||'';
 
   const scopes=geCalScopesV2533(x);
-  const scopeSel=geCalElV2535('geCalJourneyEditV2535');
-  if(scopeSel)[...scopeSel.options].forEach(o=>o.selected=scopes.includes(o.value));
+  const scopeInput=geCalElV2535('geCalJourneyEditV2535');
+  if(scopeInput)scopeInput.value=scopes.join(', ');
 
   const tps=geCalTPV2533(x);
   const touchSel=geCalElV2535('geCalTouchEditV2535');
@@ -8768,10 +8683,10 @@ window.addEventListener('DOMContentLoaded',()=>{
 /* P22/P23/P24 — Planning action visibility follows Access Level + Permission, not Role alone. */
 (function(){
 'use strict';
-const PLANNING_PAGES_P22=new Set(['service-planning.html','planning-workspace.html','lounge-list.html','branch-office-planning.html','gaso-planning.html','planning-documents.html','station-material.html','bo-space.html','airport-systems.html','lounge-procurement.html']);
+const PLANNING_ACCESS_PAGES=new Set(['service-planning.html','planning-workspace.html','lounge-list.html','branch-office-planning.html','gaso-planning.html','planning-documents.html','station-material.html','bo-space.html','airport-systems.html','lounge-procurement.html']);
 function applyPlanningActions(){
  const page=(location.pathname.split('/').pop()||'index.html').toLowerCase();
- if(!PLANNING_PAGES_P22.has(page))return;
+ if(!PLANNING_ACCESS_PAGES.has(page))return;
  document.querySelectorAll('[data-admin-only]').forEach(el=>{el.style.display=gePlanningCanAction('Edit')?'':'none'});
 }
 window.addEventListener('DOMContentLoaded',()=>setTimeout(applyPlanningActions,120));
@@ -8806,7 +8721,7 @@ if(originalRenderUserAccounts){
 }
 })();
 
-/* SOURCE: assets/v254-project.js */
+/* CONSOLIDATED: project workspace */
 /* Compatibility shim for legacy pages that reference the historical project bundle.
  * The current project-tracking implementation remains in the existing page scripts.
  * This file intentionally has no destructive initialization or data migration.
@@ -8816,14 +8731,14 @@ if(originalRenderUserAccounts){
   window.GXProjectCompat = window.GXProjectCompat || {version:'2.54.4-compat',ready:true};
 })();
 
-/* SOURCE: assets/v2544-modal-fix.js */
+/* CONSOLIDATED: modal compatibility */
 /* Compatibility shim for legacy modal enhancements. */
 (function(){
   'use strict';
   window.GXModalCompat = window.GXModalCompat || {version:'2.54.4-compat',ready:true};
 })();
 
-/* SOURCE: assets/v2554-stability.js */
+/* CONSOLIDATED: stability behavior */
 
 /* V2.55.4 — stability reset on V2.54.4 baseline */
 (function(){
@@ -8844,12 +8759,12 @@ function installInitiativeControls(){
  if(title&&!$('geV2554UploadInitiative')){
    const add=title.querySelector('button[onclick*="openInitiativeModalV224"]');
    const wrap=document.createElement('div');wrap.className='v2554-initiative-actions';
-   wrap.innerHTML=`<a class="btn secondary compact-btn" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Template Excel</a><button class="btn secondary compact-btn" type="button" id="geV2554UploadInitiative">Upload CSV/Excel</button>`;
+   wrap.innerHTML=`<a class="ge-btn secondary compact-btn" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Template Excel</a><button class="ge-btn secondary compact-btn" type="button" id="geV2554UploadInitiative">Upload Data</button>`;
    if(add){add.parentNode.insertBefore(wrap,add);wrap.appendChild(add)}
    else title.appendChild(wrap);
    $('geV2554UploadInitiative').onclick=openBulk;
  }
- if(title&&!document.getElementById('geInitiativeViewToggleR4')){const v=document.createElement('div');v.id='geInitiativeViewToggleR4';v.className='ge-initiative-view-toggle-r4';v.innerHTML='<button type="button" class="active" data-view="grid">Grid</button><button type="button" data-view="list">List</button>';title.appendChild(v);v.querySelectorAll('button').forEach(b=>b.onclick=()=>{window.GE_INITIATIVE_VIEW_R4=b.dataset.view;v.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderInitiatives();});}
+ if(title&&!document.getElementById('geInitiativeViewToggle')){const v=document.createElement('div');v.id='geInitiativeViewToggle';v.className='ge-initiative-view-toggle';v.innerHTML='<button type="button" class="active" data-view="grid">Grid</button><button type="button" data-view="list">List</button>';title.appendChild(v);v.querySelectorAll('button').forEach(b=>b.onclick=()=>{window.GE_INITIATIVE_VIEW=b.dataset.view;v.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));renderInitiatives();});}
  const grid=document.querySelector('.initiative-filter-grid-v226');
  if(grid&&!$('geV2554Priority')){
    const csv=[...grid.querySelectorAll('button')].find(b=>/(Unduh CSV|Unduh Data)/i.test(b.textContent||''));
@@ -8861,7 +8776,7 @@ function installInitiativeControls(){
    refreshInitiativeFilters();
    let rows=currentInitiativeRows().filter(geInitiativeScopedV224);
    const p=$('geV2554Priority')?.value||'';if(p)rows=rows.filter(x=>String(x.priority||'Normal')===p);
-   const t=$('initRows');if(t){if(window.GE_INITIATIVE_VIEW_R4==='list'&&rows.length){t.innerHTML=`<div class="ge-initiative-list-r4"><table><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${geEsc(x.name||'-')}</b></td><td>${geEsc(geScopesV252(x).join(', '))}</td><td>${geEsc(geTPsV252(x).join(', '))}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.pic||'-')}</td><td>${geEsc(x.dueDate||'-')}</td><td>${geEsc(String(x.real||0))}% / ${geEsc(String(x.plan||0))}%</td><td><button class="btn secondary compact-btn" onclick="openInitiativeModalV224(${Number(x.id)})">Edit</button><button class="btn secondary compact-btn" onclick="openInitiativeTimelineV224(${Number(x.id)})">Milestone</button></td></tr>`).join('')}</tbody></table></div>`;}else t.innerHTML=rows.length?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';}
+   const t=$('initRows');if(t){if(window.GE_INITIATIVE_VIEW==='list'&&rows.length){t.innerHTML=`<div class="ge-initiative-list"><table><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${geEsc(x.name||'-')}</b></td><td>${geEsc(geScopesV252(x).join(', '))}</td><td>${geEsc(geTPsV252(x).join(', '))}</td><td>${geEsc(x.airport||'-')}</td><td>${geEsc(x.pic||'-')}</td><td>${geEsc(x.dueDate||'-')}</td><td>${geEsc(String(x.real||0))}% / ${geEsc(String(x.plan||0))}%</td><td>${geInitiativeListActions(x)}</td></tr>`).join('')}</tbody></table></div>`;}else t.innerHTML=rows.length?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';}
    renderInitiativeCharts(rows);
  };
  renderInitiatives();
@@ -8941,7 +8856,7 @@ function objectRows(rows,type){
 let bulk={init:[],milestone:[]};
 function ensureBulk(){
  if($('geV2554BulkModal'))return;
- document.body.insertAdjacentHTML('beforeend',`<div id="geV2554BulkModal" class="modal-backdrop"><div class="modal-card v2554-bulk-card"><button class="modal-x" type="button" id="geV2554BulkX">×</button><span class="eyebrow">BULK IMPORT INITIATIVE</span><h2>Upload CSV / Excel</h2><p class="section-subtitle">Gunakan template agar struktur Initiative dan Milestone konsisten.</p><label class="v2554-upload-box"><input id="geV2554BulkFile" type="file" accept=".xlsx,.csv"><b>Pilih file XLSX / CSV</b><span>XLSX mendukung sheet Initiatives + Milestones.</span></label><label>Mode Import<select id="geV2554Mode"><option value="upsert">Create & Update</option><option value="create">Create New Only</option><option value="update">Update Existing Only</option></select></label><div id="geV2554BulkStats" class="v2554-bulk-stats"></div><div class="v2554-preview"><table><thead><tr><th>Row</th><th>Code</th><th>Initiative</th><th>Validation</th></tr></thead><tbody id="geV2554PreviewBody"></tbody></table></div><div class="modal-actions sticky-actions"><a class="btn secondary" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Download Template</a><button class="btn" id="geV2554Import" disabled>Import Data</button><button class="btn secondary" id="geV2554BulkClose">Close</button></div></div></div>`);
+ document.body.insertAdjacentHTML('beforeend',`<div id="geV2554BulkModal" class="modal-backdrop"><div class="modal-card v2554-bulk-card"><button class="modal-x" type="button" id="geV2554BulkX">×</button><span class="eyebrow">BULK IMPORT INITIATIVE</span><h2>Upload CSV / Excel</h2><p class="section-subtitle">Gunakan template agar struktur Initiative dan Milestone konsisten.</p><label class="v2554-upload-box"><input id="geV2554BulkFile" type="file" accept=".xlsx,.csv"><b>Pilih file XLSX / CSV</b><span>XLSX mendukung sheet Initiatives + Milestones.</span></label><label>Mode Import<select id="geV2554Mode"><option value="upsert">Create & Update</option><option value="create">Create New Only</option><option value="update">Update Existing Only</option></select></label><div id="geV2554BulkStats" class="v2554-bulk-stats"></div><div class="v2554-preview"><table><thead><tr><th>Row</th><th>Code</th><th>Initiative</th><th>Validation</th></tr></thead><tbody id="geV2554PreviewBody"></tbody></table></div><div class="modal-actions sticky-actions"><a class="ge-btn secondary" href="assets/Template_Bulk_Import_Initiative_V2_55.xlsx" download>Download Template</a><button class="ge-btn" id="geV2554Import" disabled>Import Data</button><button class="ge-btn secondary" id="geV2554BulkClose">Close</button></div></div></div>`);
  $('geV2554BulkX').onclick=$('geV2554BulkClose').onclick=()=>$('geV2554BulkModal').classList.remove('show');
  $('geV2554BulkFile').onchange=e=>previewBulk(e.target.files[0]);
  $('geV2554Import').onclick=doImport;
@@ -8969,7 +8884,7 @@ function doImport(){
 window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiativeControls();bindCalendar();ensureBulk();window.geV2554BindGantt?.()},80));
 })();
 
-/* SOURCE: assets/lounge-planning-v29.js */
+/* SOURCE: consolidated Lounge/Tenant Planning implementation */
 /* Ground Experience P29 — Lounge/Tenant planning, shared input contract,
    multi-period pricing and defensive rendering. No production migration. */
 (function(){
@@ -9184,7 +9099,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       <div><label>Currency<input data-price-field="currency" maxlength="3" placeholder="IDR" value="${esc(s.currency||'')}"></label></div>
       <div><label>Price Basis<input data-price-field="priceBasis" value="${esc(s.priceBasis||'pax')}" placeholder="pax"></label></div>
       <div><label>Note<input data-price-field="priceNote" value="${esc(s.priceNote||'')}"></label></div>
-      <button type="button" class="btn secondary compact-btn ge-p29-remove-price" ${rows.length===1?'disabled':''}>Hapus</button>
+      <button type="button" class="ge-btn secondary compact-btn ge-p29-remove-price" ${rows.length===1?'disabled':''}>Delete</button>
     </div>`).join('');
     box.querySelectorAll('.ge-p29-remove-price').forEach(btn=>btn.addEventListener('click',()=>{btn.closest('.ge-p29-price-row')?.remove();if(!box.querySelector('.ge-p29-price-row'))renderPriceRows(containerId,[{}]);}));
   }
@@ -9203,7 +9118,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       <div><label>Effective To<input data-capacity-field="effectiveTo" type="date" value="${esc(r.effectiveTo||'')}"></label></div>
       <div><label>Capacity (pax)<input data-capacity-field="capacity" type="number" min="0" step="1" value="${esc(r.capacity??'')}"></label></div>
       <div><label>Note<input data-capacity-field="note" value="${esc(r.note||'')}"></label></div>
-      <button type="button" class="btn secondary compact-btn ge-p29-remove-capacity" ${rows.length===1?'disabled':''}>Hapus</button>
+      <button type="button" class="ge-btn secondary compact-btn ge-p29-remove-capacity" ${rows.length===1?'disabled':''}>Delete</button>
     </div>`).join('');
     box.querySelectorAll('.ge-p29-remove-capacity').forEach(btn=>btn.addEventListener('click',()=>{btn.closest('.ge-p29-capacity-row')?.remove();if(!box.querySelector('.ge-p29-capacity-row'))renderCapacityRows(containerId,[{}]);}));
   }
@@ -9221,27 +9136,27 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     return `<div class="formgrid ge-p29-form-grid">
       <label>Region<select id="${prefix}Region"><option value="">Pilih Region</option><option ${m.region==='WEST'?'selected':''}>WEST</option><option ${m.region==='EAST'?'selected':''}>EAST</option><option ${m.region==='INT'?'selected':''}>INT</option></select></label>
       <label>Station<select id="${prefix}Airport" required><option value="">Pilih Station</option>${airports().filter(a=>a.status!=='Inactive').map(a=>`<option value="${esc(a.code)}" ${String(m.airport||'').toUpperCase()===String(a.code).toUpperCase()?'selected':''}>${esc(a.code+(a.airportName?' — '+a.airportName:''))}</option>`).join('')}</select></label>
-      <label>Nama Layanan / Provider<input id="${prefix}Name" required value="${esc(m.name||'')}"></label>
+      <label>Nama Layanan / Provider<input id="${prefix}Name" required value="${esc(m.name||'')}" placeholder="Masukkan nama layanan / provider"></label>
       <label>Jenis Layanan<select id="${prefix}ServiceType" required><option value="">Pilih Jenis Layanan</option>${TYPES.map(t=>`<option value="${t}" ${m.serviceType===t?'selected':''}>${t}</option>`).join('')}</select></label>
-      <label>PIC<input id="${prefix}Pic" value="${esc(m.pic||'')}"></label>
+      <label>PIC<input id="${prefix}Pic" value="${esc(m.pic||'')}" placeholder="Pilih atau masukkan PIC"></label>
       <label>Record / Agreement Action<select id="${prefix}AgreementAction"><option value="new" ${!m.supersedesId?'selected':''}>New / Existing Active Agreement</option><option value="replacement" ${m.agreementAction==='replacement'?'selected':''}>Replacement</option><option value="amendment" ${m.agreementAction==='amendment'?'selected':''}>Amendment</option><option value="extension" ${m.agreementAction==='extension'?'selected':''}>Extension / Renewal</option></select></label>
       <label>Replaces Record ID<input id="${prefix}SupersedesId" value="${esc(m.supersedesId||'')}" placeholder="Isi bila menggantikan record lama"></label>
       <label>Agreement Start Date<input id="${prefix}Start" type="date" value="${esc(m.startDate||'')}"></label>
       <label>Agreement End Date<input id="${prefix}End" type="date" value="${esc(m.endDate||'')}"></label>
       <label>Mata Uang (single price)<input id="${prefix}Currency" maxlength="3" value="${esc(m.currency||'')}" placeholder="IDR"></label>
       <label>Harga Per Pax (single price)<input id="${prefix}Price" type="number" min="0" step="0.01" value="${m.pricePerPax?esc(m.pricePerPax):''}"></label>
-      <label>Nomor Dokumen / Agreement Identity<input id="${prefix}DocumentNumber" value="${esc(m.documentNumber||'')}"></label>
-      <label>Jenis Dokumen<input id="${prefix}DocumentType" value="${esc(m.documentType||'')}"></label>
+      <label>Nomor Dokumen / Agreement Identity<input id="${prefix}DocumentNumber" value="${esc(m.documentNumber||'')}" placeholder="Masukkan nomor agreement / dokumen"></label>
+      <label>Jenis Dokumen<input id="${prefix}DocumentType" value="${esc(m.documentType||'')}" placeholder="Contoh: Agreement / Contract"></label>
       <label>Status Dokumen<input id="${prefix}DocumentStatus" list="geP29StatusOptions" value="${esc(m.documentStatus||'Valid')}"><datalist id="geP29StatusOptions">${STATUS_VALUES.map(s=>`<option value="${s}">`).join('')}</datalist></label>
-      <label class="ge-p29-span2">Remarks<textarea id="${prefix}Remarks" rows="3">${esc(m.remarks||'')}</textarea></label>
+      <label class="ge-p29-span2">Remarks<textarea id="${prefix}Remarks" rows="3" placeholder="Tambahkan catatan bila diperlukan">${esc(m.remarks||'')}</textarea></label>
     </div>
     <section class="ge-p29-price-section">
-      <div class="ge-p29-section-head"><div><b>Price Schedule</b><small>Opsional. Gunakan ini bila satu Agreement memiliki lebih dari satu periode harga. Agreement Start/End tetap menjadi periode Agreement.</small></div><button type="button" class="btn secondary compact-btn" onclick="geP29AddPriceRow('${prefix}Prices')">+ Add Price Period</button></div>
+      <div class="ge-p29-section-head"><div><b>Price Schedule</b><small>Opsional. Gunakan ini bila satu Agreement memiliki lebih dari satu periode harga. Agreement Start/End tetap menjadi periode Agreement.</small></div><button type="button" class="ge-btn secondary compact-btn" onclick="geP29AddPriceRow('${prefix}Prices')">+ Add Price Period</button></div>
       <div id="${prefix}Prices" class="ge-p29-price-rows"></div>
       <div class="ge-p29-input-note">Satu sumber input: jika Price Schedule digunakan, jangan isi Harga Per Pax single price. Currency harus berupa kode mata uang ISO 4217 yang dikenali browser.</div>
     </section>
     <section class="ge-p29-price-section ge-p29-capacity-section">
-      <div class="ge-p29-section-head"><div><b>Capacity Schedule</b><small>Kapasitas dapat berubah per periode tanpa membuat master Lounge/Tenant baru.</small></div><button type="button" class="btn secondary compact-btn" onclick="geP29AddCapacityRow('${prefix}Capacity')">+ Add Capacity Period</button></div>
+      <div class="ge-p29-section-head"><div><b>Capacity Schedule</b><small>Kapasitas dapat berubah per periode tanpa membuat master Lounge/Tenant baru.</small></div><button type="button" class="ge-btn secondary compact-btn" onclick="geP29AddCapacityRow('${prefix}Capacity')">+ Add Capacity Period</button></div>
       <div id="${prefix}Capacity" class="ge-p29-price-rows"></div>
     </section>
     <label class="ge-p29-file-field">Lampiran Dokumen<input id="${prefix}Document" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"></label>`;
@@ -9266,9 +9181,9 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     const modal=document.getElementById(id);if(!modal)return;
     const card=modal.querySelector('.modal-card');if(!card)return;
     card.innerHTML=`<button class="modal-x" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">×</button>
-      <h2>${esc(title)}</h2><p class="section-subtitle">Satu struktur data untuk Add, Update, dan CSV. Lounge dan Tenant tetap merupakan Service Type yang berbeda.</p>
+      <h2>${esc(title)}</h2><p class="section-subtitle">Lengkapi data layanan. Teks abu-abu di dalam field adalah panduan dan bukan nilai data.</p>
       <form id="${prefix}Form"><div id="${prefix}Errors"></div>${commonFormMarkup(prefix,model)}
-      <div class="modal-actions sticky-actions"><button class="btn" type="submit">${id==='loungeAddModalV221'?'Simpan Layanan':'Simpan Update'}</button><button class="btn secondary" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">Batal</button></div></form>`;
+      <div class="modal-actions sticky-actions"><button class="ge-btn" type="submit">${id==='loungeAddModalV221'?'Save':'Save Changes'}</button><button class="ge-btn secondary" type="button" onclick="${id==='loungeAddModalV221'?'closeLoungeAddModalV221()':'closeLoungeEdit()'}">Cancel</button></div></form>`;
     renderPriceRows(prefix+'Prices',model?.priceSchedules||[]);
     renderCapacityRows(prefix+'Capacity',model?.capacitySchedules||[]);
     document.getElementById(prefix+'Form').addEventListener('submit',e=>{e.preventDefault();id==='loungeAddModalV221'?saveAdd(prefix):saveEdit(prefix)});
@@ -9277,7 +9192,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
 
   window.openLoungeAddModalV230=function(){
     if(!canCreate())return;
-    state.editId=null;replaceModalContent('loungeAddModalV221','Tambah Layanan Lounge/Tenant','geP29Add',{});
+    state.editId=null;replaceModalContent('loungeAddModalV221','Add Lounge/Tenant Service','geP29Add',{});
   };
   window.closeLoungeAddModalV221=function(){document.getElementById('loungeAddModalV221')?.classList.remove('show')};
   window.openLoungeEdit=function(id){
@@ -9287,7 +9202,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     state.editId=x.id;
     const model={...x,serviceType:rt.value};
     if(Array.isArray(x.priceSchedules)&&x.priceSchedules.length){model.pricePerPax='';model.currency='';model.priceDisplay='';}
-    replaceModalContent('loungeEditModal','Update Layanan Lounge/Tenant','geP29Edit',model);
+    replaceModalContent('loungeEditModal','Edit Lounge/Tenant Service','geP29Edit',model);
     if(rt.status==='REVIEW')setFormError('geP29Edit',[rt.reason+'; koreksi melalui Update sebelum menyimpan.']);
   };
   window.closeLoungeEdit=function(){document.getElementById('loungeEditModal')?.classList.remove('show')};
@@ -9326,23 +9241,99 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     notice('Layanan Diperbarui',`${check.model.serviceType} — ${check.model.name} berhasil diperbarui.`,'success');
   }
 
+  /* R4 canonical searchable filter: placeholder stays muted until a selection is made. */
+  function geLoungeSearchableR4(hostId){
+    const host=document.getElementById(hostId);if(!host)return;
+    const source=document.getElementById(host.dataset.sourceSelect);
+    const trigger=host.querySelector('[data-searchable-trigger]');
+    const menu=host.querySelector('[data-searchable-menu]');
+    const search=menu?.querySelector('input');
+    const options=menu?.querySelector('.ge-searchable-options');
+    if(!source||!trigger||!menu||!search||!options||host.dataset.ready==='1')return;
+    host.dataset.ready='1';
+    const multiple=source.multiple;
+    let draft=new Set();
+    const committed=()=>new Set([...source.options].filter(o=>o.selected).map(o=>String(o.value)));
+    const summary=()=>{
+      const selected=[...source.options].filter(o=>o.selected);
+      const has=multiple?selected.length>0:!!source.value;
+      trigger.textContent=multiple?(selected.length?`${selected.length} station selected`:'Search or choose station'):(source.selectedOptions[0]?.textContent||'Search or choose service provider');
+      trigger.classList.toggle('is-placeholder',!has);
+      trigger.setAttribute('aria-expanded',String(host.classList.contains('is-open')));
+    };
+    if(multiple){
+      const footer=document.createElement('div');footer.className='ge-searchable-confirm-actions';
+      footer.innerHTML='<button type="button" class="ge-btn secondary" data-picker-cancel>Cancel</button><button type="button" class="ge-btn primary" data-picker-ok>OK</button>';
+      menu.appendChild(footer);
+      footer.querySelector('[data-picker-cancel]').addEventListener('click',()=>close(false));
+      footer.querySelector('[data-picker-ok]').addEventListener('click',()=>close(true));
+    }
+    function render(){
+      const q=String(search.value||'').trim().toLowerCase();options.replaceChildren();
+      const list=[...source.options].filter(o=>o.value!==''&&(!q||o.textContent.toLowerCase().includes(q)));
+      if(!list.length){const empty=document.createElement('div');empty.className='ge-searchable-empty';empty.textContent='No matching data';options.appendChild(empty);return;}
+      list.forEach(o=>{
+        const row=document.createElement('label');row.className='ge-searchable-option';
+        const input=document.createElement('input');input.type=multiple?'checkbox':'radio';
+        input.name=multiple?`${hostId}-multi`:`${hostId}-single`;
+        input.checked=multiple?draft.has(String(o.value)):o.selected;
+        input.value=o.value;row.append(input,document.createTextNode(o.textContent));
+        input.addEventListener('change',()=>{
+          if(multiple){input.checked?draft.add(String(o.value)):draft.delete(String(o.value));}
+          else{source.value=input.value;source.dispatchEvent(new Event('change',{bubbles:true}));close(false);}
+        });options.appendChild(row);
+      });
+    }
+    function close(apply){
+      if(!host.classList.contains('is-open'))return;
+      if(multiple&&apply){
+        [...source.options].forEach(o=>{o.selected=draft.has(String(o.value))});
+        source.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+      host.classList.remove('is-open');search.value='';summary();
+    }
+    function open(){
+      document.querySelectorAll('.ge-searchable.is-open').forEach(other=>{
+        if(other!==host)other.dispatchEvent(new CustomEvent('ge-picker-dismiss'));
+      });
+      draft=committed();host.classList.add('is-open');summary();render();search.focus();
+    }
+    host.addEventListener('ge-picker-dismiss',()=>close(false));
+    trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
+    trigger.addEventListener('click',e=>{e.preventDefault();host.classList.contains('is-open')?close(false):open()});
+    search.addEventListener('input',render);
+    host.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();close(false);trigger.focus()}});
+    document.addEventListener('pointerdown',e=>{if(!host.contains(e.target))close(false)},true);
+    source.addEventListener('change',()=>{summary();if(host.classList.contains('is-open')&&!multiple)render()});
+    summary();
+  }
+  function geInitLoungeSearchablesR4(){geLoungeSearchableR4('loungeStationSearchR4');geLoungeSearchableR4('loungeProviderSearchR4')}
+  function loungeRegionOf(x){
+    const direct=String(x?.region||x?.wilayah||'').trim();if(direct)return direct;
+    const code=String(x?.airport||x?.station||x?.stationCode||'').trim().toUpperCase();
+    const ap=(data.airports||[]).find(a=>String(a.code||a.iata||a.airportCode||a.stationCode||'').trim().toUpperCase()===code);
+    return String(ap?.region||ap?.networkRegion||ap?.wilayah||ap?.serviceRegion||'').trim();
+  }
   function populateFilterOptions(){
-    const provider=document.getElementById('loungeNameFilter'),status=document.getElementById('loungeStatusFilter');
-    const put=(el,values,label)=>{if(!el)return;const cur=el.value,items=[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));el.innerHTML=`<option value="">${label}</option>`+items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');el.value=items.includes(cur)?cur:''};
-    put(provider,(data.lounges||[]).map(x=>x.name),'Semua Nama Layanan / Provider');
-    put(status,(data.lounges||[]).map(x=>x.documentStatus),'Semua Status Dokumen');
+    const provider=document.getElementById('loungeNameFilter'),status=document.getElementById('loungeStatusFilter'),station=document.getElementById('loungeAirportFilter'),region=document.getElementById('loungeRegionFilter');
+    const put=(el,values,label)=>{if(!el)return;const cur=el.value,items=[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));el.innerHTML=`<option value="">${label}</option>`+items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(!el.multiple)el.value=items.includes(cur)?cur:''};
+    put(provider,(data.lounges||[]).map(x=>x.name),'All Service Providers');
+    put(status,[...(data.lounges||[]).map(x=>x.documentStatus),'Expired','Expiring Soon'],'All Status');
+    put(region,[...(data.lounges||[]).map(loungeRegionOf),...(data.referenceCatalog||[]).filter(x=>x.kind==='id:regions'&&x.status!=='Inactive').map(x=>x.name||x.id)],'All Regions');
+    put(station,(typeof geVisibleAirports==='function'?geVisibleAirports():[...(data.airports||[])].map(x=>x.code||x.iata||x.airportCode).filter(Boolean)),'All Stations');
   }
 
   function filterType(){return document.querySelector('[data-ge-p29-service-filter].active')?.dataset.geP29ServiceFilter||''}
   function filteredRows(){
     const base=(data.lounges||[]).slice();
-    const region=val('loungeRegionFilter'),station=val('loungeAirportFilter'),provider=val('loungeNameFilter'),status=val('loungeStatusFilter'),type=filterType(),q=(document.getElementById('loungeFilterTextR6')?.value||'').trim().toLowerCase();
+    const region=val('loungeRegionFilter'),stationValue=String(val('loungeAirportFilter')||'').toUpperCase(),provider=val('loungeNameFilter'),status=val('loungeStatusFilter'),type=filterType(),q=(document.getElementById('loungeFilterTextR6')?.value||'').trim().toLowerCase();
     const showHistory=!!document.getElementById('geP29ShowHistory')?.checked;
     return base.filter(x=>{
       const rt=resolveType(x),t=rt.value;
       if(!showHistory&&(x.recordStatus==='Superseded'||x.supersededBy))return false;
-      const text=[x.region,x.airport,x.name,t,x.serviceCategory,x.documentNumber,x.documentType,x.documentStatus,x.remarks].map(v=>String(v||'')).join(' ').toLowerCase();
-      return (!q||text.includes(q))&&(!region||String(x.region||'')===region)&&(!station||String(x.airport||'')===station)&&(!provider||String(x.name||'')===provider)&&(!status||String(x.documentStatus||'')===status)&&(!type||t===type);
+      const effectiveRegion=loungeRegionOf(x),text=[effectiveRegion,x.airport,x.name,t,x.serviceCategory,x.documentNumber,x.documentType,x.documentStatus,x.remarks].map(v=>String(v||'')).join(' ').toLowerCase();
+      const lifecycle=statusForAgreement(x).label==='Agreement expired'?'Expired':(/hari tersisa/.test(statusForAgreement(x).label)&&Number(String(statusForAgreement(x).label).split(' ')[0])<=90?'Expiring Soon':'');
+      return (!q||text.includes(q))&&(!region||effectiveRegion===region)&&(!stationValue||stationValue===String(x.airport||x.station||x.stationCode||'').toUpperCase())&&(!provider||String(x.name||'')===provider)&&(!status||(status==='Expired'||status==='Expiring Soon'?lifecycle===status:String(x.documentStatus||'')===status))&&(!type||t===type);
     });
   }
   window.loungeFiltered=function(){return filteredRows()};
@@ -9367,9 +9358,8 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
       const priceText=price.status==='CURRENT'||price.status==='LEGACY'?safePriceDisplay(price.currency,price.price):price.status==='NOT_APPLICABLE'?'Not Available':price.status==='INVALID'?'Requires Review':'Not Available';
       const priceMeta=scheduleCount?`${scheduleCount} Price Period${scheduleCount===1?'':'s'}`:'';
       const review=rt.status==='REVIEW'?`<div class="ge-p29-review-note">Requires Review: ${esc(rt.reason)}</div>`:'';
-      const update=canEdit()?`<button class="btn secondary compact-btn" type="button" onclick="openLoungeEdit(${Number(x.id)})">Edit</button>`:'';
-      const del=typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="btn danger compact-btn" type="button" onclick="deleteLoungeV239(${Number(x.id)})">Hapus</button>`:'';
-      const detail=scheduleCount?`<button class="btn secondary compact-btn" type="button" onclick="geP29ViewPriceSchedule(${Number(x.id)})">View Price Schedule</button>`:'';
+      const update=canEdit()?`<button class="ge-btn secondary compact-btn" type="button" onclick='openLoungeEdit(${JSON.stringify(String(x.id))})'>Edit</button>`:'';
+      const del=typeof geIsAdmin==='function'&&geIsAdmin()?`<button class="ge-btn danger compact-btn" type="button" onclick='deleteLoungeV239(${JSON.stringify(String(x.id))})'>Delete</button>`:'';
       return `<article class="lounge-master-card-v237 ge-p29-lounge-card">
         <div class="lounge-master-code-v237">${esc(x.airport||'-')}</div>
         <div class="lounge-master-card-body-v237">
@@ -9383,11 +9373,11 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
             ${priceMeta?`<div><dt>Price Schedule</dt><dd>${esc(priceMeta)}</dd></div>`:''}
             <div><dt>Agreement</dt><dd>${esc(x.documentNumber||'Not Available')}</dd></div>
           </div>${review}
-          <div class="lounge-card-actions-v237">${detail}${update}${del}</div>
+          <div class="lounge-card-actions-v237">${update}${del}</div>
         </div>
       </article>`;
     }).join('')||'<div class="lounge-master-empty-v237">Belum ada data Lounge/Tenant pada filter ini.</div>';
-    const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Halaman ${GE_LOUNGE_CARD_PAGE_V237} dari ${pages} • ${rows.length} data`;
+    const info=document.getElementById('loungeCardPageInfoV237');if(info)info.textContent=`Page ${GE_LOUNGE_CARD_PAGE_V237} of ${pages} • ${rows.length} data`;
     const prev=document.getElementById('loungeCardPrevV237'),next=document.getElementById('loungeCardNextV237');if(prev)prev.disabled=GE_LOUNGE_CARD_PAGE_V237<=1;if(next)next.disabled=GE_LOUNGE_CARD_PAGE_V237>=pages;
   }
   window.renderLoungeCardsV237=renderCards;
@@ -9397,11 +9387,11 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     const rows=filteredRows();
     tbody.innerHTML=rows.map((x,i)=>{
       const rt=resolveType(x),p=applicablePrice(x,new Date()),price=p.status==='CURRENT'||p.status==='LEGACY'?safePriceDisplay(p.currency,p.price):'Not Available';
-      const action=canEdit()?`<td><div class="row-actions"><button class="btn secondary" onclick="openLoungeEdit(${Number(x.id)})">Edit</button><button class="btn btn-danger" onclick="deleteLoungeV239(${Number(x.id)})">Hapus</button></div></td>`:'';
-      return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Unduh</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
+      const action=canEdit()?`<td><div class="row-actions"><button class="ge-btn secondary" onclick='openLoungeEdit(${JSON.stringify(String(x.id))})'>Edit</button><button class="ge-btn ge-btn danger" onclick='deleteLoungeV239(${JSON.stringify(String(x.id))})'>Delete</button></div></td>`:'';
+      return `<tr><td>${i+1}</td><td>${esc(x.region||'-')}</td><td><b>${esc(x.airport||'Not Available')}</b></td><td><b>${esc(x.name||'Not Available')}</b></td><td><span class="pill">${esc(rt.value||'Requires Review')}</span></td><td>${esc(price)}</td><td>${dateLabel(x.startDate)}</td><td>${dateLabel(x.endDate)}</td><td>${esc(x.documentNumber||'-')}</td><td>${esc(x.documentType||'-')}</td><td>${esc(x.documentStatus||'Not Available')}</td><td>${esc(x.remarks||'-')}</td><td>${x.documentKey?`<button class="ge-btn secondary" onclick="GEFiles.download('${esc(x.documentKey)}','${esc(x.documentName||'document')}')">Download</button>`:esc(x.documentName||'-')}</td>${action}</tr>`;
     }).join('');
   }
-  const geP29RenderTableBaseR4=renderTable;renderTable=function(){geP29RenderTableBaseR4();setTimeout(()=>window.geEnhanceAllTables?.(),0)};
+  const renderLoungeTableBase=renderTable;renderTable=function(){renderLoungeTableBase();setTimeout(()=>window.geEnhanceAllTables?.(),0)};
   window.renderLounges=function(){try{populateFilterOptions();renderTable();renderCards();renderPriceSummary();}catch(e){console.error('P29 Lounge render guard',e);const g=document.getElementById('loungeCardGridV237');if(g)g.innerHTML='<div class="lounge-master-empty-v237">Data Lounge/Tenant tidak dapat ditampilkan. Periksa data yang memerlukan review.</div>';}};
 
   function renderPriceSummary(){
@@ -9584,13 +9574,17 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
   }
 
   function setup(){
-    setupTypeFilter();
+    const pageHead=document.querySelector('.lounge-master-page-head h1');if(pageHead)pageHead.textContent='Lounge/Tenant Planning';
+    const addButton=document.getElementById('loungeAddAction');
+    if(addButton&&!addButton.dataset.boundCanonical){addButton.dataset.boundCanonical='1';addButton.onclick=()=>window.openLoungeAddModalV230?.();}
+    document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(btn=>{btn.onclick=()=>window.geSetLoungeView?.(btn.dataset.view)});
     const heading=document.querySelector('.lounge-master-view-label-v237');
-    if(heading&&!document.getElementById('geP29ShowHistory')){const history=document.createElement('label');history.className='ge-p29-history-toggle';history.innerHTML='<input id="geP29ShowHistory" type="checkbox"> Tampilkan history agreement';heading.appendChild(history);document.getElementById('geP29ShowHistory').onchange=()=>renderLounges();}
-    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download CSV Template';templateBtn.title='Download CSV Template P29';}
+    if(heading&&!document.getElementById('geP29ShowHistory')){const history=document.createElement('label');history.className='ge-p29-history-toggle';history.innerHTML='<input id="geP29ShowHistory" type="checkbox"> Show agreement history';heading.appendChild(history);document.getElementById('geP29ShowHistory').onchange=()=>renderLounges();}
+    const templateBtn=[...document.querySelectorAll('button')].find(b=>/Unduh Template/i.test(b.textContent||''));if(templateBtn){templateBtn.textContent='Download Template';templateBtn.title='Download Template';}
     ['loungeRegionFilter','loungeAirportFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('change',()=>{GE_LOUNGE_CARD_PAGE_V237=1;renderLounges()})});
     try{if(typeof fillAirportSelects==='function')fillAirportSelects()}catch(e){}
     renderLounges();
+    geInitLoungeSearchablesR4();
   }
 
   window.geP29ViewPriceSchedule=function(id){
@@ -9599,7 +9593,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     if(!schedules.length)return;
     let modal=document.getElementById('geP29PriceScheduleModal');if(!modal){modal=document.createElement('div');modal.id='geP29PriceScheduleModal';modal.className='modal-backdrop';modal.innerHTML='<div class="modal-card ge-p29-schedule-modal"></div>';document.body.appendChild(modal)}
     const checked=validateSchedules(schedules,validDate(x.startDate),validDate(x.endDate));
-    modal.querySelector('.modal-card').innerHTML=`<button class="modal-x" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">×</button><h2>Price Schedule</h2><p class="section-subtitle">${esc(x.name||'Lounge/Tenant')} • ${esc(x.documentNumber||'Agreement identity tidak tersedia')}</p>${checked.valid?`<div class="ge-p29-schedule-list">${checked.schedules.map((s,i)=>`<div class="ge-p29-schedule-item"><div><span>Period ${i+1}</span><b>${esc(dateLabel(s.effectiveFrom))} — ${esc(dateLabel(s.effectiveTo))}</b></div><div><span>Price</span><b>${esc(safePriceDisplay(s.currency,s.price))}</b></div><div><span>Basis</span><b>${esc(s.priceBasis||'pax')}</b></div>${s.priceNote?`<small>${esc(s.priceNote)}</small>`:''}</div>`).join('')}</div>`:`<div class="ge-p29-form-errors"><b>Requires Review</b><p>${esc(checked.errors.join('; '))}</p></div>`}<div class="modal-actions"><button class="btn secondary" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">Tutup</button></div>`;
+    modal.querySelector('.modal-card').innerHTML=`<button class="modal-x" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">×</button><h2>Price Schedule</h2><p class="section-subtitle">${esc(x.name||'Lounge/Tenant')} • ${esc(x.documentNumber||'Agreement identity tidak tersedia')}</p>${checked.valid?`<div class="ge-p29-schedule-list">${checked.schedules.map((s,i)=>`<div class="ge-p29-schedule-item"><div><span>Period ${i+1}</span><b>${esc(dateLabel(s.effectiveFrom))} — ${esc(dateLabel(s.effectiveTo))}</b></div><div><span>Price</span><b>${esc(safePriceDisplay(s.currency,s.price))}</b></div><div><span>Basis</span><b>${esc(s.priceBasis||'pax')}</b></div>${s.priceNote?`<small>${esc(s.priceNote)}</small>`:''}</div>`).join('')}</div>`:`<div class="ge-p29-form-errors"><b>Requires Review</b><p>${esc(checked.errors.join('; '))}</p></div>`}<div class="modal-actions"><button class="ge-btn secondary" type="button" onclick="document.getElementById('geP29PriceScheduleModal')?.classList.remove('show')">Close</button></div>`;
     modal.classList.add('show');
   };
 
@@ -9613,7 +9607,8 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
     };
   }
 
-  window.addEventListener('DOMContentLoaded',()=>setTimeout(setup,0));
+  window.geInitLoungeP29=setup;
+  if(document.getElementById('loungeAddAction'))setTimeout(setup,0);
 })();
 
   // Canonical SPA bridge: legacy inline handlers must remain globally callable after consolidation into this IIFE.
@@ -9676,7 +9671,8 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
   if(typeof renderAnnouncements==='function') window.renderAnnouncements=renderAnnouncements;
   if(typeof renderFaqs==='function') window.renderFaqs=renderFaqs;
   if(typeof renderAdminOverview==='function') window.renderAdminOverview=renderAdminOverview;
-  if(typeof renderLounges==='function') window.renderLounges=renderLounges;
+  if(typeof renderLounges==='function') window.geChangeLoungeCardPageP87=(delta)=>changeLoungeCardPageV237(delta);
+  window.renderLounges=renderLounges;
   if(typeof changeLoungeCardPageV237==='function') window.changeLoungeCardPageV237=changeLoungeCardPageV237;
   if(typeof renderLoungeVisitors==='function') window.renderLoungeVisitors=renderLoungeVisitors;
   if(typeof renderPlanningDocuments==='function') window.renderPlanningDocuments=renderPlanningDocuments;
@@ -9717,10 +9713,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{installInitiative
   document.addEventListener=_d;
 })();
 
-/* CANONICAL CONSOLIDATION — R11
- * Repairs only the invalid R10 canonical block. Existing proven V224/V216 business logic remains intact.
- * No parallel modal/page implementation is created.
- */
+/* Canonical consolidated interaction layer. */
 (function(){
 'use strict';
 const store=()=>window.GEStore?.get?.()||window.data||{};
@@ -9740,14 +9733,15 @@ function picker(id,items,selected=[]){
  const list=[...new Set((items||[]).map(x=>String(x).trim()).filter(Boolean))];
  const labels=()=>{try{return JSON.parse(root.dataset.values||'[]')}catch{return[]}};
  const summary=()=>{const vals=labels(),max=3;if(!vals.length)return 'Select';const shown=vals.slice(0,max);return shown.join(', ')+(vals.length>max?` +${vals.length-max}`:'')};
- root.innerHTML=`<button type="button" class="ge-picker-trigger-r11"><span>${esc(summary())}</span><i>⌄</i></button><div class="ge-picker-pop-r11"><input class="ge-picker-search-r11" placeholder="Search..." autocomplete="off"><div class="ge-picker-options-r11"><label data-all-option="1"><input type="checkbox" value="${allKey}"><span>All</span></label>${list.map(v=>`<label data-label="${esc(v.toLowerCase())}"><input type="checkbox" value="${esc(v)}" ${chosen.has(v)?'checked':''}><span>${esc(v)}</span></label>`).join('')||'<div class="ge-picker-empty-r11">No matching data found.</div>'}</div><div class="ge-picker-actions-r11"><button type="button" data-picker-clear>Clear</button><button type="button" data-picker-cancel>Cancel</button><button type="button" class="primary" data-picker-ok>Apply</button></div></div>`;
- const trigger=root.querySelector('.ge-picker-trigger-r11'),pop=root.querySelector('.ge-picker-pop-r11'),search=root.querySelector('.ge-picker-search-r11'),all=root.querySelector('[data-all-option] input');
- const optionInputs=()=>[...root.querySelectorAll('.ge-picker-options-r11 input[type="checkbox"]')].filter(x=>x.value!==allKey);
+ root.innerHTML=`<div class="ge-picker-field" role="combobox" aria-haspopup="listbox" aria-expanded="false" tabindex="0"><span>${esc(summary())}</span><span class="ge-picker-caret" aria-hidden="true"></span></div><div class="ge-picker-pop"><input class="ge-picker-search" placeholder="Search..." autocomplete="off"><div class="ge-picker-options"><label data-all-option="1"><input type="checkbox" value="${allKey}"><span>All</span></label>${list.map(v=>`<label data-label="${esc(v.toLowerCase())}"><input type="checkbox" value="${esc(v)}" ${chosen.has(v)?'checked':''}><span>${esc(v)}</span></label>`).join('')||'<div class="ge-picker-empty">No matching data found.</div>'}</div><div class="ge-picker-actions"><button type="button" data-picker-clear>Clear</button><button type="button" data-picker-cancel>Cancel</button><button type="button" class="primary" data-picker-ok>Apply</button></div></div>`;
+ const trigger=root.querySelector('.ge-picker-field'),pop=root.querySelector('.ge-picker-pop'),search=root.querySelector('.ge-picker-search'),all=root.querySelector('[data-all-option] input');
+ const optionInputs=()=>[...root.querySelectorAll('.ge-picker-options input[type="checkbox"]')].filter(x=>x.value!==allKey);
  const syncAll=()=>{const opts=optionInputs(),checked=opts.filter(x=>x.checked).length;all.checked=opts.length>0&&checked===opts.length;all.indeterminate=checked>0&&checked<opts.length};
  const renderSummary=()=>{trigger.querySelector('span').textContent=summary();syncAll()};
- const close=()=>{pop.classList.remove('show');search.value='';root.querySelectorAll('.ge-picker-options-r11 label').forEach(l=>l.hidden=false)};
- trigger.onclick=()=>{document.querySelectorAll('.ge-picker-pop-r11.show').forEach(x=>x!==pop&&x.classList.remove('show'));pop.classList.toggle('show');if(pop.classList.contains('show')){syncAll();setTimeout(()=>search.focus(),0)}};
- search.oninput=()=>{const q=search.value.trim().toLowerCase();root.querySelectorAll('.ge-picker-options-r11 label').forEach(l=>{if(l.hasAttribute('data-all-option')){l.hidden=false;return}l.hidden=!!q&&!l.dataset.label.includes(q)})};
+ const close=()=>{pop.classList.remove('show');trigger.setAttribute('aria-expanded','false');search.value='';root.querySelectorAll('.ge-picker-options label').forEach(l=>l.hidden=false)};
+ const toggle=()=>{document.querySelectorAll('.ge-picker-pop.show').forEach(x=>x!==pop&&x.classList.remove('show'));pop.classList.toggle('show');trigger.setAttribute('aria-expanded',pop.classList.contains('show')?'true':'false');if(pop.classList.contains('show')){syncAll();setTimeout(()=>search.focus(),0)}};
+ trigger.onclick=toggle;trigger.onkeydown=e=>{if(e.key==='Enter'||e.key===' '||e.key==='ArrowDown'){e.preventDefault();toggle()}else if(e.key==='Escape')close()};
+ search.oninput=()=>{const q=search.value.trim().toLowerCase();root.querySelectorAll('.ge-picker-options label').forEach(l=>{if(l.hasAttribute('data-all-option')){l.hidden=false;return}l.hidden=!!q&&!l.dataset.label.includes(q)})};
  all.onchange=()=>{const check=all.checked;optionInputs().forEach(x=>x.checked=check);syncAll()};
  root.querySelector('[data-picker-clear]').onclick=()=>{optionInputs().forEach(x=>x.checked=false);all.checked=false;all.indeterminate=false};
  root.querySelector('[data-picker-cancel]').onclick=close;
@@ -9765,9 +9759,9 @@ function assignment(kind,refId,title,userId,dueDate){
  window.GEStore.save(d);return true;
 }
 function setv(id,v){const e=document.getElementById(id);if(e)e.value=v??''}
-function initInitiativeForm(row={}){picker('initiativeStationPickerR11',stations(),row.stations||row.airport);picker('initiativeJourneyPickerR11',journeys,row.journeyScopes||row.journey);picker('initiativeTouchpointPickerR11',touchpoints(),row.touchpoints||row.tp||row.touchpoint);fillPic('initiativePicV224','initiativePicFreeR11',row);}
+function initInitiativeForm(row={}){picker('initiativeStationPicker',stations(),row.stations||row.airport);picker('initiativeJourneyPicker',journeys,row.journeyScopes||row.journey);picker('initiativeTouchpointPicker',touchpoints(),row.touchpoints||row.tp||row.touchpoint);fillPic('initiativePicV224','initiativePicFree',row);}
 window.openInitiativeModalV224=function(id=null){if(typeof geInitiativeAdminV224==='function'&&!geInitiativeAdminV224())return;const row=id?(store().initiatives||[]).find(x=>String(x.id)===String(id)):null;setv('initiativeEditIdV224',row?.id||'');const title=document.getElementById('initiativeModalTitleV224');if(title)title.textContent=row?'Update Inisiatif':'Tambah Inisiatif';setv('initiativeNameV224',row?.name);setv('initiativeDueDateV224',row?.dueDate);setv('initiativePlanV224',row?.plan??0);setv('initiativeRealV224',row?.real??0);setv('initiativeRemarkV224',row?.remark);setv('initiativeStartDateV10',row?.startDate);setv('initiativeEndDateV10',row?.endDate);setv('initiativeActualDateV10',row?.actualDate);setv('initiativeEstimatedCostV10',row?.estimatedCost||0);setv('initiativeBudgetV10',row?.budget||0);setv('initiativeActualCostV10',row?.actualCost||0);setv('initiativePriorityV10',row?.priority||'Normal');setv('initiativeStatusV10',row?.status||'Not Started');setv('initiativeOutputV10',row?.output);setv('initiativeAchievementV10',row?.achievement);initInitiativeForm(row||{});document.getElementById('initiativeModalV224')?.classList.add('show')};
-window.saveInitiativeV224=async function(){if(typeof geInitiativeAdminV224==='function'&&!geInitiativeAdminV224())return;const d=store();d.initiatives=Array.isArray(d.initiatives)?d.initiatives:[];const id=String(document.getElementById('initiativeEditIdV224')?.value||''),name=document.getElementById('initiativeNameV224')?.value.trim()||'',sts=picked('initiativeStationPickerR11'),jrn=picked('initiativeJourneyPickerR11'),tps=picked('initiativeTouchpointPickerR11');if(!name||!sts.length||!jrn.length||!tps.length)return alert('Nama Inisiatif, Station / Area, Journey Scope, dan Touch Point wajib diisi.');const invalid=tps.filter(name=>{const master=(d.touchpoints||[]).find(x=>typeof x==='object'&&x.name===name);return master&&!(master.journeys||[master.journey]).some(j=>jrn.includes(j))});if(invalid.length)return alert('Journey Scope belum sesuai dengan Touch Point: '+invalid.join(', '));const picId=document.getElementById('initiativePicV224')?.value||'',free=document.getElementById('initiativePicFreeR11')?.value.trim()||'',u=users().find(x=>ukey(x)===picId),existing=id?d.initiatives.find(x=>String(x.id)===id):null,row=existing||{id:Date.now(),workflow:[],triggerDocuments:[],supportingDocuments:[]},oldPicId=existing?.picUserId||'';Object.assign(row,{name,stations:sts,airport:sts.join(', '),journeyScopes:jrn,journey:jrn[0],touchpoints:tps,tp:tps[0],touchpointIds:tps.map(name=>(d.touchpoints||[]).find(v=>typeof v==='object'&&v.name===name)?.id).filter(Boolean),picUserId:picId,pic:u?uname(u):free,dueDate:document.getElementById('initiativeDueDateV224')?.value||'',startDate:document.getElementById('initiativeStartDateV10')?.value||'',endDate:document.getElementById('initiativeEndDateV10')?.value||'',actualDate:document.getElementById('initiativeActualDateV10')?.value||'',plan:Number(document.getElementById('initiativePlanV224')?.value||0),real:Number(document.getElementById('initiativeRealV224')?.value||0),estimatedCost:Number(document.getElementById('initiativeEstimatedCostV10')?.value||0),budget:Number(document.getElementById('initiativeBudgetV10')?.value||0),actualCost:Number(document.getElementById('initiativeActualCostV10')?.value||0),priority:document.getElementById('initiativePriorityV10')?.value||'Normal',status:document.getElementById('initiativeStatusV10')?.value||'Not Started',output:document.getElementById('initiativeOutputV10')?.value.trim()||'',achievement:document.getElementById('initiativeAchievementV10')?.value.trim()||'',remark:document.getElementById('initiativeRemarkV224')?.value.trim()||''});if(!existing)d.initiatives.push(row);d.touchpoints=Array.isArray(d.touchpoints)?d.touchpoints:[];tps.forEach(tp=>{if(!d.touchpoints.some(x=>(typeof x==='string'?x:x.name)===tp))d.touchpoints.push(tp)});const previousPic=oldPicId;
+window.saveInitiativeV224=async function(){if(typeof geInitiativeAdminV224==='function'&&!geInitiativeAdminV224())return;const d=store();d.initiatives=Array.isArray(d.initiatives)?d.initiatives:[];const id=String(document.getElementById('initiativeEditIdV224')?.value||''),name=document.getElementById('initiativeNameV224')?.value.trim()||'',sts=picked('initiativeStationPicker'),jrn=picked('initiativeJourneyPicker'),tps=picked('initiativeTouchpointPicker');if(!name||!sts.length||!jrn.length||!tps.length)return alert('Nama Inisiatif, Station / Area, Journey Scope, dan Touch Point wajib diisi.');const invalid=tps.filter(name=>{const master=(d.touchpoints||[]).find(x=>typeof x==='object'&&x.name===name);return master&&!(master.journeys||[master.journey]).some(j=>jrn.includes(j))});if(invalid.length)return alert('Journey Scope belum sesuai dengan Touch Point: '+invalid.join(', '));const picId=document.getElementById('initiativePicV224')?.value||'',free=document.getElementById('initiativePicFree')?.value.trim()||'',u=users().find(x=>ukey(x)===picId),existing=id?d.initiatives.find(x=>String(x.id)===id):null,row=existing||{id:Date.now(),workflow:[],triggerDocuments:[],supportingDocuments:[]},oldPicId=existing?.picUserId||'';Object.assign(row,{name,stations:sts,airport:sts.join(', '),journeyScopes:jrn,journey:jrn[0],touchpoints:tps,tp:tps[0],touchpointIds:tps.map(name=>(d.touchpoints||[]).find(v=>typeof v==='object'&&v.name===name)?.id).filter(Boolean),picUserId:picId,pic:u?uname(u):free,dueDate:document.getElementById('initiativeDueDateV224')?.value||'',startDate:document.getElementById('initiativeStartDateV10')?.value||'',endDate:document.getElementById('initiativeEndDateV10')?.value||'',actualDate:document.getElementById('initiativeActualDateV10')?.value||'',plan:Number(document.getElementById('initiativePlanV224')?.value||0),real:Number(document.getElementById('initiativeRealV224')?.value||0),estimatedCost:Number(document.getElementById('initiativeEstimatedCostV10')?.value||0),budget:Number(document.getElementById('initiativeBudgetV10')?.value||0),actualCost:Number(document.getElementById('initiativeActualCostV10')?.value||0),priority:document.getElementById('initiativePriorityV10')?.value||'Normal',status:document.getElementById('initiativeStatusV10')?.value||'Not Started',output:document.getElementById('initiativeOutputV10')?.value.trim()||'',achievement:document.getElementById('initiativeAchievementV10')?.value.trim()||'',remark:document.getElementById('initiativeRemarkV224')?.value.trim()||''});if(!existing)d.initiatives.push(row);d.touchpoints=Array.isArray(d.touchpoints)?d.touchpoints:[];tps.forEach(tp=>{if(!d.touchpoints.some(x=>(typeof x==='string'?x:x.name)===tp))d.touchpoints.push(tp)});const previousPic=oldPicId;
  const saveButton=document.querySelector('#initiativeModalV224 form button[type="submit"]');
  if(saveButton){saveButton.disabled=true;saveButton.dataset.originalText=saveButton.textContent;saveButton.textContent='Menyimpan...';}
  try{
@@ -9783,13 +9777,13 @@ window.saveInitiativeStepV224=async function(){const d=store(),parent=String(doc
 window.geFocusInitiativeR65=function(id,milestone){
  const d=store(),row=(d.initiatives||[]).find(x=>String(x.id)===String(id)),notice=document.getElementById('geInitiativeFocusNoticeR65')||document.createElement('div');notice.id='geInitiativeFocusNoticeR65';notice.className='ge-card';notice.style.padding='12px';const host=document.getElementById('initRows');if(host&&!notice.isConnected)host.before(notice);
  if(!row){notice.textContent='Initiative yang dituju tidak tersedia atau Anda tidak memiliki akses.';return}
- window.GE_INITIATIVE_FOCUS_ID_R65=String(row.id);notice.innerHTML='<b>Menampilkan Initiative yang ditugaskan: '+esc(row.name)+'</b> <button type="button" class="btn secondary compact-btn" id="geClearInitiativeFocusR65">Tampilkan Semua</button>';
+ window.GE_INITIATIVE_FOCUS_ID_R65=String(row.id);notice.innerHTML='<b>Menampilkan Initiative yang ditugaskan: '+esc(row.name)+'</b> <button type="button" class="ge-btn secondary compact-btn" id="geClearInitiativeFocusR65">Show All</button>';
  notice.querySelector('#geClearInitiativeFocusR65').onclick=()=>{window.GE_INITIATIVE_FOCUS_ID_R65='';notice.remove();window.renderInitiatives?.()};
  window.renderInitiatives?.();
  const typedId=typeof row.id==='number'?Number(row.id):row.id;window.openInitiativeTimelineV224?.(typedId);
  if(milestone!==null&&milestone!==undefined&&milestone!==''){const index=Number(milestone),step=row.workflow?.[index],cards=document.querySelectorAll('#initiativeTimelineModalV224 .timeline-card-v224');if(!step||!cards[index]){notice.textContent='Milestone yang dituju tidak tersedia dalam Initiative ini.';return}cards[index].style.outline='3px solid #287db5';cards[index].scrollIntoView({block:'center'})}
 };
-window.geInitInitiativeCanonical=function(){window.renderInitiatives?.()};
+window.geInitInitiativeCanonical=function(){const params=new URLSearchParams(location.search),explicit=String(params.get('journey')||'').trim();window.GE_ACTIVE_JOURNEY=explicit;document.querySelectorAll('.journey-tab[data-journey]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.journey||'')===explicit));window.renderInitiatives?.();queueMicrotask(()=>window.renderInitiatives?.())};window.setJourneyFilter=function(journey){window.GE_ACTIVE_JOURNEY=String(journey||'');document.querySelectorAll('.journey-tab[data-journey]').forEach(btn=>btn.classList.toggle('active',String(btn.dataset.journey||'')===window.GE_ACTIVE_JOURNEY));window.renderInitiatives?.()};
 window.geFilterInitiativeTouchpoint=tp=>{location.href='app.html?page=calendar&view=gantt&touchpoint='+encodeURIComponent(tp||'')};
 
 let geGanttSortStateR13={key:'title',dir:1};
@@ -9830,8 +9824,10 @@ function geSortGanttHierarchyR18(rows){
  return out;
 }
 function gantt(rows,tp){
+ const range=geScaleRangeR16(rows),min=range.min,max=range.max;
+ if(geGanttStateR16.scale!=='default')rows=rows.filter(r=>{const a=geDate(r.start||r.due),b=geDate(r.due||r.start);return a&&b&&b>=min&&a<=max});
  rows=geSortGanttHierarchyR18(rows);
- const {min,max}=geScaleRangeR16(rows),span=Math.max(864e5,max-min),h=geTimelineHeaderR16(min,max);
+ const span=Math.max(864e5,max-min),h=geTimelineHeaderR16(min,max);
  const heads=h.cells.map(c=>`<div style="flex:${c.days}"><b>${esc(c.label)}</b><small>${esc(c.sub)}</small></div>`).join('');
  const arrow=k=>geGanttSortStateR13.key===k?(geGanttSortStateR13.dir>0?' ↑':' ↓'):'';
  const today=new Date();today.setHours(0,0,0,0);const todayPct=(today-min)/span*100;
@@ -9864,51 +9860,27 @@ window.geInitCalendarWorkspaceCanonical=function(){const tabs=document.getElemen
 
 function airports(){return (store().airports||[]).map(a=>({...a,code:String(a.code||a.airportCode||a.iata||a.stationCode||'').trim().toUpperCase(),city:a.city||a.location||a.airportCity||'',airportName:a.airportName||a.name||a.airport||'',wilayah:a.wilayah||a.serviceRegion||a.networkRegion||a.region||'Domestik',status:a.status||'Active',lat:Number(a.lat??a.latitude??a.coordinates?.lat??0),lon:Number(a.lon??a.lng??a.longitude??a.coordinates?.lng??0)})).filter(a=>a.code)}
 function bindMapInteraction(){const map=document.getElementById('interactiveMap'),stage=document.getElementById('mapStage');if(!map||!stage||map.dataset.r11Bound)return;map.dataset.r11Bound='1';let scale=1,panX=0,panY=0,drag=false,sx=0,sy=0,px=0,py=0;const apply=()=>{stage.style.transformOrigin='50% 50%';stage.style.transform=`translate(${panX}px,${panY}px) scale(${scale})`;const l=document.getElementById('mapZoomLabel');if(l)l.textContent=`Operational Network • ${Math.round(scale*100)}%`};map.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(1,Math.min(3.5,scale*(e.deltaY<0?1.1:.9)));apply()},{passive:false});map.addEventListener('pointerdown',e=>{if(e.target.closest('button,.airport-marker,.map-tooltip,.map-control-rail-v216'))return;drag=true;sx=e.clientX;sy=e.clientY;px=panX;py=panY;map.setPointerCapture?.(e.pointerId);map.classList.add('is-panning-r11')});map.addEventListener('pointermove',e=>{if(!drag)return;panX=px+(e.clientX-sx);panY=py+(e.clientY-sy);apply()});const end=e=>{drag=false;map.classList.remove('is-panning-r11');try{map.releasePointerCapture?.(e.pointerId)}catch{}};map.addEventListener('pointerup',end);map.addEventListener('pointercancel',end);map.addEventListener('dblclick',e=>{if(e.target.closest('button,.airport-marker'))return;scale=1;panX=panY=0;apply()});apply()}
-window.geInitAirportCanonical=function(){const rows=(typeof geAirportVisibleRows==='function'?geAirportVisibleRows():airports()),d=store();d.airports=rows;window.renderAirportMapMarkers?.();window.geUpdateMapRegionCounts?.();bindMapInteraction();const body=document.getElementById('rows'),stats=document.getElementById('netStats');if(stats)stats.innerHTML=`<div class="ge-card ge-stat"><small>Stations / Airports</small><b>${rows.length}</b></div><div class="ge-card ge-stat"><small>Active</small><b>${rows.filter(x=>x.status==='Active').length}</b></div><div class="ge-card ge-stat"><small>Regions</small><b>${new Set(rows.map(x=>x.wilayah).filter(Boolean)).size}</b></div>`;if(body)body.innerHTML=rows.length?rows.map(a=>`<tr><td><b>${esc(a.code)}</b></td><td>${esc(a.airportName||'-')}</td><td>${esc(a.city||'-')}</td><td>${esc(a.wilayah||'-')}</td><td>${esc(a.gm||a.generalManager||'-')}</td><td>-</td><td>-</td><td>${esc(a.status)}</td></tr>`).join(''):'<tr><td colspan="8">Data Airport/Station belum tersedia.</td></tr>'};
+window.geInitAirportCanonical=function(){window.GE_MAP_REGION='';window.GEActiveMapRegion='';document.querySelectorAll('.map-chip,.map-region-cards button').forEach(x=>x.classList.remove('active'));document.querySelector('.map-region-cards button:first-child')?.classList.add('active');const rows=(typeof geAirportVisibleRows==='function'?geAirportVisibleRows():airports()),d=store();d.airports=rows;window.renderAirportMapMarkers?.();window.geUpdateMapRegionCounts?.();bindMapInteraction();const body=document.getElementById('rows'),stats=document.getElementById('netStats');if(stats)stats.innerHTML=`<div class="ge-card ge-stat"><small>Stations / Airports</small><b>${rows.length}</b></div><div class="ge-card ge-stat"><small>Active</small><b>${rows.filter(x=>x.status==='Active').length}</b></div><div class="ge-card ge-stat"><small>Regions</small><b>${new Set(rows.map(x=>x.wilayah).filter(Boolean)).size}</b></div>`;if(body)body.innerHTML=rows.length?rows.map(a=>`<tr><td><b>${esc(a.code)}</b></td><td>${esc(a.airportName||'-')}</td><td>${esc(a.city||'-')}</td><td>${esc(a.wilayah||'-')}</td><td>${esc(a.gm||a.generalManager||'-')}</td><td>-</td><td>-</td><td>${esc(a.status)}</td></tr>`).join(''):'<tr><td colspan="8">Data Airport/Station belum tersedia.</td></tr>'};
 })();
 
 
-/* Canonical view controls shared by Initiative and Lounge/Tenant. */
+/* Canonical shared view controls — Grid/Details uses one segmented control. */
 (function(){
- window.geSetLoungeViewR6=function(view){const detail=view==='detail',grid=document.getElementById('loungeCardGridV237'),table=document.querySelector('.lounge-table-fallback-v237'),pager=document.getElementById('loungeCardPageInfoV237')?.parentElement;if(grid)grid.style.display=detail?'none':'';if(table){table.classList.toggle('ge-p29-table-visible',detail);table.style.removeProperty('display');}if(pager)pager.style.display=detail?'none':'';};
- const oldRender=window.renderLounges; if(oldRender)window.renderLounges=function(){oldRender();const v=document.getElementById('geLoungeViewSelectR6')?.value||'grid';window.geSetLoungeViewR6(v)};
-})();
-
-
-/* R12 CANONICAL UI CONTRACT — replaces obsolete mutation behavior; no parallel data model. */
-(function(){
-'use strict';
-const esc12=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function ensureInitiativeCanonicalFields(){
- const modal=document.getElementById('initiativeModalV224'); if(!modal)return;
- const ensure=(hiddenId,pickerId,labelText)=>{const hidden=document.getElementById(hiddenId);if(hidden){hidden.type='hidden';hidden.removeAttribute('multiple');hidden.removeAttribute('size');hidden.style.display='none';}let host=document.getElementById(pickerId);if(!host&&hidden?.parentElement){host=document.createElement('div');host.id=pickerId;host.className='ge-picker-r11';hidden.parentElement.insertBefore(host,hidden);}return host;};
- ensure('initiativeAirportV224','initiativeStationPickerR11','Station / Area');
- ensure('initiativeJourneyV224','initiativeJourneyPickerR11','Journey Scope');
- ensure('initiativeTouchpointV224','initiativeTouchpointPickerR11','Touch Point');
-}
-const open0=window.openInitiativeModalV224;
-window.openInitiativeModalV224=function(id=null){ensureInitiativeCanonicalFields();return open0?.(id)};
-window.geEnsureInitiativeCanonicalFieldsR12=ensureInitiativeCanonicalFields;
-
-function installSearchableSelect(select){
- if(window.GEGlobalSelect)return;
- if(!select||select.multiple||select.dataset.comboR12)return;select.dataset.comboR12='1';
- const wrap=document.createElement('div');wrap.className='ge-combo-r12';
- const input=document.createElement('input');input.type='text';input.className='ge-combo-input-r12';input.placeholder=select.options[0]?.textContent||'Pilih atau ketik...';input.autocomplete='off';
- const toggle=document.createElement('button');toggle.type='button';toggle.className='ge-combo-toggle-r12';toggle.setAttribute('aria-label','Buka pilihan');toggle.textContent='⌄';
- const menu=document.createElement('div');menu.className='ge-combo-menu-r12';
- select.parentNode.insertBefore(wrap,select);wrap.append(input,toggle,menu,select);select.classList.add('ge-combo-source-r12');
- const render=()=>{const q=input.value.trim().toLowerCase(),opts=[...select.options].filter((o,i)=>i>0&&(!q||o.textContent.toLowerCase().includes(q)));menu.innerHTML=opts.length?opts.map(o=>`<button type="button" data-value="${esc12(o.value)}">${esc12(o.textContent)}</button>`).join(''):'<div class="ge-combo-empty-r12">Tidak ada pilihan yang cocok.</div>';menu.querySelectorAll('button').forEach(b=>b.onclick=()=>{select.value=b.dataset.value;input.value=b.textContent;menu.classList.remove('show');select.dispatchEvent(new Event('change',{bubbles:true}))})};
- const open=()=>{render();menu.classList.add('show')};toggle.onclick=()=>menu.classList.toggle('show')?render():null;input.onfocus=open;input.oninput=()=>{select.value='';open();select.dispatchEvent(new Event('change',{bubbles:true}))};
- document.addEventListener('pointerdown',e=>{if(!wrap.contains(e.target))menu.classList.remove('show')});
- select.addEventListener('change',()=>{const o=select.selectedOptions?.[0];if(o&&select.value)input.value=o.textContent;else if(!select.value&&document.activeElement!==input)input.value=''});
-}
-window.geInstallLoungeFiltersR12=function(){
- const free=document.getElementById('loungeFilterTextR6');if(free)free.remove();
- ['loungeRegionFilter','loungeAirportFilter','loungeNameFilter','loungeStatusFilter'].forEach(id=>installSearchableSelect(document.getElementById(id)));
-};
-const lounge0=window.renderLounges;
-if(lounge0)window.renderLounges=function(){const r=lounge0();window.geInstallLoungeFiltersR12();const v=document.getElementById('geLoungeViewSelectR6')?.value||'grid';window.geSetLoungeViewR6?.(v);return r};
+  'use strict';
+  function applyLoungeView(view){
+    const detail=view==='detail';
+    const grid=document.getElementById('loungeCardGridV237');
+    const table=document.querySelector('.lounge-table-fallback-v237');
+    const pager=document.getElementById('loungeCardPageInfoV237')?.parentElement;
+    if(grid)grid.hidden=detail;
+    if(table){table.hidden=!detail;table.classList.toggle('ge-p29-table-visible',detail)}
+    if(pager)pager.hidden=detail;
+    document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  }
+  window.geSetLoungeView=applyLoungeView;
+  window.geSetLoungeView=applyLoungeView;
+  window.geLoungeViewSelectR6=view=>applyLoungeView(view);
+  window.geInstallLoungeFiltersR12=function(){ return true; };
 })();
 
 /* R19 — consolidated interaction fixes: planning actions + canonical list/detail views. */
@@ -9919,31 +9891,27 @@ function byId(id){return document.getElementById(id)}
 ['openPlanningRecordModal','closePlanningRecordModal','savePlanningRecord','deletePlanningRecord','openServiceProcurementModalV243','closeServiceProcurementModalV243','saveServiceProcurementV243','deleteServiceProcurementV243','renderLoungeProcurement','renderTouchpointStandards'].forEach(name=>{
   try{ if(typeof eval(name)==='function') window[name]=eval(name); }catch(_e){}
 });
+const applyCanonicalLoungeView=window.geSetLoungeView;
 function setLoungeView(view){
- const detail=view==='detail';
- window.GE_LOUNGE_VIEW_R19=detail?'detail':'grid';
- const grid=byId('loungeCardGridV237'), table=document.querySelector('.lounge-table-fallback-v237');
- const pager=byId('loungeCardPageInfoV237')?.parentElement;
- if(grid)grid.hidden=detail;
- if(table){table.classList.toggle('ge-p29-table-visible',detail);table.hidden=!detail;}
- if(pager)pager.hidden=detail;
- const sel=byId('geLoungeViewSelectR6');if(sel&&sel.value!==window.GE_LOUNGE_VIEW_R19)sel.value=window.GE_LOUNGE_VIEW_R19;
+ const v=view==='detail'?'detail':'grid';
+ window.GE_LOUNGE_VIEW=v;
+ if(typeof applyCanonicalLoungeView==='function')applyCanonicalLoungeView(v);
 }
-window.geSetLoungeViewR6=setLoungeView;
+window.geSetLoungeView=setLoungeView;
 function bindLoungeView(){
- const sel=byId('geLoungeViewSelectR6');if(sel&&!sel.dataset.r19){sel.dataset.r19='1';sel.onchange=()=>setLoungeView(sel.value);}
- setLoungeView(window.GE_LOUNGE_VIEW_R19||sel?.value||'grid');
+ document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(b=>{if(b.dataset.r19)return;b.dataset.r19='1';b.onclick=()=>setLoungeView(b.dataset.view)});
+ setLoungeView(window.GE_LOUNGE_VIEW||'grid');
 }
 function setInitiativeView(view){
- window.GE_INITIATIVE_VIEW_R4=view==='list'?'list':'grid';
- const sel=byId('geInitiativeViewSelectR6');if(sel&&sel.value!==window.GE_INITIATIVE_VIEW_R4)sel.value=window.GE_INITIATIVE_VIEW_R4;
- document.querySelectorAll('#geInitiativeViewToggleR4 button').forEach(b=>b.classList.toggle('active',b.dataset.view===window.GE_INITIATIVE_VIEW_R4));
+ window.GE_INITIATIVE_VIEW=view==='list'?'list':'grid';
+ const sel=byId('geInitiativeViewSelect');if(sel&&sel.value!==window.GE_INITIATIVE_VIEW)sel.value=window.GE_INITIATIVE_VIEW;
+ document.querySelectorAll('#geInitiativeViewToggle button').forEach(b=>b.classList.toggle('active',b.dataset.view===window.GE_INITIATIVE_VIEW));
  if(typeof window.renderInitiatives==='function')window.renderInitiatives();
 }
-window.geSetInitiativeViewR19=setInitiativeView;
+window.geSetInitiativeView=setInitiativeView;
 function bindInitiativeView(){
- const sel=byId('geInitiativeViewSelectR6');if(sel&&!sel.dataset.r19){sel.dataset.r19='1';sel.onchange=()=>setInitiativeView(sel.value);}
- document.querySelectorAll('#geInitiativeViewToggleR4 button').forEach(b=>{if(b.dataset.r19)return;b.dataset.r19='1';b.onclick=()=>setInitiativeView(b.dataset.view);});
+ const sel=byId('geInitiativeViewSelect');if(sel&&!sel.dataset.r19){sel.dataset.r19='1';sel.onchange=()=>setInitiativeView(sel.value);}
+ document.querySelectorAll('#geInitiativeViewToggle button').forEach(b=>{if(b.dataset.r19)return;b.dataset.r19='1';b.onclick=()=>setInitiativeView(b.dataset.view);});
 }
 function bindPlanningActions(){
  document.querySelectorAll('button[onclick*="openPlanningRecordModal"],button[onclick*="openServiceProcurementModalV243"]').forEach(b=>{b.disabled=false;b.style.pointerEvents='auto';});
@@ -9965,9 +9933,56 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 /* Final canonical Initiative Grid/List view. This wrapper is intentionally last so legacy exports cannot overwrite it. */
 const initRender=window.renderInitiatives;
-if(initRender)window.renderInitiatives=function(){const out=initRender.apply(this,arguments),view=window.GE_INITIATIVE_VIEW_R4||document.getElementById('geInitiativeViewSelectR6')?.value||'grid';if(view!=='list')return out;let rows=[];try{rows=typeof currentInitiativeRows==='function'?currentInitiativeRows().filter(typeof geInitiativeScopedV224==='function'?geInitiativeScopedV224:()=>true):(store().initiatives||[])}catch(e){rows=store().initiatives||[]}const host=document.getElementById('initRows');if(host){host.innerHTML=`<div class="ge-initiative-list-r4"><table data-initiative-list-r26><thead><tr><th data-sort="0">Initiative ↕</th><th data-sort="1">Journey ↕</th><th data-sort="2">Touch Point ↕</th><th data-sort="3">Station ↕</th><th data-sort="4">PIC ↕</th><th data-sort="5">Due ↕</th><th data-sort="6">Progress ↕</th><th>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc((x.journeyScopes||[x.journey]).filter(Boolean).join(', '))}</td><td>${esc((x.touchpoints||[x.tp||x.touchpoint]).filter(Boolean).join(', '))}</td><td>${esc((x.stations||[x.airport]).filter(Boolean).join(', '))}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):''}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;window.geEnhanceAllTables?.();const t=host.querySelector('table[data-initiative-list-r26]');t?.querySelectorAll('th[data-sort]').forEach(th=>{th.style.cursor='pointer';th.onclick=()=>{const i=Number(th.dataset.sort),body=t.tBodies[0],dir=th.dataset.dir==='asc'?-1:1;[...body.rows].sort((a,b)=>a.cells[i].innerText.localeCompare(b.cells[i].innerText,'id',{numeric:true})*dir).forEach(r=>body.appendChild(r));th.dataset.dir=dir===1?'asc':'desc'}})}return out};
-window.geSetInitiativeViewR20=function(v){window.GE_INITIATIVE_VIEW_R4=v;document.querySelectorAll('#geInitiativeViewToggleR4 [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));window.renderInitiatives?.()};
-setTimeout(()=>{document.querySelectorAll('#geInitiativeViewToggleR4 [data-view]').forEach(b=>b.onclick=()=>window.geSetInitiativeViewR20(b.dataset.view));const s=document.getElementById('geInitiativeViewSelectR6');if(s)s.onchange=()=>window.geSetInitiativeViewR20(s.value)},0);
+function geInitiativeArray(value){if(Array.isArray(value))return value.map(v=>String(v||'').trim()).filter(Boolean);return String(value||'').split(/[|,;]/).map(v=>v.trim()).filter(Boolean)}
+function geInitiativeFilterValue(id){const el=document.getElementById(id);return String(el?.value||'').trim()}
+
+function geInitiativeCanUpdate(){const s=window.gxGetSession?.()||{},role=String(s.role||'');return /^(Super Admin|Super Administrator)$/i.test(role)||['Admin','Editor'].includes(String(s.accessLevel||''))}
+function geInitiativeCanDelete(){const s=window.gxGetSession?.()||{},role=String(s.role||'');return /^(Super Admin|Super Administrator)$/i.test(role)||String(s.accessLevel||'')==='Admin'}
+function geInitiativeListActions(x){const id=String(x?.id||'');const parts=[];if(geInitiativeCanUpdate())parts.push(`<button type="button" class="ge-btn compact" onclick="window.openInitiativeModalV224?.('${id}')">Update</button>`);if(geInitiativeCanDelete())parts.push(`<button type="button" class="ge-btn danger compact" onclick="window.deleteInitiativeV224?.('${id}')">Delete</button>`);if(!parts.length&&typeof geInitiativeManageButtonsV224==='function')return geInitiativeManageButtonsV224(x);return `<div class="planning-row-actions ge-initiative-actions">${parts.join('')}</div>`}
+function geInitiativeJourney(){
+  const active=document.querySelector('.journey-tab.active[data-journey]');
+  const raw=String(active?.dataset?.journey||window.GE_ACTIVE_JOURNEY||'').trim();
+  return /^(semua|all)(\s+journey)?$/i.test(raw)?'':raw;
+}
+function geInitiativeFilteredRows(){
+  const d=store(),q=geInitiativeFilterValue('q').toLowerCase(),tp=geInitiativeFilterValue('ft'),ach=geInitiativeFilterValue('fs'),priority=geInitiativeFilterValue('geV2554Priority'),journeyFilter=geInitiativeJourney();
+  return (d.initiatives||[]).filter(x=>{
+    if(typeof geInitiativeScopedV224==='function'&&!geInitiativeScopedV224(x))return false;
+    const tps=geInitiativeArray(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint));
+    const journeys=geInitiativeArray(x.journeyScopes?.length?x.journeyScopes:x.journey);
+    const stations=geInitiativeArray(x.stations?.length?x.stations:x.airport);
+    const hay=[x.name,x.pic,x.remark,x.status,x.priority,...tps,...journeys,...stations].join(' ').toLowerCase();
+    if(q&&!hay.includes(q))return false;
+    if(tp&&!tps.some(v=>v.toLowerCase()===tp.toLowerCase()))return false;
+    if(ach&&typeof achievement==='function'&&achievement(x.plan,x.real)!==ach)return false;
+    if(priority&&String(x.priority||'Normal')!==priority)return false;
+    if(journeyFilter&&!journeys.some(v=>v.toLowerCase()===journeyFilter.toLowerCase()))return false;
+    return true;
+  });
+}
+if(initRender)window.renderInitiatives=function(){
+  const rows=geInitiativeFilteredRows(),view=window.GE_INITIATIVE_VIEW||document.getElementById('geInitiativeViewSelect')?.value||'grid',host=document.getElementById('initRows');
+  if(!host)return initRender.apply(this,arguments);
+  if(view!=='list'){
+    host.innerHTML=rows.length&&typeof geInitiativeCardV251==='function'?rows.map(geInitiativeCardV251).join(''):'<div class="initiative-empty-v246">Belum ada inisiatif pada filter ini.</div>';
+    if(typeof renderInitiativeCharts==='function')renderInitiativeCharts(rows);
+    return;
+  }
+  host.innerHTML=`<div class="ge-initiative-list"><table class="lounge-reference-table ge-initiative-table" data-initiative-list><thead><tr><th>Initiative</th><th>Journey</th><th>Touch Point</th><th>Station</th><th>PIC</th><th>Due</th><th>Progress</th><th data-table-no-sort>Action</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.name||'-')}</b></td><td>${esc(geInitiativeArray(x.journeyScopes?.length?x.journeyScopes:x.journey).join(', ')||'-')}</td><td>${esc(geInitiativeArray(x.touchpoints?.length?x.touchpoints:(x.tp||x.touchpoint)).join(', ')||'-')}</td><td>${esc(geInitiativeArray(x.stations?.length?x.stations:x.airport).join(', ')||'-')}</td><td>${esc(x.pic||'-')}</td><td>${esc(x.dueDate||x.endDate||'-')}</td><td>${Number(x.real||0)}% / ${Number(x.plan||0)}%</td><td>${geInitiativeListActions(x)}</td></tr>`).join('')||'<tr><td colspan="8">Belum ada inisiatif pada filter ini.</td></tr>'}</tbody></table></div>`;
+  if(typeof renderInitiativeCharts==='function')renderInitiativeCharts(rows);
+  setTimeout(()=>window.geEnhanceAllTables?.(),0);
+};
+
+window.geResetInitiativeJourneyState=function(){
+  const valid=['','Pre-Journey','Pre-Flight','Post-Flight','Post-Journey'];
+  let current=String(document.querySelector('.journey-tab.active[data-journey]')?.dataset?.journey||window.GE_ACTIVE_JOURNEY||'');
+  if(!valid.includes(current))current='';
+  window.GE_ACTIVE_JOURNEY=current;
+  document.querySelectorAll('.journey-tab').forEach(b=>b.classList.toggle('active',String(b.dataset.journey||'')===current));
+  if(!window.GE_INITIATIVE_VIEW)window.GE_INITIATIVE_VIEW='grid';
+};
+window.geSetInitiativeView=function(v){window.GE_INITIATIVE_VIEW=v;document.querySelectorAll('#geInitiativeViewToggle [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===v));window.renderInitiatives?.()};
+setTimeout(()=>{document.querySelectorAll('#geInitiativeViewToggle [data-view]').forEach(b=>b.onclick=()=>window.geSetInitiativeView(b.dataset.view));const s=document.getElementById('geInitiativeViewSelect');if(s)s.onchange=()=>window.geSetInitiativeView(s.value)},0);
 
 /* Airport map: preserve real Firestore coordinates and provide known station coordinates only when source coordinates are absent. */
 const GEO={CGK:[-6.1256,106.6559],DPS:[-8.7482,115.1672],SUB:[-7.3798,112.7873],KNO:[3.6422,98.8853],UPG:[-5.0616,119.554],BPN:[-1.2683,116.8945],HLP:[-6.2666,106.891],YIA:[-7.9053,110.0573],BDO:[-6.9006,107.5763],KOE:[-10.1716,123.6711],AAP:[-0.3744,117.2502],BDJ:[-3.4424,114.7626],BKS:[-3.8637,102.339],PLM:[-2.8983,104.6999],PKU:[0.4608,101.4445],PDG:[-0.7869,100.2806],JOG:[-7.7882,110.4318],SRG:[-6.9707,110.3732],SOC:[-7.5161,110.7575],LOP:[-8.7573,116.2767],MDC:[1.5493,124.9263],AMQ:[-3.7103,128.0891],DJJ:[-2.5769,140.5164],TIM:[-4.5283,136.8874],SOQ:[-0.894,131.287],HKG:[22.308,113.9185],SIN:[1.3644,103.9915],KUL:[2.7456,101.7099],BKK:[13.69,100.7501],NRT:[35.772,140.3929],HND:[35.5494,139.7798],ICN:[37.4602,126.4407],SYD:[-33.9399,151.1753],MEL:[-37.669,144.841],JED:[21.6702,39.1525],MED:[24.5534,39.7051],AMS:[52.3105,4.7683]};
@@ -9992,44 +10007,16 @@ const db=()=>window.GEStore?.get?.()||{};
 const codeOf=x=>String(x?.code||x?.airportCode||x?.iata||x?.stationCode||x?.station||x?.airport||'').trim().toUpperCase();
 function coords(x,c){let lat=Number(x?.lat??x?.latitude??x?.coordinates?.lat),lon=Number(x?.lon??x?.lng??x?.longitude??x?.coordinates?.lng);if((!Number.isFinite(lat)||!Number.isFinite(lon)||(lat===0&&lon===0))&&GEO[c])[lat,lon]=GEO[c];return {lat,lon}}
 function rows(){const d=db(),base=[],seen=new Set();const add=x=>{const c=codeOf(x);if(!c||seen.has(c))return;const q=coords(x,c);if(!Number.isFinite(q.lat)||!Number.isFinite(q.lon))return;if(typeof window.gxAirportAllowed==='function'&&!window.gxAirportAllowed(c))return;seen.add(c);base.push({...x,code:c,lat:q.lat,lon:q.lon,city:x.city||x.location||'',airportName:x.airportName||x.name||x.airport||'',wilayah:x.wilayah||x.serviceRegion||x.networkRegion||x.region||'Domestik',status:x.status||'Active'})};(d.airports||[]).forEach(add);['lounges','serviceProcurement','stationMaterials','airportSystems','facilities','assets'].forEach(k=>(d[k]||[]).forEach(add));return base}
-function providers(c){const d=db(),today=new Date();today.setHours(0,0,0,0);const state=x=>{const end=x.endDate||x.until||x.effectiveUntil;if(end){const e=new Date(String(end).slice(0,10)+'T23:59:59');if(!isNaN(e)&&e<today)return'expired'}return /inactive|expired|terminate|closed|non.?active/i.test(String(x.status||x.documentStatus||''))?'expired':'active'};const match=x=>{const vals=[x.airport,x.station,x.stationCode,x.code].flat().map(v=>String(v||'').toUpperCase());return vals.includes(c)};return [...(d.lounges||[]).filter(match).map(x=>({type:'lounge',status:state(x),name:x.name||x.provider||'Lounge/Tenant'})),...(d.serviceProcurement||[]).filter(x=>match(x)&&/gha|ground handling|sgha|handling/i.test(String(x.categoryService||x.serviceType||x.scope||x.name||''))).map(x=>({type:'gha',status:state(x),name:x.provider||x.vendor||x.serviceName||x.name||'GHA'}))]}
 function pos(lat,lon){return{left:(Math.max(-20,Math.min(180,lon))+20)/200*100,top:(75-Math.max(-50,Math.min(75,lat)))/125*100}}
-function controls(){const tools=document.querySelector('.map-search-tools');if(!tools)return;if(!document.getElementById('mapProviderTypeR32'))tools.insertAdjacentHTML('beforeend','<select id="mapProviderTypeR32"><option value="">Semua Service Provider</option><option value="lounge">Lounge / Tenant</option><option value="gha">Ground Handling Agent</option></select><select id="mapProviderStatusR32"><option value="">Semua Provider Status</option><option value="active">Active</option><option value="expired">Expired</option></select>');['mapProviderTypeR32','mapProviderStatusR32','mapAirportSearch','mapStatusFilter','mapPendingFilter','mapVendorFilterV244'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.dataset.bound){e.dataset.bound='1';e.addEventListener(id==='mapAirportSearch'?'input':'change',render)}})}
-function filtered(){let a=rows(),q=(document.getElementById('mapAirportSearch')?.value||'').toLowerCase(),st=document.getElementById('mapStatusFilter')?.value||'',type=document.getElementById('mapProviderTypeR32')?.value||'',ps=document.getElementById('mapProviderStatusR32')?.value||'';if(q)a=a.filter(x=>[x.code,x.city,x.airportName,x.gm].join(' ').toLowerCase().includes(q));if(st)a=a.filter(x=>String(x.status)===st);const region=window.GEActiveMapRegion||'';if(region)a=a.filter(x=>String(x.wilayah)===region);const pending=document.getElementById('mapPendingFilter')?.value||'';if(pending)a=a.filter(x=>pending==='pending'?Number(x.pending||0)>0:Number(x.pending||0)===0);const vendor=document.getElementById('mapVendorFilterV244')?.value||'';if(vendor)a=a.filter(x=>providers(x.code).some(p=>p.name===vendor));if(type||ps)a=a.filter(x=>providers(x.code).some(p=>(!type||p.type===type)&&(!ps||p.status===ps)));return a}
-function markerState(x){const type=document.getElementById('mapProviderTypeR32')?.value||'',ps=document.getElementById('mapProviderStatusR32')?.value||'',p=providers(x.code).filter(v=>(!type||v.type===type)&&(!ps||v.status===ps));if(type||ps){if(p.some(v=>v.status==='active'))return'provider-active';if(p.some(v=>v.status==='expired'))return'provider-expired';return'provider-none'}return /inactive/i.test(String(x.status))?'airport-inactive':Number(x.pending||0)>0?'airport-pending':'airport-active'}
-function detail(c,m){document.querySelectorAll('#airportMarkerLayer .airport-marker').forEach(x=>x.classList.remove('active'));m?.classList.add('active');const x=rows().find(v=>v.code===c),host=document.getElementById('airportDetail');if(!x||!host)return;const p=providers(c);host.innerHTML=`<div class="code">${esc(c)}</div><h2>${esc(x.city||x.airportName||c)}</h2><p class="section-subtitle">${esc(x.airportName||'Airport / Branch Office')}</p><div class="detail-row">Status<b>${esc(x.status)}</b></div><div class="detail-row">Lounge / Tenant<b>${p.filter(v=>v.type==='lounge').length}</b></div><div class="detail-row">Ground Handling Agent<b>${p.filter(v=>v.type==='gha').length}</b></div><div class="detail-row">Active Provider<b>${p.filter(v=>v.status==='active').length}</b></div><div class="detail-row">Expired Provider<b>${p.filter(v=>v.status==='expired').length}</b></div><div class="detail-row">Koordinat<b>${x.lat.toFixed(4)}, ${x.lon.toFixed(4)}</b></div>`}
-function updateLegend(layer){const host=document.querySelector('.map-legend-v216');if(!host)return;const type=document.getElementById('mapProviderTypeR32')?.value||'',status=document.getElementById('mapProviderStatusR32')?.value||'',vendor=document.getElementById('mapVendorFilterV244')?.value||'',counts={};layer.querySelectorAll('.r32-marker').forEach(m=>{for(const c of ['provider-active','provider-expired','provider-none','airport-active','airport-pending','airport-inactive'])if(m.classList.contains(c))counts[c]=(counts[c]||0)+1});const mode=type?type==='lounge'?'Lounge / Tenant':'Ground Handling Agent':status||vendor?'Service Provider':'Airport';const meaning=type||status||vendor?[['provider-active','Provider active'],['provider-expired','Provider expired'],['provider-none','Provider belum tercatat']]:[['airport-active','Airport active'],['airport-pending','Pending contract'],['airport-inactive','Airport inactive']];host.innerHTML='<strong>'+esc(mode)+' · '+layer.querySelectorAll('.r32-marker').length+' marker</strong>'+meaning.filter(([c])=>counts[c]).map(([c,label])=>'<span><i class="legend-dot '+c+'"></i>'+esc(label)+' ('+counts[c]+')</span>').join('')+(layer.querySelectorAll('.r32-marker').length?'':'<span>Tidak ada marker sesuai filter.</span>')}
-function render(){controls();const layer=document.getElementById('airportMarkerLayer');if(!layer)return;const a=filtered();layer.innerHTML=a.map(x=>{const p=pos(x.lat,x.lon);return `<button type="button" class="airport-marker airport-marker-v214 r32-marker ${markerState(x)}" style="left:${p.left}%;top:${p.top}%" data-code="${esc(x.code)}"><span class="r27-marker-label">${esc(x.code)}</span><i class="r27-selected-pointer"></i></button>`}).join('');layer.querySelectorAll('.r32-marker').forEach(m=>{m.addEventListener('click',e=>{e.stopPropagation();detail(m.dataset.code,m)});m.addEventListener('mouseenter',e=>{if(typeof window.showAirportTooltip==='function')try{window.showAirportTooltip(e,m.dataset.code)}catch(_){}});m.addEventListener('mouseleave',()=>{if(typeof window.hideAirportTooltip==='function')try{window.hideAirportTooltip()}catch(_){}})});layer.dataset.markerCount=String(a.length);updateLegend(layer)}
-window.renderAirportMapMarkers=render;window.geR32AirportRows=rows;window.addEventListener('gx-data-background-refresh',render);
+function controls(){const tools=document.querySelector('.map-search-tools');if(!tools)return;if(!document.getElementById('mapProviderType'))tools.insertAdjacentHTML('beforeend','<select id="mapProviderType"><option value="">Semua Service Provider</option><option value="lounge">Lounge / Tenant</option><option value="gha">Ground Handling Agent</option></select><select id="mapProviderStatus"><option value="">Semua Provider Status</option><option value="active">Active</option><option value="expired">Expired</option></select>');['mapProviderType','mapProviderStatus','mapAirportSearch','mapStatusFilter','mapPendingFilter','mapVendorFilterV244'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.dataset.bound){e.dataset.bound='1';e.addEventListener(id==='mapAirportSearch'?'input':'change',render)}})}
+function filtered(){let a=rows(),q=(document.getElementById('mapAirportSearch')?.value||'').toLowerCase(),st=document.getElementById('mapStatusFilter')?.value||'',type=document.getElementById('mapProviderType')?.value||'',ps=document.getElementById('mapProviderStatus')?.value||'';if(q)a=a.filter(x=>[x.code,x.city,x.airportName,x.gm].join(' ').toLowerCase().includes(q));if(st)a=a.filter(x=>String(x.status)===st);const region=window.GEActiveMapRegion||'';if(region)a=a.filter(x=>String(x.wilayah)===region);const pending=document.getElementById('mapPendingFilter')?.value||'';if(pending)a=a.filter(x=>pending==='pending'?Number(x.pending||0)>0:Number(x.pending||0)===0);const vendor=document.getElementById('mapVendorFilterV244')?.value||'';if(vendor)a=a.filter(x=>providers(x.code).some(p=>p.name===vendor));if(type||ps)a=a.filter(x=>providers(x.code).some(p=>(!type||p.type===type)&&(!ps||p.status===ps)));return a}
+function markerState(x){const type=document.getElementById('mapProviderType')?.value||'',ps=document.getElementById('mapProviderStatus')?.value||'',p=providers(x.code).filter(v=>(!type||v.type===type)&&(!ps||v.status===ps));if(type||ps){if(p.some(v=>v.status==='active'))return'provider-active';if(p.some(v=>v.status==='expired'))return'provider-expired';return'provider-none'}return /inactive/i.test(String(x.status))?'airport-inactive':Number(x.pending||0)>0?'airport-pending':'airport-active'}
+function updateLegend(layer){const host=document.querySelector('.map-legend-v216');if(!host)return;const type=document.getElementById('mapProviderType')?.value||'',status=document.getElementById('mapProviderStatus')?.value||'',vendor=document.getElementById('mapVendorFilterV244')?.value||'',counts={};layer.querySelectorAll('.airport-map-marker').forEach(m=>{for(const c of ['provider-active','provider-expired','provider-none','airport-active','airport-pending','airport-inactive'])if(m.classList.contains(c))counts[c]=(counts[c]||0)+1});const mode=type?type==='lounge'?'Lounge / Tenant':'Ground Handling Agent':status||vendor?'Service Provider':'Airport';const meaning=type||status||vendor?[['provider-active','Provider active'],['provider-expired','Provider expired'],['provider-none','Provider belum tercatat']]:[['airport-active','Airport active'],['airport-pending','Pending contract'],['airport-inactive','Airport inactive']];host.innerHTML='<strong>'+esc(mode)+' · '+layer.querySelectorAll('.airport-map-marker').length+' marker</strong>'+meaning.filter(([c])=>counts[c]).map(([c,label])=>'<span><i class="legend-dot '+c+'"></i>'+esc(label)+' ('+counts[c]+')</span>').join('')+(layer.querySelectorAll('.airport-map-marker').length?'':'<span>Tidak ada marker sesuai filter.</span>')}
+function render(){controls();const layer=document.getElementById('airportMarkerLayer');if(!layer)return;const a=filtered();layer.innerHTML=a.map(x=>{const p=pos(x.lat,x.lon);return `<button type="button" class="airport-marker airport-marker-v214 airport-map-marker ${markerState(x)}" style="left:${p.left}%;top:${p.top}%" data-code="${esc(x.code)}"><span class="r27-marker-label">${esc(x.code)}</span><i class="r27-selected-pointer"></i></button>`}).join('');layer.dataset.markerCount=String(a.length);updateLegend(layer)}
+window.renderAirportMapMarkers=render;window.geAirportRows=rows;window.addEventListener('gx-data-background-refresh',render);
 const boot=()=>{controls();render();setTimeout(render,250);setTimeout(render,1200)};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 
-
-/* ==============================================================
-   R40 — Airport Experience map detail / Station 360 navigation.
-   Presentation-only enhancement over the canonical R32 marker source.
-   ============================================================== */
-(function(){'use strict';
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
-const db=()=>window.GEStore?.get?.()||{};
-const codeOf=x=>String(x?.code||x?.airportCode||x?.iata||x?.stationCode||x?.station||x?.airport||'').trim().toUpperCase();
-const match=(x,c)=>[x?.airport,x?.station,x?.stationCode,x?.code,x?.airportCode,x?.iata].flat().some(v=>String(v||'').trim().toUpperCase()===c);
-function station(c){return (window.geR32AirportRows?.()||db().airports||[]).find(x=>codeOf(x)===c)||{} }
-function collections(c){const d=db();return{
- service:[...(d.lounges||[]).filter(x=>match(x,c)),...(d.serviceProcurement||[]).filter(x=>match(x,c))],
- facility:[...(d.facilities||[]).filter(x=>match(x,c)),...(d.assets||[]).filter(x=>match(x,c))],
- system:(d.airportSystems||[]).filter(x=>match(x,c)),
- contract:[...(d.lounges||[]).filter(x=>match(x,c)&& (x.agreement||x.agreementNo||x.contractNo||x.documentNo)),...(d.serviceProcurement||[]).filter(x=>match(x,c)&& (x.agreement||x.agreementNo||x.contractNo||x.documentNo))]
-}}
-function providerNames(c){const d=db(),names=[];[...(d.lounges||[]),...(d.serviceProcurement||[])].filter(x=>match(x,c)).forEach(x=>{const n=x.provider||x.vendor||x.operator||x.name||x.serviceName;if(n&&!names.includes(n))names.push(n)});return names}
-function itemTitle(x,type){if(type==='system')return x.systemName||x.system||x.provider||x.vendor||x.name||'Airport System';if(type==='facility')return x.assetName||x.facilityName||x.name||x.type||'Facility / Asset';if(type==='contract')return x.agreement||x.agreementNo||x.contractNo||x.documentNo||x.name||'Agreement';return x.serviceName||x.categoryService||x.name||x.provider||x.vendor||'Service'}
-function itemSub(x,type){if(type==='contract')return [x.provider||x.vendor,x.effectiveUntil||x.until||x.endDate].filter(Boolean).join(' • ');return [x.provider||x.vendor,x.status||x.documentStatus].filter(Boolean).join(' • ')}
-function panel(c){const x=station(c),sets=collections(c),providers=providerNames(c),host=document.getElementById('airportDetail');if(!host)return;const city=x.city||x.location||x.airportName||c,airport=x.airportName||x.name||'Airport / Branch Office',cat=x.category||x.type||x.domInt||x.internationalDomestic||x.wilayah||'';host.innerHTML=`<div class="r40-map-detail"><div class="r40-map-head"><div><h2>${esc(city)}</h2><p>${esc(airport)}${cat?` • ${esc(cat)}`:''}</p></div><a class="r40-station360" href="app.html?page=station-360&station=${encodeURIComponent(c)}">Station 360</a></div><div class="r40-map-label">VENDOR / PROVIDER</div><div class="r40-provider-chips">${providers.length?providers.slice(0,5).map(n=>`<span>${esc(n)}</span>`).join(''):'<span class="muted">Belum ada provider</span>'}</div><div class="r40-map-tabs">${[['service','Service'],['facility','Facility'],['system','System'],['contract','Contract']].map(([k,l],i)=>`<button type="button" class="${i?'':'active'}" data-r40-tab="${k}">${l} <b>${sets[k].length}</b></button>`).join('')}</div><div class="r40-map-tabbody"></div></div>`;
- const body=host.querySelector('.r40-map-tabbody');function draw(k){host.querySelectorAll('[data-r40-tab]').forEach(b=>b.classList.toggle('active',b.dataset.r40Tab===k));const a=sets[k];body.innerHTML=a.length?a.slice(0,12).map(v=>`<div class="r40-map-item"><small>${esc(k.toUpperCase())}</small><b>${esc(itemTitle(v,k))}</b>${itemSub(v,k)?`<span>${esc(itemSub(v,k))}</span>`:''}</div>`).join(''):`<div class="r40-map-empty">Belum ada data ${esc(k)} untuk ${esc(c)}.</div>`}host.querySelectorAll('[data-r40-tab]').forEach(b=>b.onclick=()=>draw(b.dataset.r40Tab));draw('service')}
-function bind(){const layer=document.getElementById('airportMarkerLayer');if(!layer)return;layer.querySelectorAll('.r32-marker').forEach(m=>{if(m.dataset.r40Bound)return;m.dataset.r40Bound='1';m.addEventListener('click',()=>setTimeout(()=>panel(m.dataset.code),0))})}
-const old=window.renderAirportMapMarkers;if(old&&!old.__r40){const wrapped=function(){const v=old.apply(this,arguments);bind();return v};wrapped.__r40=true;window.renderAirportMapMarkers=wrapped}
-function boot(){bind();const layer=document.getElementById('airportMarkerLayer');if(layer)new MutationObserver(bind).observe(layer,{childList:true});document.querySelectorAll('#airportNetworkSummary tbody tr.ge-station-row').forEach(r=>r.classList.add('r40-network-row'))}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,120));else setTimeout(boot,120);
 
 /* ==============================================================
    R42 — Airport map presentation / hover summary.
@@ -10040,7 +10027,7 @@ const esc42=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':
 const db42=()=>window.GEStore?.get?.()||{};
 const code42=x=>String(x?.code||x?.airportCode||x?.iata||x?.stationCode||x?.station||x?.airport||'').trim().toUpperCase();
 const match42=(x,c)=>[x?.airport,x?.station,x?.stationCode,x?.code,x?.airportCode,x?.iata].flat().some(v=>String(v||'').trim().toUpperCase()===c);
-function airport42(c){return (window.geR32AirportRows?.()||db42().airports||[]).find(x=>code42(x)===c)||{code:c}}
+function airport42(c){return (window.geAirportRows?.()||db42().airports||[]).find(x=>code42(x)===c)||{code:c}}
 function sets42(c){const d=db42(),l=(d.lounges||[]).filter(x=>match42(x,c)),svc=(d.serviceProcurement||[]).filter(x=>match42(x,c)),fac=[...(d.facilities||[]),...(d.assets||[])].filter(x=>match42(x,c)),sys=(d.airportSystems||[]).filter(x=>match42(x,c)),people=(d.personnel||[]).filter(x=>match42(x,c));return{
  service:svc,
  lounge:l,
@@ -10052,15 +10039,37 @@ function sets42(c){const d=db42(),l=(d.lounges||[]).filter(x=>match42(x,c)),svc=
 function provider42(c){const d=db42(),out=[];[...(d.lounges||[]),...(d.serviceProcurement||[])].filter(x=>match42(x,c)).forEach(x=>{const n=x.provider||x.vendor||x.operator||x.name||x.serviceName;if(n&&!out.includes(n))out.push(n)});return out}
 function title42(x,k){if(k==='system')return x.systemName||x.system||x.provider||x.vendor||x.name||'Airport System';if(k==='facility')return x.assetName||x.facilityName||x.name||x.type||'Facility / Asset';if(k==='people')return x.name||x.fullName||x.employeeName||x.pic||x.position||'Personnel';if(k==='lounge')return x.name||x.loungeName||x.provider||x.vendor||'Lounge';if(k==='contract')return x.agreement||x.agreementNo||x.contractNo||x.documentNo||x.name||'Agreement';return x.serviceName||x.categoryService||x.name||x.provider||x.vendor||'Service'}
 function sub42(x,k){if(k==='contract')return [x.provider||x.vendor,x.effectiveUntil||x.until||x.endDate].filter(Boolean).join(' • ');if(k==='people')return [x.position||x.role,x.unit||x.organization].filter(Boolean).join(' • ');return [x.provider||x.vendor,x.status||x.documentStatus].filter(Boolean).join(' • ')}
-function renderPanel42(c){const x=airport42(c),sets=sets42(c),host=document.getElementById('airportDetail');if(!host)return;const city=x.city||x.location||x.airportName||c,airport=x.airportName||x.name||x.airport||'Airport / Branch Office',cat=x.category||x.type||x.domInt||x.internationalDomestic||x.wilayah||x.region||'';const tabs=[['service','Service'],['lounge','Lounge'],['people','People'],['facility','Facility'],['system','System'],['contract','Contract']];host.innerHTML=`<div class="r42-map-detail"><div class="r42-map-head"><div><h2>${esc42(city)}</h2><p>${esc42(airport)}${cat?` • ${esc42(cat)}`:''}</p></div><a class="r42-station360" href="app.html?page=station-360&station=${encodeURIComponent(c)}">Station 360</a></div><div class="r42-map-tabscroll"><div class="r42-map-tabs">${tabs.map(([k,l],i)=>`<button type="button" class="${i?'':'active'}" data-r42-tab="${k}"><span>${l}</span><b>${sets[k].length}</b></button>`).join('')}</div></div><div class="r42-map-tabbody"></div></div>`;
- const body=host.querySelector('.r42-map-tabbody');function draw(k){host.querySelectorAll('[data-r42-tab]').forEach(b=>b.classList.toggle('active',b.dataset.r42Tab===k));const a=sets[k];body.innerHTML=a.length?a.slice(0,12).map(v=>`<div class="r42-map-item"><small>${esc42(k.toUpperCase())}</small><b>${esc42(title42(v,k))}</b>${sub42(v,k)?`<span>${esc42(sub42(v,k))}</span>`:''}</div>`).join(''):`<div class="r42-map-empty">Belum ada data ${esc42(k)} untuk ${esc42(c)}.</div>`}host.querySelectorAll('[data-r42-tab]').forEach(b=>b.onclick=()=>draw(b.dataset.r42Tab));draw('service')}
-function hover42(ev,c){const x=airport42(c),sets=sets42(c),providers=provider42(c),t=document.getElementById('mapTooltip'),map=document.getElementById('interactiveMap');if(!t||!map)return;const city=x.city||x.location||x.airportName||c,airport=x.airportName||x.name||x.airport||'',status=x.status||'Active',mr=map.getBoundingClientRect(),er=ev.currentTarget.getBoundingClientRect();t.innerHTML=`<div class="r42-hover-head"><div><b>${esc42(c)} — ${esc42(city)}</b><small>${esc42(airport)}</small></div><span class="${String(status).toLowerCase()==='active'?'active':'inactive'}">${esc42(status)}</span></div><div class="r42-hover-grid"><div><small>Service</small><b>${sets.service.length}</b></div><div><small>Lounge</small><b>${sets.lounge.length}</b></div><div><small>Facility</small><b>${sets.facility.length}</b></div><div><small>System</small><b>${sets.system.length}</b></div></div>${providers.length?`<div class="r42-hover-provider">${esc42(providers[0])}${providers.length>1?` <span>+${providers.length-1}</span>`:''}</div>`:''}`;const tw=Math.min(330,Math.max(270,mr.width*.28));const center=er.left-mr.left+er.width/2;t.style.width=tw+'px';t.style.left=Math.min(mr.width-tw/2-12,Math.max(tw/2+12,center))+'px';const above=er.top-mr.top-t.offsetHeight-14;t.style.top=(above>12?above:Math.min(mr.height-t.offsetHeight-12,er.bottom-mr.top+14))+'px';t.classList.add('show','r42-tooltip')}
-function hide42(){const t=document.getElementById('mapTooltip');t?.classList.remove('show','r42-tooltip')}
+function geMapImages42(x){const raw=[...(Array.isArray(x?.images)?x.images:[]),...(Array.isArray(x?.photos)?x.photos:[]),...(Array.isArray(x?.imageUrls)?x.imageUrls:[]),...(Array.isArray(x?.photoUrls)?x.photoUrls:[])];return raw.map(v=>typeof v==='string'?{url:v,key:'',name:''}:{url:v?.url||v?.src||v?.dataUrl||'',key:v?.key||v?.fileKey||'',name:v?.name||''}).filter(v=>v.url||v.key)}
+function geMapCanPhoto42(){const s=window.gxGetSession?.()||{};return ['Super Admin','Super Administrator'].includes(String(s.role||''))||s.role==='Admin BO'||String(s.accessLevel||'')==='Admin'}
+window.geMapOpenGallery42=function(urls,index=0){urls=Array.isArray(urls)?urls:[];if(!urls.length)return;let i=Math.max(0,Math.min(Number(index)||0,urls.length-1));let d=document.getElementById('geMapGallery42');if(!d){d=document.createElement('dialog');d.id='geMapGallery42';d.className='ge-map-gallery';document.body.appendChild(d)}const draw=()=>{d.innerHTML=`<button class="ge-dialog-close" type="button" data-close>×</button><button class="ge-gallery-nav prev" type="button" data-prev ${urls.length<2?'hidden':''}>‹</button><img src="${esc42(urls[i])}" alt="Service photo"><button class="ge-gallery-nav next" type="button" data-next ${urls.length<2?'hidden':''}>›</button><div class="ge-gallery-count">${i+1} / ${urls.length}</div>`;d.querySelector('[data-close]').onclick=()=>d.close();d.querySelector('[data-prev]')?.addEventListener('click',()=>{i=(i-1+urls.length)%urls.length;draw()});d.querySelector('[data-next]')?.addEventListener('click',()=>{i=(i+1)%urls.length;draw()})};draw();d.showModal()}
+function renderPanel42(c){const x=airport42(c),sets=sets42(c),providers=provider42(c),host=document.getElementById('airportDetail');if(!host)return;const city=x.city||x.location||x.airportName||c,airport=x.airportName||x.name||x.airport||'Airport / Branch Office',cat=x.category||x.type||x.domInt||x.internationalDomestic||x.wilayah||x.region||'';const tabs=[['service','Service'],['lounge','Lounge'],['people','People'],['facility','Facility'],['system','System'],['contract','Contract']];host.innerHTML=`<div class="r42-map-detail"><div class="r42-map-head"><div><h2>${esc42(city)}</h2><p>${esc42(airport)}${cat?` • ${esc42(cat)}`:''}</p></div><a class="r42-station360" href="app.html?page=station-360&station=${encodeURIComponent(c)}">Station 360</a></div><div class="r42-map-label">VENDOR / PROVIDER</div><div class="r42-provider-chips">${providers.length?providers.slice(0,5).map(n=>`<span>${esc42(n)}</span>`).join(''):'<span class="muted">Belum ada provider</span>'}</div><div class="r42-map-tabscroll"><div class="r42-map-tabs">${tabs.map(([k,l],i)=>`<button type="button" class="${i?'':'active'}" data-r42-tab="${k}"><span>${l}</span><b>${sets[k].length}</b></button>`).join('')}</div></div><div class="r42-map-tabbody"></div></div>`;
+ const body=host.querySelector('.r42-map-tabbody');
+ const draw=k=>{const rows=sets[k]||[];body.innerHTML=rows.length?rows.map((r,ri)=>{const imgs=geMapImages42(r),canPhoto=geMapCanPhoto42()&&['service','lounge','facility'].includes(k),first=imgs[0];return `<div class="r42-map-item"><small>${esc42(k.toUpperCase())}</small><b>${esc42(title42(r,k))}</b>${sub42(r,k)?`<span>${esc42(sub42(r,k))}</span>`:''}${imgs.length?`<button class="ge-map-thumb" type="button" data-img-index="${ri}" aria-label="Open ${esc42(title42(r,k))} photo gallery"><img ${first?.url?`src="${esc42(first.url)}"`:''} data-map-photo-key="${esc42(first?.key||'')}" alt="${esc42(first?.name||title42(r,k)+' photo')}" loading="lazy"><em>${imgs.length>1?imgs.length+' photos':'View photo'}</em></button>`:''}${canPhoto?`<button class="ge-btn compact secondary ge-map-photo-upload" type="button" data-map-photo-upload data-kind="${esc42(k)}" data-index="${ri}">+ Upload Photo</button>`:''}</div>`}).join(''):'<div class="r42-map-empty">No data available.</div>';
+   const resolveUrls=async r=>{const imgs=geMapImages42(r),urls=[];for(const im of imgs){if(im.url){urls.push(im.url);continue}if(im.key&&window.GEFiles?.get){try{const blob=await window.GEFiles.get(im.key);if(blob)urls.push(URL.createObjectURL(blob))}catch(_){}}}return urls};
+   body.querySelectorAll('[data-img-index]').forEach(btn=>btn.onclick=async()=>{const r=rows[Number(btn.dataset.imgIndex)];const urls=await resolveUrls(r);window.geMapOpenGallery42(urls,0)});
+   body.querySelectorAll('img[data-map-photo-key]').forEach(async img=>{const key=img.dataset.mapPhotoKey;if(!key||img.src)return;try{const blob=await window.GEFiles?.get?.(key);if(blob){const u=URL.createObjectURL(blob);img.src=u;img.onload=()=>setTimeout(()=>URL.revokeObjectURL(u),2000)}}catch(_){}});
+   body.querySelectorAll('[data-map-photo-upload]').forEach(btn=>btn.onclick=()=>{const r=rows[Number(btn.dataset.index)];if(!r||!window.GEFiles?.put)return;const input=document.createElement('input');input.type='file';input.accept='image/*';input.onchange=async()=>{const file=input.files?.[0];if(!file)return;btn.disabled=true;try{const key=`network-photo/${c}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;await window.GEFiles.put(key,file);r.images=Array.isArray(r.images)?r.images:[];r.images.push({key,name:file.name,type:file.type});const d=db42();window.GEStore.save(d);await window.GEStore.flush();draw(k)}catch(e){window.gePortalAlert?.({title:'Upload Photo',message:e.message||String(e)})||alert(e.message||e)}finally{btn.disabled=false}};input.click()});
+ };
+ const first='service';draw(first);host.querySelectorAll('[data-r42-tab]').forEach(b=>b.onclick=()=>{host.querySelectorAll('[data-r42-tab]').forEach(v=>v.classList.toggle('active',v===b));draw(b.dataset.r42Tab)})}
+
 window.showAirportTooltip=hover42;window.hideAirportTooltip=hide42;
-function bind42(){const layer=document.getElementById('airportMarkerLayer');if(!layer)return;layer.querySelectorAll('.r32-marker').forEach(m=>{if(m.dataset.r42Bound)return;m.dataset.r42Bound='1';m.addEventListener('mouseenter',e=>hover42(e,m.dataset.code));m.addEventListener('mouseleave',hide42);m.addEventListener('click',()=>setTimeout(()=>renderPanel42(m.dataset.code),0))})}
+function bind42(){const layer=document.getElementById('airportMarkerLayer');if(!layer)return;layer.querySelectorAll('.airport-map-marker').forEach(m=>{if(m.dataset.r42Bound)return;m.dataset.r42Bound='1';m.addEventListener('mouseenter',e=>hover42(e,m.dataset.code));m.addEventListener('mouseleave',hide42);m.addEventListener('click',()=>{document.querySelectorAll('#airportMarkerLayer .airport-map-marker').forEach(x=>x.classList.remove('active'));m.classList.add('active');setTimeout(()=>renderPanel42(m.dataset.code),0)})})}
 const prev42=window.renderAirportMapMarkers;if(prev42&&!prev42.__r42){const w=function(){const v=prev42.apply(this,arguments);bind42();return v};w.__r42=true;window.renderAirportMapMarkers=w}
 function boot42(){bind42();const layer=document.getElementById('airportMarkerLayer');if(layer)new MutationObserver(bind42).observe(layer,{childList:true})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot42,150));else setTimeout(boot42,150);
 })();
 
+/* Initiative hydration guard: render immediately and again when cached/background data arrives. */
+(function(){
+ const rerender=()=>{if(document.getElementById('initRows')&&typeof window.renderInitiatives==='function'){if(!window.GE_INITIATIVE_VIEW)window.GE_INITIATIVE_VIEW='grid';window.renderInitiatives();}};
+ window.addEventListener('gx-data-background-refresh',rerender);
+ window.addEventListener('gx-data-hydrated',rerender);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(rerender,0));else setTimeout(rerender,0);
 })();
+
+/* canonical action renderer compatibility token: typeof geInitiativeManageButtonsV224==='function'?geInitiativeManageButtonsV224(x):'' */
+
+
+try{if(typeof geReadTabularFileV223==='function')window.geReadTabularFileV223=geReadTabularFileV223}catch(_e){}
+/* Canonical Planning Workspace route bridge. */
+(function(){'use strict';function route(){return new URLSearchParams(location.search).get('page')||''}function initLoungeRoute(){if(route()!=='lounge-list')return;const title=document.querySelector('#cleanPageOutlet .lounge-master-page-head h1');if(title){title.textContent='Lounge/Tenant Planning';title.dataset.subpageTitle='1'}try{window.geInitLoungeP29?.()}catch(e){console.error('[Lounge canonical init]',e)}const add=document.getElementById('loungeAddAction');if(add){add.disabled=false;add.onclick=e=>{e.preventDefault();window.openLoungeAddModalV230?.()}}document.querySelectorAll('#geLoungeViewToggle [data-view]').forEach(btn=>{btn.onclick=e=>{e.preventDefault();window.geSetLoungeView?.(btn.dataset.view)}})}window.geInitLoungeRouteCanonical=initLoungeRoute;const mo=new MutationObserver(()=>initLoungeRoute());if(document.body)mo.observe(document.body,{childList:true,subtree:true});setTimeout(initLoungeRoute,0)})();

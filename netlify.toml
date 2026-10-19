@@ -57,6 +57,13 @@
   status = 200
   force = true
 
+
+[[redirects]]
+  from = "/s/:code"
+  to = "/app.html?page=monitoring-checklist&share=:code"
+  status = 302
+  force = true
+
 [[redirects]]
   from = "/standar.html"
   to = "/app.html?page=standar"
