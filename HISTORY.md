@@ -236,3 +236,24 @@ This is the single canonical work-history file for the portal. Entries are group
 - Internal page navigation now switches the canonical `app.html` outlet in place instead of hard-reloading the shell on every sidebar/card navigation. Header/sidebar state remains persistent; route-specific Planning runtime is disposed/reloaded safely.
 - Runtime HTML/JS/CSS service-worker strategy changed to network-first to prevent a newly deployed shell from mixing with stale page/runtime assets.
 - Station scope readers use `assignedStations[]` as the canonical user field with legacy `airports[]` only as compatibility fallback.
+
+## 2026-10-16 — Persistent Shell, Firestore Scope & Airport Experience Regression Recovery
+
+### Global / Navigation
+- Removed the route-pending shell hide/reveal gate. Header and sidebar remain mounted while the content outlet changes.
+- Route changes preserve outlet height during initialization and release it after mount, preventing collapse/reflow that looked like zoom-in/zoom-out.
+- Removed the visible `Memuat data perencanaan…` placeholder from Planning Workspace routes.
+
+### Firestore / Data Visibility
+- Server station scope now reads canonical `assignedStations[]` first and uses legacy `airports[]` only as compatibility fallback.
+- Rotated the scoped browser cache schema so stale snapshots from the previous scope contract are not reused.
+- Lounge/Tenant page boot no longer requests privileged `auditLogs`; audit remains server-side after successful mutations.
+
+### Master Data & Partners
+- Master Data initialization no longer hydrates `auditLogs`, which could abort Add/Edit binding before table actions were attached.
+- Existing Add/Edit implementation and canonical modal behavior are preserved.
+
+### Airport Experience Network
+- Removed the structural assessment-foundation override from Network & Map, Station 360, Service Experience, and Capability & Classification. The foundation remains scoped to Monitoring & Assessment.
+- Restored the existing page implementations as the canonical view; station photo/gallery support remains additive only.
+- Network/Map station detail retains six operational information tabs: Service, Lounge, People, Facility, System, and Contract.

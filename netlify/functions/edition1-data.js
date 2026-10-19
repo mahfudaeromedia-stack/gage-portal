@@ -83,7 +83,9 @@ function canWrite(actor,c){
 }
 function allowedStations(actor){
   if (actor.role==='Super Admin' || (['Head Office','GE Team','Ground Experience Team'].includes(actor.role) && String(actor.accessLevel||'')==='Admin') || String(actor.scopeType||'').toUpperCase()==='ALL') return null;
-  const a=Array.isArray(actor.assignedStations)&&actor.assignedStations.length?actor.assignedStations:(Array.isArray(actor.airports)?actor.airports:[]);
+  const assigned=Array.isArray(actor.assignedStations)?actor.assignedStations:[];
+  const legacy=Array.isArray(actor.airports)?actor.airports:[];
+  const a=assigned.length?assigned:legacy;
   return new Set(a.map(x=>String(x).trim().toUpperCase()).filter(Boolean));
 }
 function stationsOf(x){
@@ -115,8 +117,6 @@ async function actorFor(event){
   if(!snap.exists) throw Object.assign(new Error('User profile not found.'),{statusCode:403,code:'PROFILE_NOT_FOUND'});
   // The authenticated UID is authoritative; a legacy profile's `id` must not override it.
   const actor={...snap.data(),id:decoded.uid};
-  if((!Array.isArray(actor.airports)||!actor.airports.length)&&Array.isArray(actor.assignedStations)) actor.airports=actor.assignedStations;
-  if((!Array.isArray(actor.loungeIds)||!actor.loungeIds.length)&&Array.isArray(actor.assignedLounges)) actor.loungeIds=actor.assignedLounges;
   if(!active(actor)) throw Object.assign(new Error('Account inactive.'),{statusCode:403,code:'ACCOUNT_INACTIVE'});
   return {db,actor};
 }
@@ -215,7 +215,7 @@ async function writeOne(db,actor,collection,action,id,raw){
     const recipient=await db.collection('users').doc(recipientId).get();if(!recipient.exists||recipient.data()?.status==='Inactive')throw Object.assign(new Error('Recipient is unavailable.'),{statusCode:400});
     const threadId=String(parent.threadId||parentSnap.id),subject=String(parent.subject||parent.title||'Pesan').replace(/^Balasan:\s*/i,'');
     for(const key of Object.keys(data))delete data[key];
-    Object.assign(data,{type:'Message',subject:'Balasan: '+subject,body:String(raw.body).trim(),threadId,replyToId:parentSnap.id,senderId:String(actor.id),senderName:actor.name||actor.username||actor.email||String(actor.id),senderArea:Array.isArray(actor.airports)?actor.airports.join(', '):actor.unit||'',recipientId,status:'Unread',notificationStatus:'Unread',destination:`app.html?page=admin&inbox=${encodeURIComponent(ref.id)}`});
+    Object.assign(data,{type:'Message',subject:'Balasan: '+subject,body:String(raw.body).trim(),threadId,replyToId:parentSnap.id,senderId:String(actor.id),senderName:actor.name||actor.username||actor.email||String(actor.id),senderArea:(Array.isArray(actor.assignedStations)&&actor.assignedStations.length?actor.assignedStations:(Array.isArray(actor.airports)?actor.airports:[])).join(', ')||actor.unit||'',recipientId,status:'Unread',notificationStatus:'Unread',destination:`app.html?page=admin&inbox=${encodeURIComponent(ref.id)}`});
   }
   if(collection==='inbox' && action==='CREATE' && !isOperationalAdmin(actor) && actor.role!=='Super Admin'){
     if(!['Article Proposal','Suggestion / Guest Book','Message'].includes(String(data.type)))throw Object.assign(new Error('Inbox category is not available for submission.'),{statusCode:403});
@@ -223,7 +223,7 @@ async function writeOne(db,actor,collection,action,id,raw){
     if(!isInboxReply){
     const users=await db.collection('users').get();inboxAudience=users.docs.filter(doc=>{const u=doc.data()||{};return u.status!=='Inactive'&&(u.role==='Super Admin'||isOperationalAdmin(u))}).map(doc=>doc.id);
     if(!inboxAudience.length)throw Object.assign(new Error('No support administrator is available.'),{statusCode:409});
-    data.destination=`app.html?page=admin&inbox=${encodeURIComponent(ref.id)}`;data.recipientId=inboxAudience.shift();data.senderId=String(actor.id);data.senderName=actor.name||actor.username||actor.email||String(actor.id);data.senderArea=Array.isArray(actor.airports)?actor.airports.join(', '):actor.unit||'';data.status='Unread';
+    data.destination=`app.html?page=admin&inbox=${encodeURIComponent(ref.id)}`;data.recipientId=inboxAudience.shift();data.senderId=String(actor.id);data.senderName=actor.name||actor.username||actor.email||String(actor.id);data.senderArea=(Array.isArray(actor.assignedStations)&&actor.assignedStations.length?actor.assignedStations:(Array.isArray(actor.airports)?actor.airports:[])).join(', ')||actor.unit||'';data.status='Unread';
     }
   }
   if(collection==='contactMessages'){
@@ -231,7 +231,7 @@ async function writeOne(db,actor,collection,action,id,raw){
     if(action==='CREATE'){
       if(admin) throw Object.assign(new Error('Support request must originate from a user.'),{statusCode:403});
       if(!String(data.subject||'').trim()||!String(data.message||'').trim())throw Object.assign(new Error('Subject and message required.'),{statusCode:400});
-      data.ownerUserId=String(actor.id);data.senderName=actor.name||actor.username||actor.email||String(actor.id);data.senderArea=Array.isArray(actor.airports)?actor.airports.join(', '):actor.unit||'';
+      data.ownerUserId=String(actor.id);data.senderName=actor.name||actor.username||actor.email||String(actor.id);data.senderArea=(Array.isArray(actor.assignedStations)&&actor.assignedStations.length?actor.assignedStations:(Array.isArray(actor.airports)?actor.airports:[])).join(', ')||actor.unit||'';
       data.messages=[{actorId:String(actor.id),senderName:actor.name||actor.username||actor.email||String(actor.id),body:String(data.message),at:data.messages?.[0]?.at||new Date().toISOString()}];
       data.status='Open';
     }else{
@@ -272,7 +272,7 @@ async function writeOne(db,actor,collection,action,id,raw){
   if(collection==='contactMessages'){
     const admin=isOperationalAdmin(actor)||actor.role==='Super Admin';
     const audience=admin?[String(prev.ownerUserId)]:[];
-    if(!admin){const users=await db.collection('users').get();users.docs.forEach(doc=>{const u=doc.data()||{};if(u.status!=='Inactive' && (u.role==='Super Admin'||(isOperationalAdmin(u)&&(!Array.isArray(u.airports)||!u.airports.length||!data.senderArea||u.airports.some(code=>String(data.senderArea).split(/[,;]+/).map(x=>x.trim()).includes(String(code))))) ))audience.push(doc.id)})}
+    if(!admin){const users=await db.collection('users').get();users.docs.forEach(doc=>{const u=doc.data()||{};if(u.status!=='Inactive' && (u.role==='Super Admin'||(isOperationalAdmin(u)&&((!Array.isArray(u.assignedStations)||!u.assignedStations.length)&&(!Array.isArray(u.airports)||!u.airports.length)||!data.senderArea||(Array.isArray(u.assignedStations)&&u.assignedStations.length?u.assignedStations:(Array.isArray(u.airports)?u.airports:[])).some(code=>String(data.senderArea).split(/[,;]+/).map(x=>x.trim()).includes(String(code))))) ))audience.push(doc.id)})}
     const last=(data.messages||[]).at(-1)||{};
     await Promise.all([...new Set(audience)].filter(Boolean).map(async uid=>{
       const messageId=`support:${ref.id}:${data.messages.length}:${uid}`;
